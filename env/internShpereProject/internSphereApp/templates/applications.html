@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+    
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <link rel="stylesheet" href="{% static 'css/applications.css' %}">
+</head>
+<body>
+    <h1>My Applications</h1>
+
+    <div class="applications-list">
+        <div class="application">
+            <h2>Software Developer Intern</h2>
+            <p>Company: Tech Corp</p>
+            <p>Status: Pending</p>
+            <button class="btn">View Application</button>
+        </div>
+
+        <div class="application">
+            <h2>Marketing Intern</h2>
+            <p>Company: Marketing Solutions</p>
+            <p>Status: Approved</p>
+            <button class="btn">View Application</button>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock nav_and_footer %}

@@ -1,31 +1,28 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #f4f4f4;
 }
 
-header {
+h1 {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
-.dashboard {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    max-width: 800px;
+.applications-list {
+    width: 80%;
     margin: 0 auto;
 }
 
-.dashboard-item {
+.application {
     background-color: white;
     padding: 20px;
+    margin-bottom: 20px;
     border-radius: 8px;
-    text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.dashboard-item h2 {
-    margin-bottom: 10px;
+.application h2 {
+    margin-top: 0;
 }
 
 .btn {

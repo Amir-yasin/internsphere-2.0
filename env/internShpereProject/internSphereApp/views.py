@@ -31,3 +31,5 @@ def company_profile(request):
     return render(request, 'company_profile.html', {'current_page': 'company_profile'})
 def student_dashboard(request):
     return render(request, 'student_dashboard.html', {'current_page': 'student_dashboard'})
+def applications(request):
+    return render(request, 'applications.html', {'current_page': 'applications'})

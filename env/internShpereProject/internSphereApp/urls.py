@@ -17,7 +17,7 @@ path('universities', views.universities , name = 'universities'),
 path('bi_weekly_report', views.bi_weekly_report , name = 'bi_weekly_report'),
 path('company_profile', views.company_profile , name = 'company_profile'),
 path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
-# path('student_profile', views.student_profile , name = 'student_profile'),
+path('applications', views.applications , name = 'applications'),
 # path('student_profile', views.student_profile , name = 'student_profile'),
 # path('student_profile', views.student_profile , name = 'student_profile'),
 
