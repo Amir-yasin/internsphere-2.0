@@ -10,31 +10,7 @@
     <link href="https://fonts.googleapis.com/css?
     family=dosis&isplay=swap" rel="stylesheet">
     <style>
-        .content-container{
-            margin-right: 10%;
-            margin-left: 10%;
-        }
-
-         
-          @keyframes bounce {
-      0% {
-          transform: translateY(0);
-      }
-      50% {
-          transform: translateY(-10px);
-      }
-      100% {
-          transform: translateY(0);
-      }
-  }
-
-  .bounce {
-      animation: bounce 2s;
-  }
-a{
-  text-decoration: none;
-}
-           
+     
           
  
     </style>
@@ -45,11 +21,7 @@ a{
 
 
 
-<section class="content-container">
 
-  <h2 class="heading" >Internship Opportunities</h2>
-  <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
-<section >
 
 <h5>We offer a variety of internships throughout the year. Check out our current opportunities below:</h5>
 
@@ -58,19 +30,19 @@ a{
        <li>
     <h3 >Marketing Intern</h3>
     <p >We are seeking a motivated and creative Marketing Intern to join our team for the summer. Applicants should have experience with social media, email campaigns, and content creation.</p>
-    <a href="{% url 'internjobs' %}">Apply Now</a>
+    <a href="{% url 'intern_opportunities' %}">Apply Now</a>
       </li>
 <br>  
       <li>
     <h3>Software Development Intern</h3>
     <p>We are looking for a talented Software Development Intern to work on exciting projects with our development team. Applicants should have experience with programming languages such as Java or Python.</p>
-    <a href="{% url 'internjobs' %}">Apply Now</a>
+    <a href="{% url 'intern_opportunities' %}">Apply Now</a>
          </li>
 <br>
          <li>
     <h3>Graphic Design Intern</h3>
     <p>We are seeking a skilled Graphic Design Intern to help create engaging visual content for our website and social media channels. Applicants should have experience with Adobe Creative Suite.</p>
-    <a href="{% url 'internjobs' %}">Apply Now</a>
+    <a href="{% url 'intern_opportunities' %}">Apply Now</a>
            </li>
        </ul>
 </section>

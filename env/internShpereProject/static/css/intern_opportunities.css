@@ -38,3 +38,26 @@ h1 {
 .btn1:hover {
     background-color: magenta;
 }
+.content-container{
+    margin-left: 10%;
+}
+
+ 
+  @keyframes bounce {
+0% {
+  transform: translateY(0);
+}
+50% {
+  transform: translateY(-10px);
+}
+100% {
+  transform: translateY(0);
+}
+}
+
+.bounce {
+animation: bounce 2s;
+}
+a{
+text-decoration: none;
+}
