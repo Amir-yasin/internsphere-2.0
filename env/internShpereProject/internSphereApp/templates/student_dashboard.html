@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Welcome, [Student Name]</h1>
+    </header>
+
+    <div class="dashboard">
+        <div class="dashboard-item">
+            <h2>Internship Opportunities</h2>
+            <p>Explore internships available for you.</p>
+            <a href="{% url 'Internships' %}" class="btn">View Opportunities</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>My Applications</h2>
+            <p>Track your internship applications.</p>
+            <a href="" class="btn">View Applications</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Profile</h2>
+            <p>Update your personal and academic profile.</p>
+            <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Submit Bi-Weekly Report</h2>
+            <p>Keep your internship progress up to date.</p>
+            <a href="{% url 'bi_weekly_report' %}" class="btn">Submit Report</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    

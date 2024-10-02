@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+  
+
+  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>InternSphere</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Aboutus.css' %}">
+    <link rel="stylesheet" type="text.css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?
+    family=dosis&isplay=swap" rel="stylesheet">
+    <style>
+     
+      
+    </style>
+    </head>
+    <body>
+     
+    
+        
+    <div class="team-container container">
+      <div class="heading">
+        <h1>About Us</h1>
+    </div>
+     <p class="text-center">Welcome to our website, where we specialize in connecting university students with internship opportunities at reputable companies. Our mission is to deliver top-notch service, prioritizing reliability, convenience, and affordability.
+
+      Established in 2023 by a group of ambitious students, Our Website has evolved significantly since its inception within the university corridors. Today, we stand poised to serve university students across Ethiopia, offering them invaluable opportunities for professional growth.
+      
+      We recognize the profound importance of bridging the gap between academia and industry, providing students with hands-on experience while offering companies access to emerging talent. Our commitment to expanding our reach reflects our dedication to inclusivity and accessibility, ensuring that students from all corners of Ethiopia can benefit from our services.
+      
+      Should you require any assistance or guidance in optimizing your platform or expanding your network, do not hesitate to reach out. We're here to support you every step of the way.</p>
+      
+      <div class="row">
+        <div class="col-md-6 ">
+          <div class="card">
+            <div class="card-body">
+          <section id="vision-mission" class="container mt-5">
+            <h2 class="text-center bold"><strong class="sphere">Vis</strong>ion</h2>
+            <p class="text-center">To foster a dynamic ecosystem where every university student in Ethiopia has access to meaningful internship opportunities, empowering them to realize their full potential and contribute to the growth and innovation of our nation's workforce.</p>
+    </div></div>
+          </section>    
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+          <section id="vision-mission" class="container mt-5">
+          <h2 class="text-center mt-5 bold">Mis<strong class="sphere">sion</strong></h2>
+          <p class="text-center">Our mission is to seamlessly connect university students with internship companies, providing reliable, convenient, and affordable services. We are committed to bridging the gap between academia and industry, facilitating experiential learning and organizational success.</p>
+        
+
+        </section>
+      </div></div>
+    </div>
+        </div>
+      </div>
+      
+
+      
+        
+    
+    <section id="core-values" class="container mt-5">
+        <h2 class="text-center bold"><strong class="sphere">Core</strong> Values</h2>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><p class="bold">Integrity:</p><p> We uphold the highest standards of honesty, transparency, and ethical conduct in all aspects of our operations.</p></li>
+            <li class="list-group-item"><p class="bold">Innovation:</p><p> We embrace creativity and continuous improvement, constantly seeking new ways to enhance the internship experience for students and companies alike.</p></li>
+            <li class="list-group-item"><p class="bold">Inclusivity:</p> <p>We believe in fostering a diverse and inclusive community where every individual is respected, valued, and given equal opportunities to succeed.</p></li>
+            <li class="list-group-item"><p class="bold">Excellence:</p> <p>We strive for excellence in everything we do, setting ambitious goals and delivering exceptional results that exceed expectations.</p></li>
+        </ul>
+    </section>
+    
+    <section id="" class="m-5 text-center ">
+        <h2 class="text-center bold">Our <strong class="sphere">Team</strong></h2>
+        <div class="row">
+            <div class="col-md-3 team">
+                <div class="card team-member">
+                    <img src=" {% static 'img/user.jpg' %} " class="card-img-top" alt="Team Member 1">
+                    <div class="card-body">
+                        <h3 class="card-title bold">John <strong class="sphere">Doe</strong> </h3>
+                        <p class="card-text">Co-founder & CEO</p>
+                        <p class="card-text">John is passionate about...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 team">
+                <div class="card team-member ">
+                    <img src="{% static 'img/user.jpg' %}" class="card-img-top" alt="Team Member 2">
+                    <div class="card-body">
+                        <h3 class="card-title bold">Jane <strong class="sphere">Smith</strong> </h3>
+                        <p class="card-text">Co-founder & CTO</p>
+                        <p class="card-text">Jane brings expertise in...</p>
+                    </div>
+                </div>
+            </div>
+        <div class="col-md-3 team">
+          <div class="card team-member ">
+              <img src="{% static 'img/user.jpg' %}" class="card-img-top text-center" alt="Team Member 1">
+              <div class="card-body">
+                  <h3 class="card-title bold">John <strong class="sphere">Doe</strong> </h3>
+                  <p class="card-text">Co-founder & CEO</p>
+                  <p class="card-text">John is passionate about...</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 team">
+        <div class="card team-member ">
+            <img src="{% static 'img/user.jpg' %}" class="card-img-top text-center" alt="Team Member 1">
+            <div class="card-body">
+                <h3 class="card-title bold">John <strong class="sphere">Doe</strong> </h3>
+                <p class="card-text">Co-founder & CEO</p>
+                <p class="card-text">John is passionate about...</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    </section>
+
+
+
+
+    </div>
+    <br><br>
+
+
+
+
+    {% endblock nav_and_footer %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="hulu.css">
+    <title>FAQ</title>
+<style>
+    body{
+        background-image: url("img/mark.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: #ffffff;
+        text-decoration: solid;
+        text-size-adjust: 30px;
+    }
+    
+    
+    @keyframes slide-in {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+    .hopp{
+        font-size: large;
+    animation: slide-in 1s ease-out both;
+    animation: forwards;
+    animation-delay: 250ms;
+
+    }
+    .hopp p{
+        animation: slide-in 2s ease-out both;
+
+    }
+    .heade{
+        font-size: 50px;
+        text-decoration: solid #dab0cd;
+    }
+  </style>
+
+</head>
+<body>
+    <div class="btn">
+    <button onclick="window.location.href='hulu/hulu.html';" class="primary-btn">Back</button>
+    </div>
+
+      <h3 class="heade">FAQ</h3>
+      <ul class="hopp">
+        <li><strong>What services do you offer?</strong></li>
+            <p>We offer web design, development, and maintenance services.</p>
+        <li><strong>How much does it cost?</strong></li>
+            <p>Our prices vary depending on the scope of the project. Contact us for a quote.</p>
+        <li><strong>How long does it take to complete a project?</strong><br></li>
+            <p>It depends on the complexity of the project. We'll give you an estimated timeline when we provide you with a quote.</p>
+      </ul>
+    </div>
+
+</body>
+</html>

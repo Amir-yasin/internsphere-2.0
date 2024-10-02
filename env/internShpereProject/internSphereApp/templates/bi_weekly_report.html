@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Bi-Weekly Report</title>
+    <link rel="stylesheet" href="{% static 'css/bi_weekly_report.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+</head>
+<body>
+    <div class="heading">
+        <h1 >Internship Bi-Weekly Report</h1>
+    </div>
+
+    <form method="post" class="bi-weekly-report-form">
+        <div class="form-row">
+            <label for="student_name">Student's Name:</label>
+            <input type="text" id="student_name" name="student_name" required>
+        </div>
+
+        <div class="form-row">
+            <label for="id_number">ID Number:</label>
+            <input type="text" id="id_number" name="id_number" required>
+        </div>
+
+        <div class="form-row">
+            <label for="section">Section:</label>
+            <input type="text" id="section" name="section" required>
+        </div>
+
+        <div class="form-row">
+            <label for="signature">Signature:</label>
+            <input type="text" id="signature" name="signature" required>
+        </div>
+
+        <div class="form-row">
+            <label for="report_number">Report Number:</label>
+            <input type="number" id="report_number" name="report_number" required>
+        </div>
+
+        <div class="form-row">
+            <label for="week_dates">For the week of (Beginning and ending date):</label>
+            <input type="text" id="week_dates" name="week_dates" required>
+        </div>
+
+        <div class="form-row">
+            <label for="hours_completed">Total Hours Completed to Date:</label>
+            <input type="number" id="hours_completed" name="hours_completed" required>
+        </div>
+
+        <div class="form-row">
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="Accounting">Accounting</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Management">Management</option>
+                <option value="Computer_Science">Computer Science</option>
+                <option value="THM">THM</option>
+            </select>
+        </div>
+
+        <h2>1. Assignment and Responsibilities</h2>
+        <div class="form-row">
+            <label for="assignment">Please give detailed information about your last week's actual assignment and responsibilities:</label>
+            <textarea id="assignment" name="assignment" rows="5" required></textarea>
+        </div>
+
+        <h2>2. Critical Analysis/Reflection</h2>
+        <div class="form-row">
+            <label for="reflection">Make a critical analysis/reflection of your experiences over the past week in terms of learning values and experiences you achieved. What did you learn? (Be specific):</label>
+            <textarea id="reflection" name="reflection" rows="5" required></textarea>
+        </div>
+
+        <h2>3. Hours Spent</h2>
+        <div class="form-row">
+            <label for="observing_hours">Observing (hours):</label>
+            <input type="number" id="observing_hours" name="observing_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="administrative_hours">Administrative (hours):</label>
+            <input type="number" id="administrative_hours" name="administrative_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="researching_hours">Researching (hours):</label>
+            <input type="number" id="researching_hours" name="researching_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="assisting_hours">Assisting (hours):</label>
+            <input type="number" id="assisting_hours" name="assisting_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="miscellaneous_hours">Miscellaneous (hours):</label>
+            <input type="number" id="miscellaneous_hours" name="miscellaneous_hours" required>
+        </div>
+
+        <h2>4. Meetings and Discussions</h2>
+        <div class="form-row">
+            <label for="meetings_discussions">Discuss briefly the nature of meetings and discussion topics, field trips, and assigned readings (if applicable) you had with the agency supervisor in which you are assigned for the internship:</label>
+            <textarea id="meetings_discussions" name="meetings_discussions" rows="5" required></textarea>
+        </div>
+
+        <h2>5. Course Relevance and Suggestions</h2>
+        <div class="form-row">
+            <label for="course_relevance">To what extent the courses you studied supported you in the internship? Were they relevant to the actual work you practiced? What content/topics do you suggest to be added for the future?</label>
+            <textarea id="course_relevance" name="course_relevance" rows="5" required></textarea>
+        </div>
+
+        <button type="submit">Submit Report</button>
+    </form>
+
+
+
+
+{% endblock nav_and_footer %}
+    
