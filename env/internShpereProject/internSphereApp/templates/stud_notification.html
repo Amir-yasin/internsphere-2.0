@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="{% static 'css/stud_notification.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <div class="heading">
+        <h1>Notifications</h1>
+    </div>
+
+    <div class="notifications-list">
+        <div class="notification">
+            <p>🔔 New internship opportunity: Software Developer at XYZ Corp.</p>
+        </div>
+
+        <div class="notification">
+            <p>🔔 Your internship application for Marketing Intern has been approved!</p>
+        </div>
+
+        <div class="notification">
+            <p>🔔 Reminder: Submit your Week 2 bi-weekly report.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    

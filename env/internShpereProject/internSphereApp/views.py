@@ -33,3 +33,13 @@ def student_dashboard(request):
     return render(request, 'student_dashboard.html', {'current_page': 'student_dashboard'})
 def applications(request):
     return render(request, 'applications.html', {'current_page': 'applications'})
+def stud_notification(request):
+    return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+# def stud_notification(request):
+#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+# def stud_notification(request):
+#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+# def stud_notification(request):
+#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+# def stud_notification(request):
+#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
