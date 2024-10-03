@@ -34,19 +34,61 @@
                         <a class="nav-link links" href="{% url 'about' %}">About Us</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
+                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Student Services</a>
                         <ul class="dropdown-menu">
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'student_dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'student_profile' %}">Profile</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="dropdown-item" href="{% url 'intern_opportunities' %}">Internships</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="{% url 'Graduate_students' %}">Graduate Students</a> 
+                                <a class="dropdown-item" href="{% url 'bi_weekly_report' %}">Submit Reports</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="{% url 'post_internship' %}">Companies</a>
+                                <a class="dropdown-item" href="{% url 'applications' %}">Applications</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'Graduate_students' %}">Graduate Students</a> 
+                            </li>
+                            
                         </ul>
                     </li>
+                    
+                   
+                    <li class="nav-item dropdown">
+                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Company Services</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'company_profile' %}">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'post_internship' %}">Post Internship</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'view_applicants' %}">Applicants</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'accepted_interns' %}">Accepted Interns</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'attendance' %}">Attendance</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="{% url 'evaluate_intern' %}">Evaluation</a> 
+                            </li>
+                           
+                        </ul>
+                    </li>
+                    
+
+
                     <li class="nav-item">
                         <a class="nav-link links" href="{% url 'contact' %}">Contact Us</a>
                     </li>
