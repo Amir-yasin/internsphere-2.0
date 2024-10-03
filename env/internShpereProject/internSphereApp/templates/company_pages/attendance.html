@@ -1,0 +1,44 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Intern Attendance</title>
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+</head>
+<body>
+<div class="heading">
+    <h1>Manage Intern Attendance</h1>
+</div>
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th>Intern Name</th>
+                <th>Attendance (hours)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John Doe</td>
+                <td>40 hours</td>
+                <td>Completed</td>
+            </tr>
+            <tr>
+                <td>Jane Smith</td>
+                <td>35 hours</td>
+                <td>Pending</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+
+
+{% endblock nav_and_footer %}
+    

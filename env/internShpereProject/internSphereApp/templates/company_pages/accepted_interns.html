@@ -1,0 +1,38 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Accepted Interns</title>
+    <link rel="stylesheet" href="{% static 'css/accepted_interns.css' %}">
+</head>
+<body>
+<div class="heading">
+    <h1>Manage Accepted Interns</h1>
+</div>
+    <div class="intern-list">
+        <div class="intern">
+            <h2>John Doe</h2>
+            <p>Position: Software Developer Intern</p>
+            <a href="validate_weekly_report.html" class="btn1">Validate Weekly Report</a>
+            <a href="final_report.html" class="btn1">View Final Report</a>
+        </div>
+
+        <div class="intern">
+            <h2>Jane Smith</h2>
+            <p>Position: Marketing Intern</p>
+            <a href="validate_weekly_report.html" class="btn1">Validate Weekly Report</a>
+            <a href="final_report.html" class="btn1">View Final Report</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+{% endblock nav_and_footer %}
+    

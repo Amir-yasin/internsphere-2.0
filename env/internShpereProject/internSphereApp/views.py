@@ -1,7 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-# main pages
+# main pages views
+
 def home(request):
     return render(request, 'main_pages/index.html', {'current_page': 'home'})
 def about(request):
@@ -17,7 +18,7 @@ def services(request):
 
 
 
-# student pages
+# student pages views
 
 def Graduate_students(request):
     return render(request, 'student_pages/Graduate_students.html', {'current_page': 'Graduate_students'})
@@ -38,7 +39,8 @@ def stud_notification(request):
 
 
 
-# company pages
+# company pages views
+
 def post_internship(request):
     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
 def company_profile(request):
@@ -47,11 +49,10 @@ def company_dashboard(request):
     return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard'})
 def view_applicants(request):
     return render(request, 'company_pages/view_applicants.html', {'current_page': 'view_applicants'})
-# def stud_notification(request):
-
-#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
-# def stud_notification(request):
-#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+def attendance(request):
+    return render(request, 'company_pages/attendance.html', {'current_page': 'attendance'})
+def accepted_interns(request):
+    return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 # def stud_notification(request):
 #     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
 
