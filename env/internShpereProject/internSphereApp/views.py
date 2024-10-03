@@ -2,39 +2,39 @@ from django.shortcuts import render
 
 # Create your views here.
 def home(request):
-    return render(request, 'index.html', {'current_page': 'home'})
+    return render(request, 'main_pages/index.html', {'current_page': 'home'})
 def about(request):
-    return render(request, 'About.html', {'current_page': 'about'})
+    return render(request, 'main_pages/About.html', {'current_page': 'about'})
 def companies(request):
-    return render(request, 'companies.html', {'current_page': 'companies'})
+    return render(request, 'company_pages/companies.html', {'current_page': 'companies'})
 def contact(request):
-    return render(request, 'contact.html', {'current_page': 'contact'})
+    return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
 def Graduate_students(request):
-    return render(request, 'Graduate_students.html', {'current_page': 'Graduate_students'})
+    return render(request, 'student_pages/Graduate_students.html', {'current_page': 'Graduate_students'})
 def intern_opportunities(request):
-    return render(request, 'intern_opportunities.html', {'current_page': 'intern_opportunities'})
+    return render(request, 'student_pages/intern_opportunities.html', {'current_page': 'intern_opportunities'})
 def Internships(request):
-    return render(request, 'Internships.html', {'current_page': 'Internships'})
+    return render(request, 'student_pages/Internships.html', {'current_page': 'Internships'})
 def login(request):
-    return render(request, 'login.html', {'current_page': 'login'})
+    return render(request, 'main_pages/login.html', {'current_page': 'login'})
 def register(request):
-    return render(request, 'register.html', {'current_page': 'register'})
+    return render(request, 'main_pages/register.html', {'current_page': 'register'})
 def services(request):
-    return render(request, 'services.html', {'current_page': 'services'})
+    return render(request, 'main_pages/services.html', {'current_page': 'services'})
 def student_profile(request):
-    return render(request, 'student_profile.html', {'current_page': 'student_profile'})
-def universities(request):
-    return render(request, 'universities.html', {'current_page': 'universities'})
+    return render(request, 'student_pages/student_profile.html', {'current_page': 'student_profile'})
+# def universities(request):
+#     return render(request, 'universities.html', {'current_page': 'universities'})
 def bi_weekly_report(request):
-    return render(request, 'bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
 def company_profile(request):
-    return render(request, 'company_profile.html', {'current_page': 'company_profile'})
+    return render(request, 'company_pages/company_profile.html', {'current_page': 'company_profile'})
 def student_dashboard(request):
-    return render(request, 'student_dashboard.html', {'current_page': 'student_dashboard'})
+    return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
 def applications(request):
-    return render(request, 'applications.html', {'current_page': 'applications'})
+    return render(request, 'student_pages/applications.html', {'current_page': 'applications'})
 def stud_notification(request):
-    return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+    return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 # def stud_notification(request):
 #     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
 # def stud_notification(request):
