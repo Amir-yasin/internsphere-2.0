@@ -45,9 +45,10 @@ def company_profile(request):
     return render(request, 'company_pages/company_profile.html', {'current_page': 'company_profile'})
 def company_dashboard(request):
     return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard'})
+def view_applicants(request):
+    return render(request, 'company_pages/view_applicants.html', {'current_page': 'view_applicants'})
 # def stud_notification(request):
-#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
-# def stud_notification(request):
+
 #     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
 # def stud_notification(request):
 #     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})

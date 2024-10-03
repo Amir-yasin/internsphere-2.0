@@ -19,7 +19,7 @@ path('company_profile', views.company_profile , name = 'company_profile'),
 path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
 path('applications', views.applications , name = 'applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
-# path('student_profile', views.student_profile , name = 'student_profile'),
+path('view_applicants', views.view_applicants , name = 'view_applicants'),
 
 
 

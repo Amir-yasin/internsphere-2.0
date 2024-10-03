@@ -1,0 +1,36 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Applicants</title>
+    <link rel="stylesheet" href="{% static 'css/view_applicants.css' %}">
+</head>
+<body>
+<div class="heading">
+    <h1>View Applicants</h1>
+</div>
+    <div class="applicants-list">
+        <div class="applicant">
+            <h2>John Doe</h2>
+            <p>Position Applied: Software Developer Intern</p>
+            <a href="{% url 'student_profile' %}" class="btn">View Profile</a>
+        </div>
+
+        <div class="applicant">
+            <h2>Jane Smith</h2>
+            <p>Position Applied: Marketing Intern</p>
+            <a href="{% url 'student_profile' %}" class="btn">View Profile</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+{% endblock nav_and_footer %}
+    
