@@ -1,6 +1,7 @@
 /* General Styles */
 body {
     font-family: 'Dosis', sans-serif;
+    background-color:#f4f4f4;
     margin: 0;
     padding: 0;
 }
@@ -11,6 +12,7 @@ header {
     color: white;
     padding: 20px;
     text-align: center;
+    
 }
 
 /* Navbar Styles */
