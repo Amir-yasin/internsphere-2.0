@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Dashboard</title>
     <link rel="stylesheet" href="{% static 'company_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="{% static 'qhome.css' %}">
 
 </head>
 <body>
@@ -21,18 +21,18 @@
         <div class="dashboard-item">
             <h2>Posted Internships</h2>
             <p>Total: 3</p>
-            <a href="{% url 'post_internship.html' %}" class="btn">Post New Internship</a>
+            <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
         </div>
 
         <div class="dashboard-item">
             <h2>Applications Received</h2>
             <p>Total: 15</p>
-            <a href="{% url 'view_applicants.html' %}" class="btn">View Applicants</a>
+            <a href="{% url 'post_internship' %}" class="btn1">View Applicants</a>
         </div>
 
         <div class="dashboard-item">
             <h2>Manage Interns</h2>
-            <a href="{% url 'manage_interns.html' %}" class="btn">Manage Attendance</a>
+            <a href="{% url 'post_internship' %}" class="btn1">Manage Attendance</a>
         </div>
     </div>
 </body>
