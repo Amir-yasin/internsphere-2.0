@@ -1,0 +1,81 @@
+body {
+  margin: 25px;
+  text-align: center;
+  font-family: 'Dosis', sans-serif;
+  background-color: #f6f4f4;
+}
+
+h1.heading {
+  color: rgb(169, 92, 241);
+  font-weight: bold;
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.companies-container {
+  background-color: white;
+  border: 3px solid #f1f1f1;
+  border-radius: 10px;
+  padding: 20px;
+  width: 60%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin: 3% auto;
+}
+
+.para {
+  margin: 10px 20px;
+  font-size: 18px;
+  color: #333;
+  line-height: 1.6;
+}
+
+form {
+  text-align: left;
+  margin-top: 20px;
+}
+
+label {
+  display: inline-block;
+  width: 30%;
+  font-weight: bold;
+  color: #444;
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 65%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+input[type="submit"] {
+  background-color: purple;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+input[type="submit"]:hover {
+  background-color: rgb(137, 41, 246);
+}
+
+a {
+  color: purple;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
