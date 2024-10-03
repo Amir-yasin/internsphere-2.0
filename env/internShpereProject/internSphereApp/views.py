@@ -13,8 +13,8 @@ def login(request):
     return render(request, 'main_pages/login.html', {'current_page': 'login'})
 def register(request):
     return render(request, 'main_pages/register.html', {'current_page': 'register'})
-def services(request):
-    return render(request, 'main_pages/services.html', {'current_page': 'services'})
+# def services(request):
+#     return render(request, 'main_pages/services.html', {'current_page': 'services'})
 
 
 
