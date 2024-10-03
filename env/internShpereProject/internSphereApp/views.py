@@ -53,6 +53,6 @@ def attendance(request):
     return render(request, 'company_pages/attendance.html', {'current_page': 'attendance'})
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
-# def stud_notification(request):
-#     return render(request, 'stud_notification.html', {'current_page': 'stud_notification'})
+def evaluate_intern(request):
+    return render(request, 'company_pages/evaluate_intern.html', {'current_page': 'evaluate_intern'})
 

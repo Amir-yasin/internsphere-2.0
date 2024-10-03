@@ -1,0 +1,51 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern Evaluation</title>
+    <link rel="stylesheet" href="{% static 'css/evaluate_intern.css' %}">
+</head>
+<body>
+<div class="heading">
+    <h1>Intern Evaluation</h1>
+</div>
+    <form class="evaluation-form">
+        <div class="form-group">
+            <label for="intern-name">Intern Name:</label>
+            <input type="text" id="intern-name" name="intern_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="position">Position:</label>
+            <input type="text" id="position" name="position" required>
+        </div>
+
+        <div class="form-group">
+            <label for="performance">Performance (1-10):</label>
+            <input type="number" id="performance" name="performance" min="1" max="10" required>
+        </div>
+
+        <div class="form-group">
+            <label for="skills">Skills Demonstrated:</label>
+            <textarea id="skills" name="skills" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="feedback">Feedback and Recommendations:</label>
+            <textarea id="feedback" name="feedback" rows="5" required></textarea>
+        </div>
+
+        <button type="submit" class="btn1">Submit Evaluation</button>
+    </form>
+</body>
+</html>
+
+
+{% endblock nav_and_footer %}
+    
