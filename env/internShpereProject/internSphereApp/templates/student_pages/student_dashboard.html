@@ -13,9 +13,13 @@
 </head>
 <body>
     <header>
-        <h1>Welcome, [Student Name]</h1>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p>You are logged in as {{ user.role }}</p>
+        <a href="{% url 'logout' %}">Logout</a>
     </header>
-
+    <h2></h2>
+    
+    
     <div class="dashboard">
         <div class="dashboard-item">
             <h2>Internship Opportunities</h2>

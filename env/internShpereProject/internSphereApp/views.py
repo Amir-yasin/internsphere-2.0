@@ -1,18 +1,66 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login as auth_login, authenticate, login, logout as auth_logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import * 
+from django.contrib.auth.models import User
+from .forms import UserRegistrationForm, StudentProfileForm, CompanyProfileForm
+
 
 # Create your views here.
 # main pages views
-
 def home(request):
     return render(request, 'main_pages/index.html', {'current_page': 'home'})
 def about(request):
     return render(request, 'main_pages/About.html', {'current_page': 'about'})
 def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
-def login(request):
-    return render(request, 'main_pages/login.html', {'current_page': 'login'})
-def register(request):
-    return render(request, 'main_pages/register.html', {'current_page': 'register'})
+
+
+
+def register_user(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()  
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('login')  
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = UserRegistrationForm()
+    
+    return render(request, 'main_pages/register.html', {'form': form})
+
+
+
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            # Redirect based on user type
+            if hasattr(user, 'student_profile'):
+                return redirect('student_dashboard')
+            elif hasattr(user, 'company_profile'):
+                return redirect('company_dashboard')
+            else:
+                return redirect('home')
+        else:
+            messages.error(request, 'Invalid credentials')
+            return render(request, 'main_pages/login.html')
+
+    return render(request, 'main_pages/login.html')
+
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
 # def services(request):
 #     return render(request, 'main_pages/services.html', {'current_page': 'services'})
 
@@ -30,6 +78,8 @@ def student_profile(request):
     return render(request, 'student_pages/student_profile.html', {'current_page': 'student_profile'})
 def bi_weekly_report(request):
     return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+
+# @login_required
 def student_dashboard(request):
     return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
 def applications(request):
