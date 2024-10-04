@@ -108,7 +108,7 @@
                                 <div class="text-danger">
                                     <ul>
                                         {% for error in form.phone_number.errors %}
-                                            <li>{{ error }}</li>
+                                        <p>{{ error }}</p>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -129,7 +129,7 @@
                                 <div class="text-danger">
                                     <ul>
                                         {% for error in form.user_type.errors %}
-                                            <li>{{ error }}</li>
+                                        <p>{{ error }}</p>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -148,7 +148,7 @@
                                 <div class="text-danger">
                                     <ul>
                                         {% for error in form.password1.errors %}
-                                            <li>{{ error }}</li>
+                                        <p>{{ error }}</p>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -167,7 +167,7 @@
                                     <ul>
                                         
                                         {% for error in form.password2.errors %}
-                                            <li>{{ error }}</li>
+                                        <p>{{ error }}</p>
                                         {% endfor %}
                                     </ul>
                                 </div>
