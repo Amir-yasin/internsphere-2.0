@@ -9,12 +9,15 @@ class CustomUser(AbstractUser):
     DEPARTMENT = 'Department'
     SUPERVISOR = 'Supervisor'
     ADMIN = 'Admin'
+    INTERNSHIP_OFFICE = 'internship_office'
     USER_TYPE_CHOICES = [
         (STUDENT, 'Student'),
         (COMPANY, 'Company'),
         (DEPARTMENT, 'Department'),
         (SUPERVISOR, 'Supervisor'),
         (ADMIN, 'Admin'),
+        (INTERNSHIP_OFFICE , 'internship_office'),
+
     ]
     user_type = models.CharField(max_length=50, choices=USER_TYPE_CHOICES)
     phone_number = models.CharField(max_length=15)
@@ -50,7 +53,7 @@ class Supervisor(models.Model):
 class Admin(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
 
-class InternshipOffice(models.Model):
+class Internship_Office(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='InternshipOffice_profile')
 
 

@@ -14,10 +14,8 @@
 <body>
     <header>
         <h1>Welcome, {{ user.username }}</h1>
-        <p>You are logged in as {{ user.role }}</p>
-        <a href="{% url 'logout' %}">Logout</a>
+        <p>You are logged in as a {{ user.user_type }}</p>
     </header>
-    <h2></h2>
     
     
     <div class="dashboard">
@@ -45,6 +43,11 @@
             <a href="{% url 'bi_weekly_report' %}" class="btn">Submit Report</a>
         </div>
     </div>
+    <br>
+    <br>
+    <br>
+
+    
 </body>
 </html>
 

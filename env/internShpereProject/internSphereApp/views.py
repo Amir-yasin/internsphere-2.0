@@ -42,9 +42,9 @@ def login_user(request):
             login(request, user)
             # Redirect based on user type
             if user.user_type == CustomUser.STUDENT:
-                return redirect('student_profile')
+                return redirect('student_dashboard')
             elif user.user_type == CustomUser.COMPANY:
-                return redirect('company_profile')
+                return redirect('company_dashboard')
             else:
                 return redirect('home')
         else:
