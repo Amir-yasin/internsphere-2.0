@@ -119,12 +119,13 @@
                         <div class="form-group mb-2">
                             <select id="user_type" class="form-control" name="user_type" required>
                                 <option value="">Select User Type</option> 
-                                <option value="student" {% if form.user_type.value == "student" %}selected{% endif %}>Student</option>
-                                <option value="company" {% if form.user_type.value == "company" %}selected{% endif %}>Company</option>
-                                <option value="department" {% if form.user_type.value == "department" %}selected{% endif %}>Department</option>
-                                <option value="supervisor" {% if form.user_type.value == "supervisor" %}selected{% endif %}>Supervisor</option>
-                                <option value="internship_office" {% if form.user_type.value == "internship_office" %}selected{% endif %}>Internship Office</option>
+                                <option value="Student" {% if form.user_type.value == "Student" %}selected{% endif %}>Student</option>
+                                <option value="Company" {% if form.user_type.value == "Company" %}selected{% endif %}>Company</option>
+                                <option value="Department" {% if form.user_type.value == "Department" %}selected{% endif %}>Department</option>
+                                <option value="Supervisor" {% if form.user_type.value == "Supervisor" %}selected{% endif %}>Supervisor</option>
+                                <option value="Internship Office" {% if form.user_type.value == "Internship Office" %}selected{% endif %}>Internship Office</option>
                             </select>
+                        
                             {% if form.user_type.errors %}
                                 <div class="text-danger">
                                     <ul>

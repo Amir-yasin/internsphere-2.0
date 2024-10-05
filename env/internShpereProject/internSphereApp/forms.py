@@ -1,32 +1,74 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Student, Company
+from .models import *
 from django.contrib.auth.forms import UserCreationForm
 
-# User registration form
-class UserRegistrationForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
-    phone_number = forms.CharField(max_length=15, required=True)
-    user_type = forms.ChoiceField(choices=[('student', 'Student'), ('company', 'Company'),
-                                           ('department', 'Department'), ('supervisor', 'Supervisor'),
-                                           ('internship_office', 'Internship Office')], required=True)
+class UserTypeForm(forms.Form):
+    USER_TYPE_CHOICES = [
+        ('student', 'Student'),
+        ('company', 'Company'),
+        ('department', 'Department'),
+        ('supervisor', 'Supervisor'),
+        ('internship_office', 'Internship Office')
+    ]
+    
+    user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
 
+class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'phone_number', 'user_type', 'password1', 'password2']
+        model = CustomUser
+        fields = ('first_name', 'last_name', 'username', 'phone_number', 'user_type', 'password1', 'password2')
 
-# Student profile form
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['full_name', 'email']
+        fields = ['phone_number', 'email']
 
-# Company profile form
 class CompanyProfileForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['company_name']
+        fields = ['company_name', 'address']
+
+# Repeat similar forms for Department, Supervisor, Admin
+
+
+
+
+
+
+
+
+# class UserRegistrationForm(UserCreationForm):
+#     USER_TYPE_CHOICES = [
+#         ('student', 'Student'),
+#         ('company', 'Company'),
+#         ('department', 'Department'),
+#         ('supervisor', 'Supervisor'),
+#         ('internship_office', 'Internship Office'),
+#     ]     
+    
+
+#     first_name = forms.CharField(max_length=30, required=True)
+#     last_name = forms.CharField(max_length=30, required=True)
+#     phone_number = forms.CharField(max_length=15, required=True)
+#     user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES, required=True)
+
+#     class Meta:
+#         model = User
+#         fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'password1', 'password2']
+
+
+# # Student profile form
+# class StudentProfileForm(forms.ModelForm):
+#     class Meta:
+#         model = Student
+#         fields = ['full_name', 'email']
+
+# # Company profile form
+# class CompanyProfileForm(forms.ModelForm):
+#     class Meta:
+#         model = Company
+#         fields = ['company_name']
 
 
 class LoginForm(forms.Form):

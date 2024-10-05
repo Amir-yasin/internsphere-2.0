@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import * 
 from django.contrib.auth.models import User
-from .forms import UserRegistrationForm, StudentProfileForm, CompanyProfileForm
+from .forms import *
 
 
 # Create your views here.
@@ -19,19 +19,61 @@ def contact(request):
 
 
 
+
+
+# def register_user(request):
+#     if request.method == 'POST':
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)  # Save the user but don't commit yet
+#             user.user_type = form.cleaned_data.get('user_type')  # Get the user_type from the form
+#             user.save()  # Now save the user with the user_type
+#             messages.success(request, 'Account created successfully. You can now log in.')
+#             return redirect('login')
+#         else:
+#             messages.error(request, 'Please correct the errors below.')
+#     else:
+#         form = UserRegistrationForm()
+    
+#     return render(request, 'main_pages/register.html', {'form': form})
+
+
+
 def register_user(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()  
-            messages.success(request, 'Account created successfully. You can now log in.')
-            return redirect('login')  
-        else:
-            messages.error(request, 'Please correct the errors below.')
+            user = form.save()
+            return redirect('login')
     else:
-        form = UserRegistrationForm()
-    
+        form = CustomUserCreationForm()
     return render(request, 'main_pages/register.html', {'form': form})
+
+def student_profile(request):
+    if request.method == 'POST':
+        form = StudentProfileForm(request.POST)
+        if form.is_valid():
+            student_profile = form.save(commit=False)
+            student_profile.user = request.user
+            student_profile.save()
+            return redirect('student_pages/student_dashboard')
+    else:
+        form = StudentProfileForm()
+    return render(request, 'create_student_profile.html', {'form': form})
+
+def company_profile(request):
+    if request.method == 'POST':
+        form = CompanyProfileForm(request.POST)
+        if form.is_valid():
+            company_profile = form.save(commit=False)
+            company_profile.user = request.user
+            company_profile.save()
+            return redirect('company_pages/company_dashboard')
+    else:
+        form = CompanyProfileForm()
+    return render(request, 'company_profile.html', {'form': form})
+
+
 
 
 
@@ -45,10 +87,10 @@ def login_user(request):
         if user is not None:
             login(request, user)
             # Redirect based on user type
-            if hasattr(user, 'student_profile'):
-                return redirect('student_dashboard')
-            elif hasattr(user, 'company_profile'):
-                return redirect('company_dashboard')
+            if user.user_type == CustomUser.STUDENT:
+                return redirect('student_profile')
+            elif user.user_type == CustomUser.COMPANY:
+                return redirect('company_profile')
             else:
                 return redirect('home')
         else:

@@ -4,10 +4,9 @@ from django.contrib.auth.models import User
 from .models import *
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ['username', 'email', 'first_name', 'last_name', ]
+    list_display = ['username', 'email', 'first_name', 'last_name', 'user_type' ]
 
 # Unregister the default User admin and register the custom one
-admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Student)
 admin.site.register(Company)
