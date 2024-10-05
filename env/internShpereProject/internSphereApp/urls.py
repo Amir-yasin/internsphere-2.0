@@ -7,6 +7,7 @@ path('', views.home , name = 'home'),
 path('about', views.about , name = 'about'),
 path('contact', views.contact , name = 'contact'),
 path('login', views.login_user , name = 'login'),
+path('accounts/login/', views.login_user , name = 'login'),
 path('register', views.register_user , name = 'register'),
 path('logout', views.logout, name='logout'),
 

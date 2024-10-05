@@ -33,11 +33,12 @@
                     <li class="nav-item">
                         <a class="nav-link links" href="{% url 'about' %}">About Us</a>
                     </li>
+                    
                     {% if user.is_authenticated %}
-                        {% if user.user_type == CustomUser.STUDENT %}
+                    {% if user.user_type == 'Student' %}
 
                         <li class="nav-item dropdown">
-                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Student Services</a>
+                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item">
                                 <a class="dropdown-item" href="{% url 'student_dashboard' %}">Dashboard</a>
@@ -61,9 +62,9 @@
                         </ul>
                         </li>
                     
-                        {% elif user.user_type == CustomUser.COMPANY %}
+                        {% elif user.user_type == 'Company' %}
                         <li class="nav-item dropdown">
-                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Company Services</a>
+                        <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item">
                                 <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
