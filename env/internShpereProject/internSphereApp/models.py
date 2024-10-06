@@ -30,6 +30,7 @@ class student_Profile(models.Model):
         ('F', 'Female'),
     ]
     
+    
     full_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
