@@ -90,7 +90,7 @@ def student_profile(request):
                 messages.success(request, 'Profile created successfully!')  # Success message for creation
 
 
-            return redirect('student_dashboard')
+            return redirect('view_student_profile')
     else:
         form = StudentProfileForm()
 
