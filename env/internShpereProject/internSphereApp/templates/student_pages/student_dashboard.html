@@ -12,15 +12,7 @@
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
 </head>
 <body>
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {% comment %} {{ message }} {% endcomment %}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+   
     <div class="heading">
         <h1>Student Dashboard</h1>
     </div>
