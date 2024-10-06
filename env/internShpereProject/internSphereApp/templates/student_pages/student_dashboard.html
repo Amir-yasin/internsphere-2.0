@@ -12,6 +12,15 @@
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
 </head>
 <body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="heading">
         <h1>Student Dashboard</h1>
     </div>
@@ -57,6 +66,17 @@
     {{ user.student_profile.major }} <br>
     {{ user.student_profile.skills }} <br>
     {{ user.student_profile.resume }}
+
+
+    <script>
+        // Automatically hide the message after 5 seconds (5000 milliseconds)
+        setTimeout(function() {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000);  // 5000 milliseconds = 5 seconds
+    </script>
 
 </body>
 </html>
