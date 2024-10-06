@@ -97,7 +97,9 @@ def student_profile(request):
     return render(request, 'student_pages/student_profile.html', {'form': form})
 
 
-
+@login_required
+def view_student_profile(request):
+    return render(request, 'student_pages/view_student_profile.html', {'current_page': 'view_student_profile'})
             
 
 @login_required

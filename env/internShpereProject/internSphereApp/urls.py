@@ -23,6 +23,7 @@ path('bi_weekly_report', views.bi_weekly_report , name = 'bi_weekly_report'),
 path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
 path('applications', views.applications , name = 'applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
+path('view_student_profile', views.view_student_profile , name = 'view_student_profile'),
 
 
 # company pages url
