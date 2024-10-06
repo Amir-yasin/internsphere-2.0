@@ -47,6 +47,8 @@
             <h2>Profile</h2>
             <p>Update your personal and academic profile.</p>
             <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
+            <a href="{% url 'student_profile' %}" class="btn">View Profile</a>
+
         </div>
 
         <div class="dashboard-item">
@@ -69,13 +71,12 @@
 
 
     <script>
-        // Automatically hide the message after 5 seconds (5000 milliseconds)
         setTimeout(function() {
             const messageContainer = document.getElementById('message-container');
             if (messageContainer) {
                 messageContainer.style.display = 'none';
             }
-        }, 5000);  // 5000 milliseconds = 5 seconds
+        }, 7000);  // 7000 milliseconds = 7 seconds
     </script>
 
 </body>
