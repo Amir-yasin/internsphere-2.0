@@ -125,6 +125,8 @@
 
 <head>
     <link rel="stylesheet" href="{% static 'css/student_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Profile Form</title>
@@ -134,63 +136,125 @@
     <h1>Student Profile Form</h1>
     </div>    
     <form method="post" enctype="multipart/form-data" class="profile-form">
-        <div class="form-row">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name">
-        </div>
-
-        <div class="form-row">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email">
-        </div>
-
-        <div class="form-row">
-            <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number">
-        </div>
-
-        <div class="form-row">
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender">
-                <option value="M">Male</option>
-                <option value="F">Female</option>
-            </select>
-        </div>
-
-        <div class="form-row">
-            <label for="university">University:</label>
-            <input type="text" id="university" name="university">
-        </div>
-
-        <div class="form-row">
-            <label for="major">Major:</label>
-            <input type="text" id="major" name="major">
-        </div>
-
-        <div class="form-row">
-            <label for="year_of_study">Year of Study:</label>
-            <input type="number" id="year_of_study" name="year_of_study">
-        </div>
-
-        <div class="form-row">
-            <label for="skills">Skills:</label>
-            <textarea id="skills" name="skills" rows="3"></textarea>
-        </div>
-
-        <div class="form-row">
-            <label for="resume">Upload Resume (PDF):</label>
-            <input type="file" id="resume" name="resume" accept="application/pdf">
-        </div>
-
-        <div class="form-row">
-            <label for="linkedin_profile">LinkedIn Profile (Optional):</label>
-            <input type="url" id="linkedin_profile" name="linkedin_profile">
-        </div>
-
+      {% csrf_token %}
   
+      <!-- Full Name -->
+      <div class="form-row">
+          <label for="name">Full Name:</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}
+              <div class="text-danger">
+                  {{ form.full_name.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Email Address -->
+      <div class="form-row">
+          <label for="email">Email Address:</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+              <div class="text-danger">
+                  {{ form.email.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Phone Number -->
+      <div class="form-row">
+          <label for="phone_number">Phone Number:</label>
+          {{ form.phone_number }}
+          {% if form.phone_number.errors %}
+              <div class="text-danger">
+                  {{ form.phone_number.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Gender -->
+      <div class="form-row">
+          <label for="gender">Gender:</label>
+          {{ form.gender }}
+          {% if form.gender.errors %}
+              <div class="text-danger">
+                  {{ form.gender.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- University -->
+      <div class="form-row">
+          <label for="university">University:</label>
+          {{ form.university }}
+          {% if form.university.errors %}
+              <div class="text-danger">
+                  {{ form.university.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Major -->
+      <div class="form-row">
+          <label for="major">Major:</label>
+          {{ form.major }}
+          {% if form.major.errors %}
+              <div class="text-danger">
+                  {{ form.major.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Year of Study -->
+      <div class="form-row">
+          <label for="year_of_study">Year of Study:</label>
+          {{ form.year_of_study }}
+          {% if form.year_of_study.errors %}
+              <div class="text-danger">
+                  {{ form.year_of_study.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Skills -->
+      <div class="form-row">
+          <label for="skills">Skills:</label>
+          {{ form.skills }}
+          {% if form.skills.errors %}
+              <div class="text-danger">
+                  {{ form.skills.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Resume Upload -->
+      <div class="form-row">
+          <label for="resume">Upload Resume (PDF):</label>
+          {{ form.resume }}
+          {% if form.resume.errors %}
+              <div class="text-danger">
+                  {{ form.resume.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- LinkedIn Profile (Optional) -->
+      <div class="form-row">
+          <label for="linkedin_profile">LinkedIn Profile (Optional):</label>
+          {{ form.linkedin_profile }}
+          {% if form.linkedin_profile.errors %}
+              <div class="text-danger">
+                  {{ form.linkedin_profile.errors }}
+              </div>
+          {% endif %}
+      </div>
+  
+      <!-- Submit Button -->
+      <button type="submit" >Submit Profile</button>
+  </form>
 
-        <button type="submit">Submit Profile</button>
-    </form>
+ 
+
+    <br><br>
 
 
 

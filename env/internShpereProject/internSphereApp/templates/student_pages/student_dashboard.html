@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
 </head>
 <body>
+    <div class="heading">
+        <h1>Student Dashboard</h1>
+    </div>
     <header>
         <h1>Welcome, {{ user.username }}</h1>
         <p>You are logged in as a {{ user.user_type }}</p>
@@ -47,7 +50,14 @@
     <br>
     <br>
 
-    
+  name:  {{ user.student_profile.full_name }} <br>
+    {{ user.username }} <br>
+    {{ user.student_profile.email }} <br>
+    {{ user.student_profile.phone_number }} <br>
+    {{ user.student_profile.major }} <br>
+    {{ user.student_profile.skills }} <br>
+    {{ user.student_profile.resume }}
+
 </body>
 </html>
 

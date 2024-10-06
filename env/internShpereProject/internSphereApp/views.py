@@ -71,20 +71,30 @@ def intern_opportunities(request):
 def Internships(request):
     return render(request, 'student_pages/Internships.html', {'current_page': 'Internships'})
 
-
-
 @login_required
 def student_profile(request):
     if request.method == 'POST':
-        form = StudentProfileForm(request.POST)
+        form = StudentProfileForm(request.POST, request.FILES)
         if form.is_valid():
-            student_profile = form.save(commit=False)
-            student_profile.user = request.user
-            student_profile.save()
-            return redirect('student_pages/student_dashboard')
+            # Check if profile already exists for this user
+            try:
+                student_profile = student_Profile.objects.get(user=request.user)
+                form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)  # Update existing profile
+            except student_Profile.DoesNotExist:
+                # Profile does not exist, create a new one
+                student_profile = form.save(commit=False)
+                student_profile.user = request.user
+                student_profile.save()
+
+            return redirect('student_dashboard')
     else:
         form = StudentProfileForm()
-    return render(request, 'student_pages/student_profile.html', {'form':'form','current_page': 'student_profile'})
+
+    return render(request, 'student_pages/student_profile.html', {'form': form})
+
+
+
+            
 
 @login_required
 def bi_weekly_report(request):
