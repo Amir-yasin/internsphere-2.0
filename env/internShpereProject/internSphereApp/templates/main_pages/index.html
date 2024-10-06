@@ -49,14 +49,43 @@
                                     <button onclick="window.location.href='{% url 'about' %}';" class="btn btn-primary description-btns">Learn More</button>
 
                                 </div>
-                                <div class="col-4">
-                                    <button onclick="window.location.href='{% url 'post_internship' %}';" class="btn btn-primary description-btns">Post an Internship</button>
 
-                                </div>
-                                <div class="col-4">
-                                    <button onclick="window.location.href='{% url 'register' %}';" class="btn btn-primary description-btns">Register Now</button>
+                                    {% if user.is_authenticated %}
+                                    {% if user.user_type == 'Company' %}
+                                    
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'post_internship' %}';" class="btn btn-primary description-btns">Post an Internship</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'company_dashboard' %}';" class="btn btn-primary description-btns">Dashboard</button>
+                                    </div>
 
-                                </div>
+                                    {% elif user.user_type == 'Student' %}
+
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'intern_opportunities' %}';" class="btn btn-primary description-btns">Search for Internship</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'student_dashboard' %}';" class="btn btn-primary description-btns">Dashboard</button>
+                                    </div>
+
+                                    {% else %}
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'contact' %}';" class="btn btn-primary description-btns">Contact Us</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'register' %}';" class="btn btn-primary description-btns">Register Now</button>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'contact' %}';" class="btn btn-primary description-btns">Contact Us</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button onclick="window.location.href='{% url 'register' %}';" class="btn btn-primary description-btns">Register Now</button>
+                                    </div>
+                                    {% endif %}
+                                
                             </div>
                         </div>
                     </div>

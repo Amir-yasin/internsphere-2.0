@@ -16,6 +16,10 @@
     <div class="heading">
         <h1>Company Dashboard</h1>
     </div>
+    <header>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p class="text-center">You are logged in as a {{ user.user_type }}</p>
+    </header>
     <div class="dashboard">
         <div class="dashboard-item">
             <h2>Posted Internships</h2>
