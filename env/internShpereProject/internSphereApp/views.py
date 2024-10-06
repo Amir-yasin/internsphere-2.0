@@ -80,11 +80,15 @@ def student_profile(request):
             try:
                 student_profile = student_Profile.objects.get(user=request.user)
                 form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)  # Update existing profile
+                student_profile = form.save()  # Update existing profile
+                messages.success(request, 'Profile updated successfully!') 
             except student_Profile.DoesNotExist:
                 # Profile does not exist, create a new one
                 student_profile = form.save(commit=False)
                 student_profile.user = request.user
                 student_profile.save()
+                messages.success(request, 'Profile created successfully!')  # Success message for creation
+
 
             return redirect('student_dashboard')
     else:
