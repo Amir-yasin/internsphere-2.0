@@ -6,7 +6,10 @@ from django.contrib import messages
 from .models import * 
 from django.contrib.auth.models import User
 from .forms import *
-
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
 
 # Create your views here.
 # main pages views
@@ -105,6 +108,20 @@ def view_student_profile(request):
 @login_required
 def bi_weekly_report(request):
     return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+
+
+
+
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+
 
 @login_required
 def student_dashboard(request):
