@@ -104,41 +104,46 @@ class Application(models.Model):
 
 
 # BiWeeklyReport model for Student
+from django.utils import timezone
+from django.db import models
+
 class BiWeeklyReport(models.Model):
-    ACCOUNTING, 'Accounting',
-    COMPUTER_SCIENCE, 'Computer_science',
-    MANAGEMENT, 'Management',
-    MARKETING, 'Marketing',
-    THM, 'Thm',
+    ACCOUNTING = 'Accounting'
+    COMPUTER_SCIENCE = 'Computer Science'
+    MANAGEMENT = 'Management'
+    MARKETING = 'Marketing'
+    THM = 'THM'
+
     DEPARTMENT_CHOICES = [
         (ACCOUNTING, 'Accounting'),
-        (COMPUTER_SCIENCE, 'Computer_science'),
+        (COMPUTER_SCIENCE, 'Computer Science'),
         (MANAGEMENT, 'Management'),
         (MARKETING, 'Marketing'),
-        (THM, 'Thm'),
-
+        (THM, 'THM'),
     ]
-    
+
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     profile = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+    id_number = models.CharField(max_length=100)
+    section = models.CharField(max_length=50)
     report_number = models.IntegerField()
     week_start = models.DateField()
     week_end = models.DateField()
-    total_hours = models.IntegerField()
-    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
+    total_hours_completed = models.IntegerField()
+    department_choices = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     assignment_responsibilities = models.TextField()
-    critical_analysis = models.TextField() 
+    critical_analysis = models.TextField()
     observing_hours = models.IntegerField()
-    admin_hours = models.IntegerField()
+    administrative_hours = models.IntegerField()
     researching_hours = models.IntegerField()
     assisting_hours = models.IntegerField()
     misc_hours = models.IntegerField()
     meetings_discussions = models.TextField()
-    course_relevance = models.TextField()
+    course_relevance_suggestions = models.TextField()
     date_submitted = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return f"Report {self.report_number} by {self.student.full_name}"
+        return f"Report {self.report_number} by {self.student.username}"
 
 
 

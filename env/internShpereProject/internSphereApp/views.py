@@ -107,8 +107,18 @@ def view_student_profile(request):
 
 @login_required
 def bi_weekly_report(request):
-    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+    if request.method == 'POST':
+        form = BiWeeklyReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.student = request.user  # Assign the current logged-in user
+            report.profile = student_Profile.objects.get(email=request.user.email)  # Link the student profile
+            report.save()
+            return redirect('dashboard')  # Redirect after submission
+    else:
+        form = BiWeeklyReportForm()
 
+    return render(request,  'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report','form': form})
 
 
 
@@ -122,6 +132,18 @@ def render_to_pdf(template_src, context_dict={}):
     return None
 
 
+
+def generate_pdf(request, report_id):
+    report = BiWeeklyReport.objects.get(id=report_id)
+    context = {'report': report}
+    pdf = render_to_pdf('pdf_template.html', context)
+    
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = f"Report_{report.student.username}_{report.report_number}.pdf"
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
+    return HttpResponse("Error generating PDF")
 
 @login_required
 def student_dashboard(request):
