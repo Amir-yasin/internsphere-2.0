@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your views here.
 # main pages views
@@ -111,39 +113,48 @@ def bi_weekly_report(request):
         form = BiWeeklyReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
-            report.student = request.user  # Assign the current logged-in user
-            report.profile = student_Profile.objects.get(email=request.user.email)  # Link the student profile
+            try:
+                # Try to link the student profile using the username
+                report.student_profile = student_Profile.objects.get(full_name=request.user.student_profile)
+            except student_Profile.DoesNotExist:
+                # Handle case where profile doesn't exist
+                return HttpResponse("Profile not found for the current user.", status=400)
+
+            report.user = request.user  # Link to the current logged-in user
             report.save()
-            return redirect('dashboard')  # Redirect after submission
+            return redirect('student_dashboard')  # Redirect after successful submission
     else:
         form = BiWeeklyReportForm()
 
-    return render(request,  'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report','form': form})
+    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report', 'form': form})
 
 
 
-def render_to_pdf(template_src, context_dict={}):
-    template = get_template(template_src)
-    html = template.render(context_dict)
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    return None
 
+# def render_to_pdf(template_src, context_dict={}):
+#     template = get_template(template_src)
+#     html = template.render(context_dict)
+#     result = BytesIO()
+#     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+#     if not pdf.err:
+#         return HttpResponse(result.getvalue(), content_type='application/pdf')
+#     return None
 
+# def download_report(request, report_id):
+#     # Logic to generate and return the PDF or report file
+#     return HttpResponse("This is where the report would be generated.")
 
-def generate_pdf(request, report_id):
-    report = BiWeeklyReport.objects.get(id=report_id)
-    context = {'report': report}
-    pdf = render_to_pdf('pdf_template.html', context)
+# def generate_pdf(request, report_id):
+#     report = BiWeeklyReport.objects.get(id=report_id)
+#     context = {'report': report}
+#     pdf = render_to_pdf('pdf_template.html', context)
     
-    if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = f"Report_{report.student.username}_{report.report_number}.pdf"
-        response['Content-Disposition'] = f'attachment; filename={filename}'
-        return response
-    return HttpResponse("Error generating PDF")
+#     if pdf:
+#         response = HttpResponse(pdf, content_type='application/pdf')
+#         filename = f"Report_{report.student.username}_{report.report_number}.pdf"
+#         response['Content-Disposition'] = f'attachment; filename={filename}'
+#         return response
+#     return HttpResponse("Error generating PDF")
 
 @login_required
 def student_dashboard(request):

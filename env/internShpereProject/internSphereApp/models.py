@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 
 
+
 class CustomUser(AbstractUser):
     STUDENT = 'Student'
     COMPANY = 'Company'
@@ -104,8 +105,6 @@ class Application(models.Model):
 
 
 # BiWeeklyReport model for Student
-from django.utils import timezone
-from django.db import models
 
 class BiWeeklyReport(models.Model):
     ACCOUNTING = 'Accounting'
@@ -122,8 +121,8 @@ class BiWeeklyReport(models.Model):
         (THM, 'THM'),
     ]
 
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
-    profile = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
+    student_profile = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=100)
     section = models.CharField(max_length=50)
     report_number = models.IntegerField()
@@ -141,9 +140,9 @@ class BiWeeklyReport(models.Model):
     meetings_discussions = models.TextField()
     course_relevance_suggestions = models.TextField()
     date_submitted = models.DateTimeField(default=timezone.now)
-    
+
     def __str__(self):
-        return f"Report {self.report_number} by {self.student.username}"
+        return f"Report {self.report_number} by {self.user.username}"
 
 
 
