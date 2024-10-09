@@ -169,12 +169,4 @@ class Evaluation(models.Model):
     def __str__(self):
         return f"{self.student.full_name} - {self.company.company_name}"
 
-biweeklyreportbiweeklyreport
-biweeklyreport
-biweeklyreportbiweeklyreport
-biweeklyreport
-biweeklyreport
-biweeklyreport
-biweeklyreportbiweeklyreportbiweeklyreport
-
-
+# 
