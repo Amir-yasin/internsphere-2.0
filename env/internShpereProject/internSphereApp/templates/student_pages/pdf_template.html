@@ -1,0 +1,45 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Bi-Weekly Report</h2>
+    <p><strong>Student's Name:</strong> {{ report.student.get_full_name }}</p>
+    <p><strong>ID Number:</strong> {{ report.id_number }}</p>
+    <p><strong>Section:</strong> {{ report.section }}</p>
+    <p><strong>Report Number:</strong> {{ report.report_number }}</p>
+    <p><strong>For the week of:</strong> {{ report.week_start }} - {{ report.week_end }}</p>
+    <p><strong>Total Hours Completed to Date:</strong> {{ report.total_hours_completed }}</p>
+    <p><strong>Department:</strong> {{ report.department }}</p>
+
+    <h3>1. Assignment and Responsibilities</h3>
+    <p>{{ report.assignment_responsibilities }}</p>
+
+    <h3>2. Critical Analysis/Reflection</h3>
+    <p>{{ report.critical_analysis }}</p>
+
+    <h3>3. Hours Spent</h3>
+    <p>Observing: {{ report.observing_hours }} hours</p>
+    <p>Administrative: {{ report.administrative_hours }} hours</p>
+    <p>Researching: {{ report.researching_hours }} hours</p>
+    <p>Assisting: {{ report.assisting_hours }} hours</p>
+    <p>Miscellaneous: {{ report.miscellaneous_hours }} hours</p>
+
+    <h3>4. Meetings and Discussions</h3>
+    <p>{{ report.meetings_discussions }}</p>
+
+    <h3>5. Course Relevance and Suggestions</h3>
+    <p>{{ report.course_relevance_suggestions }}</p>
+</body>
+</html>

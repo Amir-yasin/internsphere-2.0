@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
+
+
 
 class CustomUser(AbstractUser):
     STUDENT = 'Student'
@@ -103,14 +106,42 @@ class Application(models.Model):
 
 # BiWeeklyReport model for Student
 class BiWeeklyReport(models.Model):
-    student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
-    report_period_start = models.DateField()
-    report_period_end = models.DateField()
-    report_content = models.TextField()
-    submitted_at = models.DateTimeField(auto_now_add=True)
+    ACCOUNTING = 'Accounting'
+    COMPUTER_SCIENCE = 'Computer Science'
+    MANAGEMENT = 'Management'
+    MARKETING = 'Marketing'
+    THM = 'THM'
+
+    DEPARTMENT_CHOICES = [
+        (ACCOUNTING, 'Accounting'),
+        (COMPUTER_SCIENCE, 'Computer Science'),
+        (MANAGEMENT, 'Management'),
+        (MARKETING, 'Marketing'),
+        (THM, 'THM'),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
+    id_number = models.CharField(max_length=100)
+    section = models.CharField(max_length=50)
+    report_number = models.IntegerField()
+    week_start = models.DateField()
+    week_end = models.DateField()
+    total_hours_completed = models.IntegerField()
+    department_choices = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
+    assignment_responsibilities = models.TextField()
+    critical_analysis = models.TextField()
+    observing_hours = models.IntegerField()
+    administrative_hours = models.IntegerField()
+    researching_hours = models.IntegerField()
+    assisting_hours = models.IntegerField()
+    misc_hours = models.IntegerField()
+    meetings_discussions = models.TextField()
+    course_relevance_suggestions = models.TextField()
+    date_submitted = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.student.full_name} - {self.report_period_start} to {self.report_period_end}"
+        return f"Report {self.report_number} by {self.user.username}"
+
 
 
 # Attendance model for Student
@@ -135,3 +166,4 @@ class Evaluation(models.Model):
     def __str__(self):
         return f"{self.student.full_name} - {self.company.company_name}"
 
+# 

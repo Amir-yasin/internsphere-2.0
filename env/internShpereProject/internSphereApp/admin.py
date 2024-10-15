@@ -11,6 +11,7 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(student_Profile)
 admin.site.register(Company)
 admin.site.register(CustomUser)
+admin.site.register(BiWeeklyReport)
 
 
 # from .models import *

@@ -1,0 +1,78 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
+
+<style>
+
+.dashboard-item{
+    width:50%;
+    margin:0 0 0 25%;
+    border: 2px solid purple;
+
+}
+</style>
+
+<body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {% comment %} {{ message }} {% endcomment %}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="heading">
+        <h1>Student Profile</h1>
+    </div>
+    <header>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p>You are logged in as a {{ user.user_type }}</p>
+    </header>
+    
+
+
+        <div class="dashboard-item">
+            Full Name: {{ user.student_profile.full_name }} <br>
+            {% comment %} {{ user.first_name }} <br>
+            {{ user.last_name }} <br> {% endcomment %}
+            User Name: {{ user.username }} <br>
+            Email Address: {{ user.student_profile.email }} <br>
+            Phone Number {{ user.student_profile.phone_number }} <br>
+            Major: {{ user.student_profile.major }} <br>
+            Skills: {{ user.student_profile.skills }} <br>
+            Resume: {{ user.student_profile.resume }}
+          
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+
+
+    <script>
+        setTimeout(function() {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 7000);  // 7000 milliseconds = 7 seconds
+    </script>
+
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    

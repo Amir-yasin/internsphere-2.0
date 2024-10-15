@@ -32,8 +32,29 @@ class CompanyProfileForm(forms.ModelForm):
         model = Company
         fields = ['company_name', 'address']
 
-# Repeat similar forms for Department, Supervisor, Admin
 
+class DepartmentChoicesForm(forms.Form):
+    DEPARTMENT_CHOICES = [
+        ('accounting', 'Accounting'),
+        ('computer_science', 'Computer Science'),
+        ('management', 'Management'),
+        ('marketing', 'Marketing'),
+        ('thm', 'THM'),
+    ]
+    department = forms.ChoiceField(choices=DEPARTMENT_CHOICES)
+
+
+class BiWeeklyReportForm(forms.ModelForm):
+    class Meta:
+        model = BiWeeklyReport
+        fields = [
+            'id_number', 'section', 'report_number', 'week_start', 'week_end', 
+            'total_hours_completed', 'department_choices', 'assignment_responsibilities', 
+            'critical_analysis', 'observing_hours', 'administrative_hours', 
+            'researching_hours', 'assisting_hours', 'misc_hours', 
+            'meetings_discussions', 'course_relevance_suggestions'
+        ]
+        exclude = ['user', 'student_profile', 'date_submitted']
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))

@@ -6,7 +6,11 @@ from django.contrib import messages
 from .models import * 
 from django.contrib.auth.models import User
 from .forms import *
-
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 # main pages views
@@ -83,26 +87,61 @@ def student_profile(request):
                 student_profile = form.save()  # Update existing profile
                 messages.success(request, 'Profile updated successfully!') 
             except student_Profile.DoesNotExist:
-                # Profile does not exist, create a new one
                 student_profile = form.save(commit=False)
                 student_profile.user = request.user
                 student_profile.save()
                 messages.success(request, 'Profile created successfully!')  # Success message for creation
 
 
-            return redirect('student_dashboard')
+            return redirect('view_student_profile')
     else:
         form = StudentProfileForm()
 
     return render(request, 'student_pages/student_profile.html', {'form': form})
 
 
-
+@login_required
+def view_student_profile(request):
+    return render(request, 'student_pages/view_student_profile.html', {'current_page': 'view_student_profile'})
             
 
 @login_required
+
 def bi_weekly_report(request):
-    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+    # Check if the request method is POST (for form submission)
+    if request.method == 'POST':
+        form = BiWeeklyReportForm(request.POST)
+        if form.is_valid():
+            # Create a report instance, but don't save it to the database yet (commit=False)
+            report = form.save
+            # Set the user who submitted the report
+            report.user = request.user
+            report.save()
+
+            # Give feedback and redirect after successful form submission
+            messages.success(request, "Bi-weekly report submitted successfully.")
+            return redirect('student_dashboard')
+        else:
+            # Log or display form errors
+            print(form.errors)
+            messages.error(request, "There was an error with your submission.")
+    else:
+        # If it's a GET request, just display the form
+        form = BiWeeklyReportForm()
+
+    # Render the bi-weekly report template, passing in the form
+    return render(request, 'student_pages/bi_weekly_report.html', {
+        'current_page': 'bi_weekly_report',
+        'form': form
+    })
+
+
+
+
+
+
+
+
 
 @login_required
 def student_dashboard(request):
