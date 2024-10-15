@@ -54,7 +54,7 @@ class BiWeeklyReportForm(forms.ModelForm):
             'researching_hours', 'assisting_hours', 'misc_hours', 
             'meetings_discussions', 'course_relevance_suggestions'
         ]
-        exclude = ['student', 'profile', 'date_submitted'] 
+        exclude = ['user', 'student_profile', 'date_submitted']
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
