@@ -88,7 +88,6 @@ def student_profile(request):
                 student_profile = form.save()  # Update existing profile
                 messages.success(request, 'Profile updated successfully!') 
             except student_Profile.DoesNotExist:
-                # Profile does not exist, create a new one
                 student_profile = form.save(commit=False)
                 student_profile.user = request.user
                 student_profile.save()
