@@ -40,7 +40,7 @@
     </html>
 
 
-
+{% comment %} 
     {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
@@ -80,7 +80,7 @@
 </table>
 {% else %}
 <p>No reports submitted yet.</p>
-{% endif %}
+{% endif %} {% endcomment %}
 
 
 
