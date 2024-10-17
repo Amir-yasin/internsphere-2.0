@@ -47,6 +47,4 @@ path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
 # path('attendance', views.attendance , name = 'attendance'),
 path('attendance', views.attendance , name = 'attendance'),
 
-
-
 ]
