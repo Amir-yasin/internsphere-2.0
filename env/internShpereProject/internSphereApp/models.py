@@ -61,6 +61,7 @@ class Department(models.Model):
     def __str__(self):
         return self.department_name
 
+
 class Supervisor(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor_profile')
     supervisor_name = models.CharField(max_length=100)
