@@ -1,91 +1,57 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
+from django.utils import timezone
 
+# Custom User Model
 class CustomUser(AbstractUser):
-    STUDENT = 'Student'
-    COMPANY = 'Company'
-    DEPARTMENT = 'Department'
-    SUPERVISOR = 'Supervisor'
-    ADMIN = 'Admin'
-    INTERNSHIP_OFFICE = 'internship_office'
-    USER_TYPE_CHOICES = [
-        (STUDENT, 'Student'),
-        (COMPANY, 'Company'),
-        (DEPARTMENT, 'Department'),
-        (SUPERVISOR, 'Supervisor'),
-        (ADMIN, 'Admin'),
-        (INTERNSHIP_OFFICE , 'internship_office'),
-
-    ]
+    USER_TYPE_CHOICES = (
+        ('Student', 'Student'),
+        ('Company', 'Company'),
+        ('Department', 'Department'),
+        ('Supervisor', 'Supervisor'),
+        ('Admin', 'Admin'),
+        ('InternshipCareerOffice', 'Internship & Career Office'),
+    )
     user_type = models.CharField(max_length=50, choices=USER_TYPE_CHOICES)
-    phone_number = models.CharField(max_length=15)
 
-class student_Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': CustomUser.STUDENT})
+# Student Profile
+class StudentProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
+    batch = models.CharField(max_length=10)
+    section = models.CharField(max_length=10)
+    temporary_password = models.CharField(max_length=100)
+    profile_completed = models.BooleanField(default=False)
 
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-    ]
-    
-    full_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=15)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    university = models.CharField(max_length=100)
-    major = models.CharField(max_length=100)
-    year_of_study = models.CharField(max_length=2)
-    skills = models.CharField(max_length=1000)
-    resume = models.FileField(upload_to='resumes/')
-    linkedin_profile = models.URLField(blank=True, null=True)
-
-    def __str__(self):
-        return self.full_name
-
-
-class Company(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='company_profile')
+# Company Profile
+class CompanyProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
     company_name = models.CharField(max_length=100)
-    address = models.CharField(max_length=255)
+    approved = models.BooleanField(default=False)
 
-class Department(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='department_profile')
-    department_name = models.CharField(max_length=100)
-    contact_email = models.EmailField()
+# Department Profile
+class DepartmentProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Department'})
 
-    def __str__(self):
-        return self.department_name
+# Supervisor Profile
+class SupervisorProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Supervisor'})
 
-class Supervisor(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor_profile')
-    supervisor_name = models.CharField(max_length=100)
-    contact_email = models.EmailField()
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+# Internship and Career Office
+class InternshipCareerOfficeProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'InternshipCareerOffice'})
 
-    def __str__(self):
-        return self.supervisor_name
-
-class Admin(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
-
-class Internship_Office(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='InternshipOffice_profile')
-
-
-# Internship model linked to Company
-class Internship(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+# Internship Posting
+class InternshipPosting(models.Model):
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
     location = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    posted_on = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=10, default='Open')  # Open or Closed
+        
     def __str__(self):
         return self.title
 
@@ -102,15 +68,23 @@ class Application(models.Model):
 
 
 # BiWeeklyReport model for Student
-class BiWeeklyReport(models.Model):
-    student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
-    report_period_start = models.DateField()
-    report_period_end = models.DateField()
-    report_content = models.TextField()
-    submitted_at = models.DateTimeField(auto_now_add=True)
+# class BiWeeklyReport(models.Model):
+#     student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+#     report_period_start = models.DateField()
+#     report_period_end = models.DateField()
+#     report_content = models.TextField()
+#     submitted_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.student.full_name} - {self.report_period_start} to {self.report_period_end}"
+#     def __str__(self):
+#         return f"{self.student.full_name} - {self.report_period_start} to {self.report_period_end}"
+# Bi-Weekly Report
+class BiWeeklyReport(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    report_number = models.IntegerField()
+    content = models.TextField()
+
+# Other relevant models (Final Reports, Evaluation, Attendance, etc.) follow similar structure.
 
 
 # Attendance model for Student
