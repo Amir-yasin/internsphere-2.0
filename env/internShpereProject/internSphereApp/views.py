@@ -102,10 +102,22 @@ def student_profile(request):
 
 @login_required
 def bi_weekly_report(request):
+    if request.method == 'POST':
+        form = BiWeeklyReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.student = request.user.student_Profile
+            report.company = CompanyProfile.objects.get(user=request.user.student_Profile.company)
+            report.save()
+            return redirect('student_dashboard')
+    else:
+        form = BiWeeklyReportForm()
     return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
 
 @login_required
 def student_dashboard(request):
+    if request.user.user_type != 'Student':
+        return redirect('home')
     return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
 
 @login_required
@@ -122,6 +134,15 @@ def stud_notification(request):
 
 @login_required
 def post_internship(request):
+    if request.method == 'POST':
+        form = InternshipPostingForm(request.POST)
+        if form.is_valid():
+            internship = form.save(commit=False)
+            internship.company = request.user.companyprofile
+            internship.save()
+            return redirect('company_dashboard')
+    else:
+        form = InternshipPostingForm()
     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
 
 @login_required
@@ -157,3 +178,11 @@ def accepted_interns(request):
 def evaluate_intern(request):
     return render(request, 'company_pages/evaluate_intern.html', {'current_page': 'evaluate_intern'})
 
+
+
+# Admin Views
+@login_required
+def admin_dashboard(request):
+    if request.user.user_type != 'Admin':
+        return redirect('home')
+    return render(request, 'admin_dashboard.html')
