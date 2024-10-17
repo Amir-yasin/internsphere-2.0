@@ -14,6 +14,9 @@ class CustomUser(AbstractUser):
     )
     user_type = models.CharField(max_length=50, choices=USER_TYPE_CHOICES)
 
+    def __str__(self):
+        return self.username
+    
 # Student Profile
 class Student(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
@@ -46,11 +49,15 @@ class student_Profile(models.Model):
 
 # Company Profile
 class Company(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
-    company_name = models.CharField(max_length=100)
-    address = models.CharField(max_length=255)
-    linkedin_profile = models.URLField()
-    approved = models.BooleanField(default=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
+    company_name = models.CharField(max_length=255)
+    company_address = models.CharField(max_length=255)
+    company_phone = models.CharField(max_length=15)
+    company_description = models.TextField(blank=True, null=True)
+    approved = models.BooleanField(default=False)  # This field indicates if the company has been approved by the admin
+
+    def __str__(self):
+        return self.company_name
 
 # Department Profile
 class Department(models.Model):

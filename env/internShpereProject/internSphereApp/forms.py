@@ -14,23 +14,23 @@ class UserTypeForm(forms.Form):
     
     user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
 
-class CustomUserCreationForm(UserCreationForm):
+class StudentCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'username', 'phone_number', 'user_type', 'password1', 'password2')
+        fields = ('batch', 'section', 'list_of_students')
 
 
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = student_Profile
-        fields = ['full_name', 'email', 'phone_number', 'gender', 'university', 'major', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
+        fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
         
 
 class CompanyProfileForm(forms.ModelForm):
     class Meta:
-        model = Company
-        fields = ['company_name', 'address']
+        model = CompanyProfile
+        fields = ['company_name', 'company_address', 'company_phone', 'company_description']
 
 # Repeat similar forms for Department, Supervisor, Admin
 

@@ -18,6 +18,57 @@ def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
 
 
+# @login_required
+# def bi_weekly_report(request):
+#     # Check if the request method is POST (for form submission)
+#     if request.method == 'POST':
+#         form = BiWeeklyReportForm(request.POST)
+#         if form.is_valid():
+#             # Create a report instance, but don't save it to the database yet (commit=False)
+#             report = form.save
+#             # Set the user who submitted the report
+#             report.user = request.user
+#             report.save()
+
+#             # Give feedback and redirect after successful form submission
+#             messages.success(request, "Bi-weekly report submitted successfully.")
+#             return redirect('student_dashboard')
+#         else:
+#             # Log or display form errors
+#             print(form.errors)
+#             messages.error(request, "There was an error with your submission.")
+#     else:
+#         # If it's a GET request, just display the form
+#         form = BiWeeklyReportForm()
+
+#     # Render the bi-weekly report template, passing in the form
+#     return render(request, 'student_pages/bi_weekly_report.html', {
+#         'current_page': 'bi_weekly_report',
+#         'form': form
+#     })
+
+
+# company pages views
+# @login_required
+# def post_internship(request):
+#     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
+
+# @login_required
+# def company_profile(request):
+#     if request.method == 'POST':
+#         form = CompanyProfileForm(request.POST)
+#         if form.is_valid():
+#             company_profile = form.save(commit=False)
+#             company_profile.user = request.user
+#             company_profile.save()
+#             return redirect('company_pages/company_dashboard')
+#     else:
+#         form = CompanyProfileForm()
+#         return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
+
+
+
+
 
 def register_user(request):
     if request.method == 'POST':
@@ -28,8 +79,6 @@ def register_user(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'main_pages/register.html', {'form': form, 'current_page': 'contact'})
-
-
 
 
 def login_user(request):
@@ -96,10 +145,6 @@ def student_profile(request):
 
     return render(request, 'student_pages/student_profile.html', {'form': form})
 
-
-
-            
-
 @login_required
 def bi_weekly_report(request):
     if request.method == 'POST':
@@ -157,6 +202,8 @@ def company_profile(request):
     else:
         form = CompanyProfileForm()
         return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
+
+
 
 @login_required
 def company_dashboard(request):
