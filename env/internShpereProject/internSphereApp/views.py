@@ -138,7 +138,7 @@ def post_internship(request):
         form = InternshipPostingForm(request.POST)
         if form.is_valid():
             internship = form.save(commit=False)
-            internship.company = request.user.companyprofile
+            internship.company = request.user.company
             internship.save()
             return redirect('company_dashboard')
     else:
