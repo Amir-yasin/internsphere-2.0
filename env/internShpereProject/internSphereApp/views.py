@@ -196,3 +196,4 @@ def accepted_interns(request):
 def evaluate_intern(request):
     return render(request, 'company_pages/evaluate_intern.html', {'current_page': 'evaluate_intern'})
 
+
