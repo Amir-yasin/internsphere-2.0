@@ -49,7 +49,4 @@ path('attendance', views.attendance , name = 'attendance'),
 
 
 
-
-
-
 ]
