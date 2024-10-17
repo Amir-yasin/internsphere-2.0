@@ -72,6 +72,7 @@ class Supervisor(models.Model):
     def __str__(self):
         return self.supervisor_name
 
+
 class Admin(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
 
