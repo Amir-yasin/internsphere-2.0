@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
 
 # Student Profile
 class Student(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
     temporary_password = models.CharField(max_length=100)
@@ -24,7 +24,7 @@ class Student(models.Model):
 
 
 class student_Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': CustomUser.STUDENT})
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'user_type': CustomUser.STUDENT})
 
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -49,7 +49,7 @@ class student_Profile(models.Model):
 
 # Company Profile
 class Company(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
     company_name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
     linkedin_profile = models.URLField()
@@ -65,7 +65,7 @@ class Department(models.Model):
         (MARKETING, 'Marketing'),
         (THM, 'THM'),
     ]
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Department'})
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='department_profile', limit_choices_to={'user_type': 'Department'})
     department_choices = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
 
 
@@ -128,18 +128,17 @@ class Application(models.Model):
 #     def __str__(self):
 #         return self.department_name
 
-class Supervisor(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor_profile')
-    supervisor_name = models.CharField(max_length=100)
-    contact_email = models.EmailField()
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Supervisor(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor_profile')
+#     supervisor_name = models.CharField(max_length=100)
+#     contact_email = models.EmailField()
+#     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.supervisor_name
+#     def __str__(self):
+#         return self.supervisor_name
 
-class Admin(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
+
 
 class Internship_Office(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='InternshipOffice_profile')
