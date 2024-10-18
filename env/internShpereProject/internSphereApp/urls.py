@@ -23,8 +23,6 @@ path('bi_weekly_report', views.bi_weekly_report , name = 'bi_weekly_report'),
 path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
 path('applications', views.applications , name = 'applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
-path('view_student_profile', views.view_student_profile , name = 'view_student_profile'),
-# path('download_report/<int:report_id>/', views.download_report, name='download_report'),
 
 
 # company pages url
@@ -45,8 +43,12 @@ path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
-path('attendance', views.attendance , name = 'attendance'),
-
+# path('attendance', views.attendance , name = 'attendance'),
+# path('attendance', views.attendance , name = 'attendance'),
+# path('attendance', views.attendance , name = 'attendance'),
+# path('attendance', views.attendance , name = 'attendance'),
+# path('attendance', views.attendance , name = 'attendance'),
+# path('attendance', views.attendance , name = 'attendance'),
 
 
 

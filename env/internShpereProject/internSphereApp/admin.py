@@ -11,16 +11,26 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(student_Profile)
 admin.site.register(Company)
 admin.site.register(CustomUser)
-admin.site.register(BiWeeklyReport)
 
 
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
-# from .models import *
+
+
+import pandas as pd
+from django.core.exceptions import ValidationError
+
+# Function to handle bulk student upload
+def upload_students_from_excel(file):
+    df = pd.read_excel(file)
+    for _, row in df.iterrows():
+        user = CustomUser.objects.create_user(
+            username=row['email'],
+            email=row['email'],
+            user_type='Student',
+            password='temporary_password'  # Set default password
+        )
+        StudentProfile.objects.create(
+            user=user,
+            batch=row['batch'],
+            section=row['section'],
+            temporary_password='temporary_password'
+        )

@@ -12,7 +12,15 @@
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
 </head>
 <body>
-   
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="heading">
         <h1>Student Dashboard</h1>
     </div>
@@ -39,8 +47,6 @@
             <h2>Profile</h2>
             <p>Update your personal and academic profile.</p>
             <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
-            <a href="{% url 'view_student_profile' %}" class="btn">View Profile</a>
-
         </div>
 
         <div class="dashboard-item">
@@ -52,44 +58,25 @@
     <br>
     <br>
     <br>
-{% comment %} 
-    <h2>Bi-Weekly Report</h2>
-    <p><strong>Student's Name:</strong> {{ request.report.section }}</p>
-    <p><strong>ID Number:</strong> {{ report.id_number }}</p>
-    <p><strong>Section:</strong> {{ report.section }}</p>
-    <p><strong>Report Number:</strong> {{ report.report_number }}</p>
-    <p><strong>For the week of:</strong> {{ report.week_start }} - {{ report.week_end }}</p>
-    <p><strong>Total Hours Completed to Date:</strong> {{ report.total_hours_completed }}</p>
-    <p><strong>Department:</strong> {{ report.department }}</p>
 
-    <h3>1. Assignment and Responsibilities</h3>
-    <p>{{ report.assignment_responsibilities }}</p>
-
-    <h3>2. Critical Analysis/Reflection</h3>
-    <p>{{ report.critical_analysis }}</p>
-
-    <h3>3. Hours Spent</h3>
-    <p>Observing: {{ report.observing_hours }} hours</p>
-    <p>Administrative: {{ report.administrative_hours }} hours</p>
-    <p>Researching: {{ report.researching_hours }} hours</p>
-    <p>Assisting: {{ report.assisting_hours }} hours</p>
-    <p>Miscellaneous: {{ report.miscellaneous_hours }} hours</p>
-
-    <h3>4. Meetings and Discussions</h3>
-    <p>{{ report.meetings_discussions }}</p>
-
-    <h3>5. Course Relevance and Suggestions</h3>
-    <p>{{ report.course_relevance_suggestions }}</p>
+  name:  {{ user.student_profile.full_name }} <br>
+    {{ user.username }} <br>
+    {{ user.student_profile.email }} <br>
+    {{ user.student_profile.phone_number }} <br>
+    {{ user.student_profile.major }} <br>
+    {{ user.student_profile.skills }} <br>
+    {{ user.student_profile.resume }}
 
 
     <script>
+        // Automatically hide the message after 5 seconds (5000 milliseconds)
         setTimeout(function() {
             const messageContainer = document.getElementById('message-container');
             if (messageContainer) {
                 messageContainer.style.display = 'none';
             }
-        }, 7000);  // 7000 milliseconds = 7 seconds
-    </script> {% endcomment %}
+        }, 5000);  // 5000 milliseconds = 5 seconds
+    </script>
 
 </body>
 </html>

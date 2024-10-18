@@ -12,75 +12,107 @@
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 
 </head>
-<style>
-    .form-row{
-        width: 50%;
-        margin-left:25%;
-        padding:40px;
-        border: 2px solid;
-        border-radius: 20px;
-    }
-</style>
-
 <body>
     <div class="heading">
         <h1 >Internship Bi-Weekly Report</h1>
     </div>
 
+    <form method="post" class="bi-weekly-report-form">
         <div class="form-row">
-       
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Submit</button>
-            </form>
-        
+            <label for="student_name">Student's Name:</label>
+            <input type="text" id="student_name" name="student_name" required>
         </div>
-    </body>
-    </html>
 
-
-{% comment %} 
-    {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
+        <div class="form-row">
+            <label for="id_number">ID Number:</label>
+            <input type="text" id="id_number" name="id_number" required>
         </div>
-    {% endfor %}
-{% endif %}
 
-<td>{{ user.report.id }}</td>  <!-- Corrected from user.report to report -->
+        <div class="form-row">
+            <label for="section">Section:</label>
+            <input type="text" id="section" name="section" required>
+        </div>
 
-{% if report %}
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Report Number</th>
-      <th>Week Start</th>
-      <th>Week End</th>
-      <th>Total Hours Completed</th>
-      <th>Assignment Responsibilities</th>
-      <th>Critical Analysis</th>
-      <th>Submitted On</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for reports in report %}
-      <tr>
-        <td>{{ user.report.report_number }}</td>  <!-- Corrected from user.report to report -->
-        <td>{{ report.week_start }}</td>
-        <td>{{ report.week_end }}</td>
-        <td>{{ report.total_hours_completed }}</td>
-        <td>{{ report.assignment_responsibilities }}</td>
-        <td>{{ report.critical_analysis }}</td>
-        <td>{{ report.date_submitted }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No reports submitted yet.</p>
-{% endif %} {% endcomment %}
+
+        <div class="form-row">
+            <label for="report_number">Report Number:</label>
+            <input type="number" id="report_number" name="report_number" required>
+        </div>
+
+        <div class="form-row">
+            <label for="week_dates">For the week of (Beginning and ending date):</label>
+            <input type="text" id="week_dates" name="week_dates" required>
+        </div>
+
+        <div class="form-row">
+            <label for="hours_completed">Total Hours Completed to Date:</label>
+            <input type="number" id="hours_completed" name="hours_completed" required>
+        </div>
+
+        <div class="form-row">
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="Accounting">Accounting</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Management">Management</option>
+                <option value="Computer_Science">Computer Science</option>
+                <option value="THM">THM</option>
+            </select>
+        </div>
+
+        <h4>1. Assignment and Responsibilities</h4>
+        <div class="form-row">
+            <label for="assignment">Please give detailed information about your last week's actual assignment and responsibilities:</label>
+            <textarea id="assignment" name="assignment" rows="5" required></textarea>
+        </div>
+
+        <h4>2. Critical Analysis/Reflection</h4>
+        <div class="form-row">
+            <label for="reflection">Make a critical analysis/reflection of your experiences over the past week in terms of learning values and experiences you achieved. What did you learn? (Be specific):</label>
+            <textarea id="reflection" name="reflection" rows="5" required></textarea>
+        </div>
+
+        <h4>3. Hours Spent</h4>
+        <div class="form-row">
+            <label for="observing_hours">Observing (hours):</label>
+            <input type="number" id="observing_hours" name="observing_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="administrative_hours">Administrative (hours):</label>
+            <input type="number" id="administrative_hours" name="administrative_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="researching_hours">Researching (hours):</label>
+            <input type="number" id="researching_hours" name="researching_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="assisting_hours">Assisting (hours):</label>
+            <input type="number" id="assisting_hours" name="assisting_hours" required>
+        </div>
+
+        <div class="form-row">
+            <label for="miscellaneous_hours">Miscellaneous (hours):</label>
+            <input type="number" id="miscellaneous_hours" name="miscellaneous_hours" required>
+        </div>
+
+        <h4>4. Meetings and Discussions</h4>
+        <div class="form-row">
+            <label for="meetings_discussions">Discuss briefly the nature of meetings and discussion topics, field trips, and assigned readings (if applicable) you had with the agency supervisor in which you are assigned for the internship:</label>
+            <textarea id="meetings_discussions" name="meetings_discussions" rows="5" required></textarea>
+        </div>
+
+        <h4>5. Course Relevance and Suggestions</h4>
+        <div class="form-row">
+            <label for="course_relevance">To what extent the courses you studied supported you in the internship? Were they relevant to the actual work you practiced? What content/topics do you suggest to be added for the future?</label>
+            <textarea id="course_relevance" name="course_relevance" rows="5" required></textarea>
+        </div>
+
+        <button type="submit">Submit Report</button>
+    </form>
+
 
 
 
