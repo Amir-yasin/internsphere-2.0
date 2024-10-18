@@ -1,0 +1,26 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Profile Completed</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+        <td>{{ student.user.username }}</td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.phone_number }}</td>
+        <td>{{ student.profile_completed }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+
+{% endblock nav_and_footer %}
+    

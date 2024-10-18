@@ -45,6 +45,12 @@ def register_students(request):
     return render(request, 'admin/register_students.html')
 
 
+def student_list(request):
+    students = student_profile.objects.all()
+    return render(request, 'admin_pages/student_list.html', {'students': students})
+
+
+
 
 def register_user(request):
     if request.method == 'POST':
@@ -109,7 +115,7 @@ def student_profile(request):
         student.resume = request.FILES['resume']
         student.profile_completed = True
         student.save()
-        return redirect('dashboard')
+        return redirect('student_dashboard')
     
     return render(request, 'students/student_profile.html', {'student': student})
 # def student_profile(request):
