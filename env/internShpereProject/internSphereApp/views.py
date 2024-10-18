@@ -6,7 +6,8 @@ from django.contrib import messages
 from .models import * 
 from django.contrib.auth.models import User
 from .forms import *
-
+from django.utils.crypto import get_random_string
+import pandas as pd  
 
 # Create your views here.
 # main pages views
@@ -18,55 +19,30 @@ def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
 
 
-# @login_required
-# def bi_weekly_report(request):
-#     # Check if the request method is POST (for form submission)
-#     if request.method == 'POST':
-#         form = BiWeeklyReportForm(request.POST)
-#         if form.is_valid():
-#             # Create a report instance, but don't save it to the database yet (commit=False)
-#             report = form.save
-#             # Set the user who submitted the report
-#             report.user = request.user
-#             report.save()
-
-#             # Give feedback and redirect after successful form submission
-#             messages.success(request, "Bi-weekly report submitted successfully.")
-#             return redirect('student_dashboard')
-#         else:
-#             # Log or display form errors
-#             print(form.errors)
-#             messages.error(request, "There was an error with your submission.")
-#     else:
-#         # If it's a GET request, just display the form
-#         form = BiWeeklyReportForm()
-
-#     # Render the bi-weekly report template, passing in the form
-#     return render(request, 'student_pages/bi_weekly_report.html', {
-#         'current_page': 'bi_weekly_report',
-#         'form': form
-#     })
-
-
-# company pages views
-# @login_required
-# def post_internship(request):
-#     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
-
-# @login_required
-# def company_profile(request):
-#     if request.method == 'POST':
-#         form = CompanyProfileForm(request.POST)
-#         if form.is_valid():
-#             company_profile = form.save(commit=False)
-#             company_profile.user = request.user
-#             company_profile.save()
-#             return redirect('company_pages/company_dashboard')
-#     else:
-#         form = CompanyProfileForm()
-#         return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
-
-
+def register_students(request):
+    if request.method == 'POST':
+        batch = request.POST['batch']
+        section = request.POST['section']
+        excel_file = request.FILES['student_list']
+        
+        # Process Excel file
+        df = pd.read_excel(excel_file)
+        for index, row in df.iterrows():
+            temp_password = get_random_string(length=6)
+            user = CustomUser.objects.create_user(
+                username=row['username'], 
+                password=temp_password, 
+                user_type='Student'
+            )
+            student_profile.objects.create(
+                user=user, 
+                batch=batch, 
+                section=section, 
+                temporary_password=temp_password
+            )
+        return redirect('student_list')
+    
+    return render(request, 'admin/register_students.html')
 
 
 
@@ -122,28 +98,43 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
+    student = request.user.student_profile
     if request.method == 'POST':
-        form = StudentProfileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Check if profile already exists for this user
-            try:
-                student_profile = student_Profile.objects.get(user=request.user)
-                form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)  # Update existing profile
-                student_profile = form.save()  # Update existing profile
-                messages.success(request, 'Profile updated successfully!') 
-            except student_Profile.DoesNotExist:
-                # Profile does not exist, create a new one
-                student_profile = form.save(commit=False)
-                student_profile.user = request.user
-                student_profile.save()
-                messages.success(request, 'Profile created successfully!')  # Success message for creation
+        student.email = request.POST['email']
+        student.phone_number = request.POST['phone_number']
+        student.gender = request.POST['gender']
+        student.year_of_study = request.POST['year_of_study']
+        student.skills = request.POST['skills']
+        student.linkedin_profile = request.POST['linkedin_profile']
+        student.resume = request.FILES['resume']
+        student.profile_completed = True
+        student.save()
+        return redirect('dashboard')
+    
+    return render(request, 'students/student_profile.html', {'student': student})
+# def student_profile(request):
+#     if request.method == 'POST':
+#         form = StudentProfileForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             # Check if profile already exists for this user
+#             try:
+#                 student_profile = student_Profile.objects.get(user=request.user)
+#                 form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)  # Update existing profile
+#                 student_profile = form.save()  # Update existing profile
+#                 messages.success(request, 'Profile updated successfully!') 
+#             except student_Profile.DoesNotExist:
+#                 # Profile does not exist, create a new one
+#                 student_profile = form.save(commit=False)
+#                 student_profile.user = request.user
+#                 student_profile.save()
+#                 messages.success(request, 'Profile created successfully!')  # Success message for creation
 
 
-            return redirect('student_dashboard')
-    else:
-        form = StudentProfileForm()
+#             return redirect('student_dashboard')
+#     else:
+#         form = StudentProfileForm()
 
-    return render(request, 'student_pages/student_profile.html', {'form': form})
+#     return render(request, 'student_pages/student_profile.html', {'form': form})
 
 @login_required
 def bi_weekly_report(request):
