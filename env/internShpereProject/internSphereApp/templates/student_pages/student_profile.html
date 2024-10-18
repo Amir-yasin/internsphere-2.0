@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css?
     family=dosis&isplay=swap" rel="stylesheet">
     
-{% comment %} <style>
+<style>
   .students-container{
     background-color: whitesmoke;
     border: 3px solid #f1f1f1;
@@ -24,108 +24,19 @@
     margin-top: 50px;
 
   }
+  input{
+    margin:8px;
+  }
 </style>
 
   </head>
- 
-      <div class="heading">
-        <h1>Student Profile Form</h1>
-        </div>
-      <div class="students-container">
-
-        
-          <form action="submit-profile.php" method="post">
-            <h2>Personal Information</h2>
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>   
-      
-            <br>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <br>
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone" required>
-            <br>
-            <label for="address">Address:</label>
-            <textarea id="address" name="address" required></textarea>
-            <br>
-            <h2>Education</h2>
-            <label for="school">School:</label>
-            <input type="text" id="school" name="school" required>
-            <br>
-            <label for="major">Major:</label>
-            <input type="text" id="major" name="major" required>
-            <br>
-            <label for="graduation">Expected Graduation:</label>
-            <input type="date" id="graduation" name="graduation" required>
-            <br>
-            <h2>Skills</h2>
-            <label for="programming">Programming languages:</label>
-            <textarea id="programming" name="programming"></textarea>
-            <br>
-            <label for="webdev">Web development:</label>
-            <textarea id="webdev" name="webdev"></textarea>
-            <br>
-            <label for="database">Database management:</label>
-            <textarea id="database" name="database"></textarea>
-            <br>
-            <label for="other">Other:</label>
-            <textarea id="other" name="other"></textarea>
-            <br>
-            <h2>Experience</h2>
-            <label for="internship">Internship:</label>
-            <textarea id="internship" name="internship"></textarea>
-            <br>
-            <label for="volunteer">Volunteer:</label>
-            <textarea id="volunteer" name="volunteer"></textarea>
-            <br>
-            <input type="submit" value="Submit">
-          </form>
-      
-      <br>
-      <br>
-      <hr>
-          
-              <h1>Student Profile</h1>
-              <hr>
-              <h2>Personal Information</h2>
-              <ul>
-                <li><strong>Name:</strong> Kemerya Zeynu</li>
-                <li><strong>Email:</strong> kemerzeynu00@gmail.com</li>
-                <li><strong>Phone:</strong> 251-456-7890</li>
-                <li><strong>Address:</strong> st'Marys, Adiss ababa, ETHIOPIA</li>
-              </ul>
-              <h2>Education</h2>
-              <ul>
-                <li><strong>School:</strong> st'Marys University</li>
-                <li><strong>Major:</strong> Computer Science</li>
-                <li><strong>Expected Graduation:</strong> December 2025</li>
-              </ul>
-              <h2>Skills</h2>
-              <ul>
-                <li>Programming languages: Java, C++</li>
-                <li>Web development: HTML, CSS, JavaScript</li>
-                <li>Database management: SQL</li>
-                <li>Other: Leadership, teamwork, communication</li>
-              </ul>
-              <h2>Experience</h2>
-              <ul>
-                <li><strong>Internship:</strong> Software Developer Intern at ABC Company (Summer 2022)</li>
-                <li><strong>Volunteer:</strong> Web Developer at HULU internship companies web platform  (Fall 2023 - Present)</li>
-              </ul>
-            
-      </div> {% endcomment %}
-
-    
-
 
 
 
 
 <head>
     <link rel="stylesheet" href="{% static 'css/student_profile.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'css/home.css' %}"> {% endcomment %}
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -138,7 +49,7 @@
 
 
     <!-- complete_profile.html -->
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" class="profile-form students-container">
     {% csrf_token %}
     <label for="email">Email:</label>
     <input type="email" name="email" value="{{ student.email }}" required><br>
@@ -164,7 +75,7 @@
     <label for="resume">Resume:</label>
     <input type="file" name="resume"><br>
 
-    <button type="submit">Complete Profile</button>
+    <button type="submit">Submit Profile</button>
 </form>
 
 

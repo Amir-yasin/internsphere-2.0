@@ -119,9 +119,10 @@ def student_profile(request):
         student.resume = request.FILES['resume']
         student.profile_completed = True
         student.save()
+        messages.success(request, 'Profile created successfully!') 
         return redirect('student_dashboard')
     
-    return render(request, 'students/student_profile.html', {'student': student})
+    return render(request, 'student_pages/student_profile.html', {'student': student})
 # def student_profile(request):
 #     if request.method == 'POST':
 #         form = StudentProfileForm(request.POST, request.FILES)
