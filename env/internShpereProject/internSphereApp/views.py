@@ -30,7 +30,9 @@ def register_students(request):
         for index, row in df.iterrows():
             temp_password = get_random_string(length=6)
             user = CustomUser.objects.create_user(
-                username=row['username'], 
+                username=row['id_number'], 
+                first_name=row['first_name'], 
+                last_name=row['last_name'], 
                 password=temp_password, 
                 user_type='Student'
             )
@@ -42,7 +44,7 @@ def register_students(request):
             )
         return redirect('student_list')
     
-    return render(request, 'admin/register_students.html')
+    return render(request, 'admin_pages/register_students.html')
 
 
 def student_list(request):
@@ -72,10 +74,12 @@ def login_user(request):
         if user is not None:
             login(request, user)
             # Redirect based on user type
-            if user.user_type == CustomUser.STUDENT:
+            if user.user_type == 'Student':
                 return redirect('student_dashboard')
-            elif user.user_type == CustomUser.COMPANY:
+            elif user.user_type == 'Company':
                 return redirect('company_dashboard')
+            elif user.user_type == 'Admin':
+                return redirect('Admin_dashboard')
             else:
                 return redirect('home')
         else:
@@ -229,4 +233,4 @@ def evaluate_intern(request):
 def admin_dashboard(request):
     if request.user.user_type != 'Admin':
         return redirect('home')
-    return render(request, 'admin_dashboard.html')
+    return render(request, 'admin_pages/admin_dashboard.html', {'current_page': 'admin_dashboard'})

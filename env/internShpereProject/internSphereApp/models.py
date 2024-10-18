@@ -23,13 +23,12 @@ class CustomUser(AbstractUser):
 
 
 # Student Profile
-# Student Profile Model with slight adjustments
 class student_profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
     temporary_password = models.CharField(max_length=100)
-    profile_completed = models.BooleanField(default=False)  # Track profile completion
+    profile_completed = models.BooleanField(default=False)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
@@ -37,6 +36,7 @@ class student_profile(models.Model):
     skills = models.CharField(max_length=1000)
     resume = models.FileField(upload_to='resumes/')
     linkedin_profile = models.URLField(blank=True, null=True)
+    list_of_students = models.FileField(upload_to='list_of_students/')
 
     def __str__(self):
         return self.user.username

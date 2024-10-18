@@ -33,8 +33,12 @@ path('view_applicants', views.view_applicants , name = 'view_applicants'),
 path('attendance', views.attendance , name = 'attendance'),
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
 path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
+
+
+
+path('register_students', views.register_students , name = 'register_students'),
+path('admin_dashboard', views.admin_dashboard , name = 'admin_dashboard'),
+path('student_list', views.student_list , name = 'student_list'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),

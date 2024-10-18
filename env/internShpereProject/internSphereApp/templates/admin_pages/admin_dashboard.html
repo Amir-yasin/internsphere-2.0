@@ -1,0 +1,67 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
+<body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="heading">
+        <h1>Admin Dashboard</h1>
+    </div>
+    <header>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p>You are logged in as a {{ user.user_type }}</p>
+    </header>
+    
+    
+    <div class="dashboard">
+        <div class="dashboard-item">
+            <h2>Register Students</h2>
+            <p>Register the students that are going to take internship.</p>
+            <a href="{% url 'register_students' %}" class="btn">Register</a>
+            <a href="{% url 'student_list' %}" class="btn">list of students</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Register Department</h2>
+            <p>Register the Department.</p>
+            <a href="{% url 'applications' %}" class="btn">Register</a>
+            <a href="{% url 'student_list' %}" class="btn">list of departments</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Register Internship Office</h2>
+            <p>Register the Internship Office.</p>
+            <a href="{% url 'applications' %}" class="btn">Register</a>
+            <a href="{% url 'student_list' %}" class="btn">list of departments</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Register supervisors</h2>
+            <p>Register the supervisors.</p>
+            <a href="{% url 'applications' %}" class="btn">Register</a>
+            <a href="{% url 'student_list' %}" class="btn">list of departments</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+
+ 
+    {% endblock nav_and_footer %}
