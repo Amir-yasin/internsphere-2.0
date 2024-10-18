@@ -175,6 +175,9 @@ def applications(request):
 def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 
+@login_required
+def view_profile(request):
+    return render(request, 'student_pages/view_profile.html', {'current_page': 'view_profile'})
 
 
 # company pages views
