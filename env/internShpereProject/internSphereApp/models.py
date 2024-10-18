@@ -110,8 +110,6 @@ class Application(models.Model):
 # BiWeeklyReport model
 class BiWeeklyReport(models.Model):
     student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
-    id_number = models.CharField(max_length=100)
-    section = models.CharField(max_length=50)
     report_number = models.IntegerField()
     week_start = models.DateField()
     week_end = models.DateField()
