@@ -55,6 +55,7 @@ class Company(models.Model):
         return self.company_name
 
 
+
 # Department Profile
 class Department(models.Model):
     DEPARTMENT_CHOICES = [
