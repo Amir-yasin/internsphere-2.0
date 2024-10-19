@@ -212,6 +212,7 @@ def company_profile(request):
 
 
 
+
 @login_required
 def company_dashboard(request):
     return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard'})
