@@ -50,7 +50,7 @@ class Company(models.Model):
     company_phone = models.CharField(max_length=15)
     company_description = models.TextField(blank=True, null=True)
     approved = models.BooleanField(default=False)  # This field indicates if the company has been approved by the admin
-
+     
     def __str__(self):
         return self.company_name
 
