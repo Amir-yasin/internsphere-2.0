@@ -171,6 +171,7 @@ def student_dashboard(request):
 def applications(request):
     return render(request, 'student_pages/applications.html', {'current_page': 'applications'})
 
+
 @login_required
 def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
