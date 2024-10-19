@@ -12,28 +12,27 @@ class UserTypeForm(forms.Form):
         ('internship_office', 'Internship Office')
     ]
     
-    
     user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
 
 class StudentCreationForm(UserCreationForm):
     class Meta:
-        model = CustomUser
+        model = student_profile
         fields = ('batch', 'section', 'list_of_students')
 
 
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:
-        model = student_Profile
+        model = student_profile
         fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
         
 
-class CompanyProfileForm(forms.ModelForm):
-    class Meta:
-        model = CompanyProfile
-        fields = ['company_name', 'company_address', 'company_phone', 'company_description']
+# class CompanyProfileForm(forms.ModelForm):
+#     class Meta:
+#         model = CompanyProfile
+#         fields = ['company_name', 'company_address', 'company_phone', 'company_description']
 
-# Repeat similar forms for Department, Supervisor, Admin
+# # Repeat similar forms for Department, Supervisor, Admin
 
 
 class LoginForm(forms.Form):

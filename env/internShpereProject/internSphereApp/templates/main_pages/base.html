@@ -108,8 +108,28 @@
                                 <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"> Ad Services</a>
                                 <ul class="dropdown-menu">
                                     <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'admin_dashboard' %}">Dashboard</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'register_students' %}">Register Students</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'student_list' %}">Student List</a>
+                                    </li>
+                                    {% comment %} <li class="nav-item">
                                         <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                    </li></li></ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
+                                    </li> {% endcomment %}
+                                </li>
+                            </ul>
                         {% elif user.user_type == 'internship_office' %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">icu Services</a>

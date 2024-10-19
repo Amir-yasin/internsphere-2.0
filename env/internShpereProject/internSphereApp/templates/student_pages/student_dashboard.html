@@ -25,7 +25,7 @@
         <h1>Student Dashboard</h1>
     </div>
     <header>
-        <h1>Welcome, {{ user.username }}</h1>
+        <h1>Welcome, {{ user.first_name }}</h1>
         <p>You are logged in as a {{ user.user_type }}</p>
     </header>
     
@@ -47,6 +47,8 @@
             <h2>Profile</h2>
             <p>Update your personal and academic profile.</p>
             <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
+            <a href="{% url 'view_profile' %}" class="btn">View Profile</a>
+
         </div>
 
         <div class="dashboard-item">
@@ -59,13 +61,6 @@
     <br>
     <br>
 
-  name:  {{ user.student_profile.full_name }} <br>
-    {{ user.username }} <br>
-    {{ user.student_profile.email }} <br>
-    {{ user.student_profile.phone_number }} <br>
-    {{ user.student_profile.major }} <br>
-    {{ user.student_profile.skills }} <br>
-    {{ user.student_profile.resume }}
 
 
     <script>
