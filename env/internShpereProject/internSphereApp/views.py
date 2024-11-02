@@ -181,6 +181,7 @@ def stud_notification(request):
 
 @login_required
 def view_profile(request):
+    students = stud_profile.objects.all()
     return render(request, 'student_pages/view_profile.html', {'current_page': 'view_profile'})
 
 
