@@ -112,7 +112,7 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
-    student = request.user.student_profile
+    student = request.user.stud_profile
     if request.method == 'POST':
         student.email = request.POST['email']
         student.phone_number = request.POST['phone_number']

@@ -36,7 +36,9 @@
             <td>{{ student.user.last_name }}</td>
             <td>{{ student.batch }}</td>
             <td>{{ student.section }}</td>
+            <td>{{ student.profile_completed }}</td>
             <td>{{ student.temporary_password }}</td>
+
             <td>
                 <a href="{% url 'delete_student' student.id %}">Delete</a>
             </td>
