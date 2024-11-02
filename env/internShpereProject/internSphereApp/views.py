@@ -180,10 +180,19 @@ def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 
 @login_required
-def view_profile(request):
-    students = stud_profile.objects.all()
-    return render(request, 'student_pages/view_profile.html', {'current_page': 'view_profile'})
+def view_profile(request, user_id):
+    # Retrieve the student user and profile using the correct model names
+    student_user = get_object_or_404(CustomUser, id=user_id, user_type='Student')
+    student_profile = get_object_or_404(stud_profile, user=student_user)  # Use stud_profile with lowercase 's'
 
+    # Prepare context for rendering
+    context = {
+        'student_user': student_user,
+        'student_profile': student_profile,
+        'current_page': 'view_profile'
+    }
+    
+    return render(request, 'student_pages/view_profile.html', context)
 
 
 # company pages views

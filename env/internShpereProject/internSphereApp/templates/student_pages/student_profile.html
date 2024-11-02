@@ -27,6 +27,10 @@
   input{
     margin:8px;
   }
+  .btn{
+    background:purple;
+    color:white;
+  }
 </style>
 
   </head>
@@ -75,6 +79,7 @@
     <label for="resume">Resume:</label>
     <input type="file" name="resume"><br>
 
+    {% comment %} <a href="{% url 'student_dashboard' %}" class="btn">Back to Dashboard</a> {% endcomment %}
     <button type="submit">Submit Profile</button>
 </form>
 

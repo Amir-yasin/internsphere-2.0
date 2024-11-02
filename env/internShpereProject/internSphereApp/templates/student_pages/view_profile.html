@@ -2,31 +2,45 @@
 {% load static %}
 
 {% block nav_and_footer %}
+<head>    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
     <style>
-        table, th ,td{
-            border:2px solid black;
-            padding:0px 7px;
+        .students-container{
+            background-color: whitesmoke;
+            border: 3px solid #f1f1f1;
+            border-radius: 10px;
+            padding: 20px;
+            width: 50%;
+            margin: auto;
+            margin-top: 50px;
         
-        }
+          }
+          
     </style>
-<table>
-    <tr>
-        <th>Id Number</th> 
-        <th>first_name</th>
-        <th>last_name </th>
-        <th>Profile Completed</th>
-    </tr>
-    {% for student in students %}
-    <tr>
-        <td>{{ student.username }}</td> 
-        <td>{{ student.first_name }}</td>
-        <td>{{ student.user.last_name }}</td>
-        <td>{{ student.profile_completed }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="heading">
+        <h1>Student Profile</h1>
+    </div> 
+    <div class="students-container">
+        <h2>Profile Information</h2>
 
+    <h4><strong>Name:</strong> {{ student_user.first_name }} {{ student_user.last_name }}</h4>
+    <p><strong>ID Number:</strong> {{ student_user.username }}</p>
+    <p><strong>Email:</strong> {{ student_profile.email }}</p>
+    <p><strong>Department:</strong> {{ student_profile.phone_number }}</p>
+    <p><strong>Batch:</strong> {{ student_profile.batch }}</p>
+    <p><strong>Section:</strong> {{ student_profile.section }}</p>
+    <p><strong>Gender:</strong> {{ student_profile.gender }}</p>
+    <p><strong>year_of_study:</strong> {{ student_profile.year_of_study }}</p>
+    <p><strong>skills:</strong> {{ student_profile.skills }}</p>
+    <p><strong>resume:</strong> {{ student_profile.resume }}</p>
+    <p><strong>linkedin_profile:</strong> {{ student_profile.linkedin_profile }}</p>
+    <p><strong>profile_completed:</strong> {{ student_profile.profile_completed }}</p>
 
+    <!-- Add more fields as needed from stud_profile model -->
+
+    <a href="{% url 'student_dashboard' %}" class="btn">Back to Dashboard</a>
+    <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
+</div>
 
 {% endblock nav_and_footer %}
     
