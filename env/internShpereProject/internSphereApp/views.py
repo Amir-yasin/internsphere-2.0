@@ -211,7 +211,7 @@ def post_internship(request):
     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
 
 @login_required
-def company_profile(request):
+def CompanyProfile(request):
     if request.method == 'POST':
         form = CompanyProfileForm(request.POST)
         if form.is_valid():
