@@ -8,7 +8,7 @@ class CustomUserAdmin(UserAdmin):
 
 # Unregister the default User admin and register the custom one
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(student_profile)
+admin.site.register(stud_profile)
 admin.site.register(Company)
 admin.site.register(CustomUser)
 

@@ -47,7 +47,7 @@
             <h2>Profile</h2>
             <p>Update your personal and academic profile.</p>
             <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
-            <a href="{% url 'view_profile' %}" class="btn">View Profile</a>
+            <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn">View Profile</a>
 
         </div>
 
