@@ -103,7 +103,7 @@
                                     <li class="nav-item">
                                         <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
                                     </li></li></ul>
-                        {% elif user.user_type == 'Admin' %}
+                        {% elif user.user_type == 'Admin' or user.is_superuser %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"> Ad Services</a>
                                 <ul class="dropdown-menu">

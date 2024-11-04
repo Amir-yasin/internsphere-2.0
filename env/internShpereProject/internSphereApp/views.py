@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from .forms import *
 from django.utils.crypto import get_random_string
 import pandas as pd  
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 # main pages views
@@ -28,7 +29,7 @@ def register_students(request):
         # Process Excel file
         df = pd.read_excel(excel_file)
         for index, row in df.iterrows():
-            temp_password = get_random_string(length=6)
+            temp_password = row['temporary_password']
             user = CustomUser.objects.create_user(
                 username=row['id_number'], 
                 first_name=row['first_name'], 
@@ -36,7 +37,7 @@ def register_students(request):
                 password=temp_password, 
                 user_type='Student'
             )
-            student_profile.objects.create(
+            stud_profile.objects.create(
                 user=user, 
                 batch=batch, 
                 section=section, 
@@ -48,10 +49,13 @@ def register_students(request):
 
 
 def student_list(request):
-    students = student_profile.objects.all()
+    students = stud_profile.objects.all()
     return render(request, 'admin_pages/student_list.html', {'students': students})
 
-
+def delete_student(request, student_id):
+    student = get_object_or_404(stud_profile, id=student_id)
+    student.user.delete()  
+    return redirect('student_list')
 
 
 def register_user(request):
@@ -78,10 +82,10 @@ def login_user(request):
                 return redirect('student_dashboard')
             elif user.user_type == 'Company':
                 return redirect('company_dashboard')
-            elif user.user_type == 'Admin':
-                return redirect('Admin_dashboard')
+            elif user.is_superuser:
+                return redirect('admin_dashboard')
             else:
-                return redirect('home')
+                return redirect('homes')
         else:
             messages.error(request, 'Invalid credentials')
             return render(request, 'main_pages/login.html')
@@ -108,7 +112,7 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
-    student = request.user.student_profile
+    student = request.user.stud_profile
     if request.method == 'POST':
         student.email = request.POST['email']
         student.phone_number = request.POST['phone_number']
@@ -177,8 +181,19 @@ def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 
 @login_required
-def view_profile(request):
-    return render(request, 'student_pages/view_profile.html', {'current_page': 'view_profile'})
+def view_profile(request, user_id):
+    # Retrieve the student user and profile using the correct model names
+    student_user = get_object_or_404(CustomUser, id=user_id, user_type='Student')
+    student_profile = get_object_or_404(stud_profile, user=student_user)  # Use stud_profile with lowercase 's'
+
+    # Prepare context for rendering
+    context = {
+        'student_user': student_user,
+        'student_profile': student_profile,
+        'current_page': 'view_profile'
+    }
+    
+    return render(request, 'student_pages/view_profile.html', context)
 
 
  
@@ -197,19 +212,24 @@ def post_internship(request):
         form = InternshipPostingForm()
     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
 
+
+
+
+
+def company_register(request):
+    if request.method == 'POST':
+        form = CompanyRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')  # Redirect to login page or another relevant page
+    else:
+        form = CompanyRegistrationForm()
+
+    return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
+
 @login_required
 def company_profile(request):
-    if request.method == 'POST':
-        form = CompanyProfileForm(request.POST)
-        if form.is_valid():
-            company_profile = form.save(commit=False)
-            company_profile.user = request.user
-            company_profile.save()
-            return redirect('company_pages/company_dashboard')
-    else:
-        form = CompanyProfileForm()
-        return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
-
+    return render(request, 'company_pages/company_profile.html', {'form': form, 'current_page': 'company_profile'})
 
 
 
@@ -238,6 +258,7 @@ def evaluate_intern(request):
 # Admin Views
 @login_required
 def admin_dashboard(request):
-    if request.user.user_type != 'Admin':
+    if request.user.is_superuser == False:
         return redirect('home')
-    return render(request, 'admin_pages/admin_dashboard.html', {'current_page': 'admin_dashboard'})
+    elif request.user.is_superuser or request.user.user_type == 'Admin':
+        return render(request, 'admin_pages/admin_dashboard.html', {'current_page': 'admin_dashboard'})
