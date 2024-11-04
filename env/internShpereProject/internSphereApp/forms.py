@@ -33,6 +33,8 @@ class StudentProfileForm(forms.ModelForm):
 #         fields = ['company_name', 'company_address', 'company_phone', 'company_description']
 
 class CompanyRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     company_name = forms.CharField(max_length=255)
     company_address = forms.CharField(max_length=255)
     company_phone = forms.CharField(max_length=15)
@@ -40,11 +42,12 @@ class CompanyRegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'password1', 'password2']  # Fields for authentication
+        fields = ('username','email', 'password1', 'password2')
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.user_type = 'Company'
+
         if commit:
             user.save()
             Company.objects.create(
@@ -55,7 +58,6 @@ class CompanyRegistrationForm(UserCreationForm):
                 company_description=self.cleaned_data['company_description']
             )
         return user
-
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))

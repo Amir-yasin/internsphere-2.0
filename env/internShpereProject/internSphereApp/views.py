@@ -212,17 +212,22 @@ def post_internship(request):
 
 
 
-def Company(request):
+
+
+def company_register(request):
     if request.method == 'POST':
         form = CompanyRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # login(request, user)
-            return redirect('login')  
+            form.save()
+            return redirect('login')  # Redirect to login page or another relevant page
     else:
         form = CompanyRegistrationForm()
-        return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
 
+    return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
+
+@login_required
+def company_profile(request):
+    return render(request, 'company_pages/company_profile.html', {'form': form, 'current_page': 'company_profile'})
 
 
 @login_required
