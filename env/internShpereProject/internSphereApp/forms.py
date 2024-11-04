@@ -27,11 +27,34 @@ class StudentProfileForm(forms.ModelForm):
         fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
         
 
-class CompanyProfileForm(forms.ModelForm):
-    class Meta:
-        model = CompanyProfile
-        fields = ['company_name', 'company_address', 'company_phone', 'company_description']
+# class CompanyProfileForm(forms.ModelForm):
+#     class Meta:
+#         model = Company
+#         fields = ['company_name', 'company_address', 'company_phone', 'company_description']
 
+class CompanyRegistrationForm(UserCreationForm):
+    company_name = forms.CharField(max_length=255)
+    company_address = forms.CharField(max_length=255)
+    company_phone = forms.CharField(max_length=15)
+    company_description = forms.CharField(widget=forms.Textarea, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'password1', 'password2']  # Fields for authentication
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.user_type = 'Company'
+        if commit:
+            user.save()
+            Company.objects.create(
+                user=user,
+                company_name=self.cleaned_data['company_name'],
+                company_address=self.cleaned_data['company_address'],
+                company_phone=self.cleaned_data['company_phone'],
+                company_description=self.cleaned_data['company_description']
+            )
+        return user
 
 
 class LoginForm(forms.Form):

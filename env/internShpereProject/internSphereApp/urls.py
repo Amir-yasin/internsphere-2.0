@@ -29,7 +29,7 @@ path('stud_notification', views.stud_notification , name = 'stud_notification'),
 # company pages url
 path('post_internship', views.post_internship , name = 'post_internship'),
 path('company_dashboard', views.company_dashboard , name = 'company_dashboard'),
-path('company_profile', views.company_profile , name = 'company_profile'),
+path('company_profile', views.Company , name = 'Company'),
 path('view_applicants', views.view_applicants , name = 'view_applicants'),
 path('attendance', views.attendance , name = 'attendance'),
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),

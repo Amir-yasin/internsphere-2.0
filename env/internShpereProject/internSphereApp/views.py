@@ -210,17 +210,17 @@ def post_internship(request):
         form = InternshipPostingForm()
     return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
 
-@login_required
-def CompanyProfile(request):
+
+
+def Company(request):
     if request.method == 'POST':
-        form = CompanyProfileForm(request.POST)
+        form = CompanyRegistrationForm(request.POST)
         if form.is_valid():
-            company_profile = form.save(commit=False)
-            company_profile.user = request.user
-            company_profile.save()
-            return redirect('company_pages/company_dashboard')
+            user = form.save()
+            # login(request, user)
+            return redirect('login')  
     else:
-        form = CompanyProfileForm()
+        form = CompanyRegistrationForm()
         return render(request, 'company_pages/company_profile.html', {'form':'form','current_page': 'company_profile'})
 
 
