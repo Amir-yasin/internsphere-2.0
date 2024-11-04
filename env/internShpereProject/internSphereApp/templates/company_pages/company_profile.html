@@ -18,8 +18,15 @@
     <div class="heading">
         <h1>Company Profile</h1>
     </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    {% comment %} </form> {% endcomment %}
 
-    <form method="post" class="company-profile-form">
+
+    {% comment %} <form method="post" class="company-profile-form">
+            {% csrf_token %}
         <h2>Enter Company Information</h2>
 
         <div class="form-row">
@@ -45,7 +52,7 @@
         <div class="form-row">
             <label for="company_website">Company Website(Optional):</label>
             <input type="url" id="company_website" name="company_website">
-        </div>
+        </div> {% endcomment %}
 
 
         {% comment %} <!-- Internship Offerings Section -->
@@ -76,7 +83,7 @@
             <input type="date" id="application_deadline" name="application_deadline" required>
         </div> {% endcomment %}
 
-        <button type="submit">Save Profile</button>
+        {% comment %} <button type="submit">Save Profile</button> {% endcomment %}
     </form>
 
 {% endblock nav_and_footer %}
