@@ -111,7 +111,7 @@ def Internships(request):
     return render(request, 'student_pages/Internships.html', {'current_page': 'Internships'})
 
 @login_required
-def student_profile(request):
+def stud_profile(request):
     student = request.user.stud_profile
     if request.method == 'POST':
         student.email = request.POST['email']

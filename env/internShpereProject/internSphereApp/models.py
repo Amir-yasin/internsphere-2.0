@@ -23,7 +23,7 @@ class CustomUser(AbstractUser):
 
 
 # Student Profile
-class student_profile(models.Model):
+class stud_profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
@@ -107,7 +107,7 @@ class Internship(models.Model):
 
 # Application model linking Student and Internship
 class Application(models.Model):
-    student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')])
     applied_at = models.DateTimeField(auto_now_add=True)
@@ -118,7 +118,7 @@ class Application(models.Model):
 
 # BiWeeklyReport model
 class BiWeeklyReport(models.Model):
-    student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     report_number = models.IntegerField()
     week_start = models.DateField()
     week_end = models.DateField()
@@ -140,13 +140,13 @@ class BiWeeklyReport(models.Model):
 
 # Final Report
 class FinalReport(models.Model):
-    student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     report = models.FileField(upload_to='final-reports/')
 
 
 # Attendance model
 class Attendance(models.Model):
-    student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
     date = models.DateField()
     status = models.CharField(max_length=10, choices=[('present', 'Present'), ('absent', 'Absent')])
@@ -157,7 +157,7 @@ class Attendance(models.Model):
 
 # Evaluation model linking Student and Company
 class Evaluation(models.Model):
-    student = models.ForeignKey(student_profile, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     feedback = models.TextField()
     score = models.DecimalField(max_digits=5, decimal_places=2)  # out of 100
@@ -215,7 +215,7 @@ class Evaluation(models.Model):
 
 # Application model linking Student and Internship
 # class Application(models.Model):
-#     student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
 #     internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
 #     status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')])
 #     applied_at = models.DateTimeField(auto_now_add=True)
@@ -231,7 +231,7 @@ class Evaluation(models.Model):
 
 # BiWeeklyReport model for Student
 # class BiWeeklyReport(models.Model):
-#     student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
 #     report_period_start = models.DateField()
 #     report_period_end = models.DateField()
 #     report_content = models.TextField()
