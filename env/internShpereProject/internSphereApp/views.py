@@ -19,7 +19,7 @@ def about(request):
 def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
 
-
+#admin pages
 def register_students(request):
     if request.method == 'POST':
         batch = request.POST['batch']
@@ -56,6 +56,20 @@ def delete_student(request, student_id):
     student = get_object_or_404(stud_profile, id=student_id)
     student.user.delete()  
     return redirect('student_list')
+
+@login_required
+def approve_companies(request):
+    pending_companies = Company.objects.filter(approved=False)
+    return render(request, 'admin_pages/approve_companies.html', {'pending_companies': pending_companies})
+
+@login_required
+def approve_company(request, company_id):
+    if request.user.is_superuser:  # Ensure only admins can approve
+        company = get_object_or_404(Company, id=company_id)
+        company.approved = True
+        company.save()
+        messages.success(request, f"{company.company_name} has been approved.")
+    return redirect('approve_companies')
 
 
 def register_user(request):
@@ -127,29 +141,6 @@ def student_profile(request):
         return redirect('student_dashboard')
     
     return render(request, 'student_pages/student_profile.html', {'student': student})
-# def student_profile(request):
-#     if request.method == 'POST':
-#         form = StudentProfileForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             # Check if profile already exists for this user
-#             try:
-#                 student_profile = student_Profile.objects.get(user=request.user)
-#                 form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)  # Update existing profile
-#                 student_profile = form.save()  # Update existing profile
-#                 messages.success(request, 'Profile updated successfully!') 
-#             except student_Profile.DoesNotExist:
-#                 # Profile does not exist, create a new one
-#                 student_profile = form.save(commit=False)
-#                 student_profile.user = request.user
-#                 student_profile.save()
-#                 messages.success(request, 'Profile created successfully!')  # Success message for creation
-
-
-#             return redirect('student_dashboard')
-#     else:
-#         form = StudentProfileForm()
-
-#     return render(request, 'student_pages/student_profile.html', {'form': form})
 
 @login_required
 def bi_weekly_report(request):
@@ -196,19 +187,34 @@ def view_profile(request, user_id):
 
 
 # company pages views
-
 @login_required
 def post_internship(request):
+    try:
+        company = request.user.company
+    except Company.DoesNotExist:
+        messages.error(request, "You need a company profile to post internships.")
+        return redirect('company_dashboard')
+
+    # Check if the company is approved
+    if not company.approved:
+        messages.error(request, "Your company must be approved by an admin to post internships.")
+        return redirect('company_dashboard')
+
     if request.method == 'POST':
         form = InternshipPostingForm(request.POST)
         if form.is_valid():
             internship = form.save(commit=False)
-            internship.company = request.user.company
+            internship.company = company
             internship.save()
+            messages.success(request, "Internship posted successfully.")
             return redirect('company_dashboard')
     else:
         form = InternshipPostingForm()
-    return render(request, 'company_pages/post_internship.html', {'current_page': 'post_internship'})
+
+    return render(request, 'company_pages/post_internship.html', {
+        'form': form,
+        'current_page': 'post_internship'
+    })
 
 
 
@@ -218,8 +224,19 @@ def company_register(request):
     if request.method == 'POST':
         form = CompanyRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Redirect to login page or another relevant page
+            user = form.save(commit=False)
+            user.user_type = 'Company'
+            user.save()
+            # Save company profile with approved=False by default
+            Company.objects.create(
+                user=user,
+                company_name=form.cleaned_data['company_name'],
+                company_address=form.cleaned_data['company_address'],
+                company_phone=form.cleaned_data['company_phone'],
+                company_description=form.cleaned_data['company_description'],
+                approved=False
+            )
+            return redirect('login')
     else:
         form = CompanyRegistrationForm()
 
