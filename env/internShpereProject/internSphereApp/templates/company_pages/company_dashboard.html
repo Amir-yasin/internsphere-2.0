@@ -20,7 +20,16 @@
         <h1>Welcome, {{ user.username }}</h1>
         <p class="text-center">You are logged in as a {{ user.user_type }}</p>
     </header>
+
     <div class="dashboard">
+
+        <div class="dashboard-item">
+            <h2>My Profile</h2>
+            <p>View your Company's profile.</p>
+            <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn1">View Profile</a>
+
+        </div>
+
         <div class="dashboard-item">
             <h2>Posted Internships</h2>
             <p>Total: 3</p>

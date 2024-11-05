@@ -226,8 +226,15 @@ def company_register(request):
     return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
 
 @login_required
-def company_profile(request):
-    return render(request, 'company_pages/company_profile.html', {'form': form, 'current_page': 'company_profile'})
+def view_company_profile(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id, user_type='Company')
+    company = get_object_or_404(Company, user=user)  
+
+    context = {
+        'company': company,
+        'current_page': 'view_company'
+    }
+    return render(request, 'company_pages/view_company_profile.html', context)
 
 
 @login_required

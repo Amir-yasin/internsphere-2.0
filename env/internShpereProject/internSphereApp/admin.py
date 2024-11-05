@@ -5,6 +5,7 @@ from .models import *
 
 class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'email', 'first_name', 'last_name', 'user_type' ]
+    search_fields = ['username','email', 'phone_number','section','batch','department','user_type']
 
 # Unregister the default User admin and register the custom one
 admin.site.register(User, CustomUserAdmin)
