@@ -228,8 +228,15 @@ def company_register(request):
     return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
 
 @login_required
-def company_profile(request):
-    return render(request, 'company_pages/company_profile.html', {'form': form, 'current_page': 'company_profile'})
+def company_profile(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id, user_type='Company')
+    company = get_object_or_404(Company, user=user)  # Ensure you're passing the Company model
+
+    context = {
+        'company': company,
+        'current_page': 'company_profile'
+    }
+    return render(request, 'company_pages/company_profile.html',context)
 
 
 
