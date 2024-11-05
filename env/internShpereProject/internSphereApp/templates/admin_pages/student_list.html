@@ -18,6 +18,13 @@
     <title>Student List</title>
 </head>
 <body>
+    {% if messages %}
+    <ul class="text-Success">
+        {% for message in messages %}
+           <p>{{ message }}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
     <h1>Student List</h1>
     <table border="1">
         <tr>

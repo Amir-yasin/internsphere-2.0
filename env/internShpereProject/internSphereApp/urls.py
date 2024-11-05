@@ -10,7 +10,6 @@ path('login', views.login_user , name = 'login'),
 path('accounts/login/', views.login_user , name = 'login'),
 path('register', views.register_user , name = 'register'),
 path('logout', views.logout, name='logout'),
-
 # path('services', views.services , name = 'services'),
 
 
@@ -37,11 +36,19 @@ path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
 path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
 
 
-
-path('register_students', views.register_students , name = 'register_students'),
+#admin pages url(students)
 path('admin_dashboard', views.admin_dashboard , name = 'admin_dashboard'),
+path('register_students', views.register_students , name = 'register_students'),
 path('student_list', views.student_list , name = 'student_list'),
 path('delete_student/<int:student_id>/', views.delete_student, name='delete_student'),
+
+#admin pages url(company)
+path('approve_companies/', views.approve_companies, name='approve_companies'),
+path('approve_company/<int:company_id>/', views.approve_company, name='approve_company'),
+path('view_company_info/<int:company_id>/', views.view_company_info, name='view_company_info'),
+path('delete_company/<int:company_id>/', views.delete_company, name='delete_company'),
+
+
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),

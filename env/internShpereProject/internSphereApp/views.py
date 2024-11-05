@@ -10,7 +10,6 @@ from django.utils.crypto import get_random_string
 import pandas as pd  
 from django.shortcuts import get_object_or_404
 
-# Create your views here.
 # main pages views
 def home(request):
     return render(request, 'main_pages/index.html', {'current_page': 'home'})
@@ -60,16 +59,30 @@ def delete_student(request, student_id):
 @login_required
 def approve_companies(request):
     pending_companies = Company.objects.filter(approved=False)
-    return render(request, 'admin_pages/approve_companies.html', {'pending_companies': pending_companies})
+    approved_companies = Company.objects.filter(approved=True)
+    return render(request, 'admin_pages/approve_companies.html', {'pending_companies': pending_companies, 'approved_companies': approved_companies})
 
 @login_required
 def approve_company(request, company_id):
-    if request.user.is_superuser:  # Ensure only admins can approve
+    if request.user.is_superuser: 
         company = get_object_or_404(Company, id=company_id)
         company.approved = True
         company.save()
         messages.success(request, f"{company.company_name} has been approved.")
     return redirect('approve_companies')
+
+@login_required
+def view_company_info(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+    return render(request, 'admin_pages/view_company_info.html', {'company': company})
+
+@login_required
+def delete_company(request, company_id):
+    company = get_object_or_404(company, id=company_id)
+    company.user.delete()  
+    return redirect('approve_companies')
+
+
 
 
 def register_user(request):

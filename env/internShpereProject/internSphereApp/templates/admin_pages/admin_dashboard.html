@@ -29,13 +29,28 @@
         <p>You are logged in as a {{ user.user_type }}</p>
     </header>
     
-    
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="dashboard">
         <div class="dashboard-item">
             <h2>Register Students</h2>
             <p>Register the students that are going to take internship.</p>
             <a href="{% url 'register_students' %}" class="btn">Register</a>
             <a href="{% url 'student_list' %}" class="btn">list of students</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Approve Companies</h2>
+            <p>Approve the Companies that are going to post the internships.</p>
+            <a href="{% url 'approve_companies' %}" class="btn">Approve Now</a>
+            {% comment %} <a href="{% url 'student_list' %}" class="btn">list of students</a> {% endcomment %}
         </div>
 
         <div class="dashboard-item">

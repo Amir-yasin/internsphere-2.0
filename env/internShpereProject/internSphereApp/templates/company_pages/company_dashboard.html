@@ -13,6 +13,15 @@
 
 </head>
 <body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="heading">
         <h1>Company Dashboard</h1>
     </div>
