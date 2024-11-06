@@ -27,11 +27,6 @@ class StudentProfileForm(forms.ModelForm):
         fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
         
 
-# class CompanyProfileForm(forms.ModelForm):
-#     class Meta:
-#         model = Company
-#         fields = ['company_name', 'company_address', 'company_phone', 'company_description']
-
 class CompanyRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -62,3 +57,13 @@ class CompanyRegistrationForm(UserCreationForm):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
+
+
+class InternshipPostingForm(forms.ModelForm):
+    class Meta:
+        model = Internship
+        fields = ['title', 'description', 'requirement', 'location', 'start_date', 'end_date']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+        }
