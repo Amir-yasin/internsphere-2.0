@@ -18,6 +18,48 @@ def about(request):
 def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
 
+def register_user(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            return redirect('login')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'main_pages/register.html', {'form': form, 'current_page': 'contact'})
+
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            # Redirect based on user type
+            if user.user_type == 'Student':
+                return redirect('student_dashboard')
+            elif user.user_type == 'Company':
+                return redirect('company_dashboard')
+            elif user.is_superuser:
+                return redirect('admin_dashboard')
+            else:
+                return redirect('homes')
+        else:
+            messages.error(request, 'Invalid credentials')
+            return render(request, 'main_pages/login.html')
+
+    return render(request, 'main_pages/login.html')
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
+
+
+
+
+
 #admin pages
 def register_students(request):
     if request.method == 'POST':
@@ -84,44 +126,6 @@ def delete_company(request, company_id):
 
 
 
-
-def register_user(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('login')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'main_pages/register.html', {'form': form, 'current_page': 'contact'})
-
-
-def login_user(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            # Redirect based on user type
-            if user.user_type == 'Student':
-                return redirect('student_dashboard')
-            elif user.user_type == 'Company':
-                return redirect('company_dashboard')
-            elif user.is_superuser:
-                return redirect('admin_dashboard')
-            else:
-                return redirect('homes')
-        else:
-            messages.error(request, 'Invalid credentials')
-            return render(request, 'main_pages/login.html')
-
-    return render(request, 'main_pages/login.html')
-
-def logout(request):
-    auth_logout(request)
-    return redirect('login')
 
 
 # student pages views
