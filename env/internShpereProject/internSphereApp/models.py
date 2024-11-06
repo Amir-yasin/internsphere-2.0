@@ -40,7 +40,7 @@ class stud_profile(models.Model):
 
     def __str__(self):
         return self.user.username
-
+#this is branch from martha
 
 # Company Profile
 class Company(models.Model):

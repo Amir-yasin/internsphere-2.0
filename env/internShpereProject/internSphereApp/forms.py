@@ -21,6 +21,7 @@ class StudentCreationForm(UserCreationForm):
 
 
 
+
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = stud_profile
