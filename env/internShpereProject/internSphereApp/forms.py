@@ -61,8 +61,9 @@ class LoginForm(forms.Form):
 class InternshipPostingForm(forms.ModelForm):
     class Meta:
         model = Internship
-        fields = ['title', 'description', 'requirement', 'location', 'start_date', 'end_date']
+        fields = ['title', 'description', 'requirement', 'location', 'start_date', 'end_date', 'deadline']
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
