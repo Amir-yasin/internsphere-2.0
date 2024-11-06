@@ -24,6 +24,14 @@ class CustomUser(AbstractUser):
 
 # Student Profile
 class stud_profile(models.Model):
+    DEPARTMENT_CHOICES = [
+        ('Accounting', 'Accounting'),
+        ('Computer Science', 'Computer Science'),
+        ('Management', 'Management'),
+        ('Marketing', 'Marketing'),
+        ('THM', 'THM'),
+    ]
+        
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
@@ -34,25 +42,13 @@ class stud_profile(models.Model):
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
     year_of_study = models.CharField(max_length=2)
     skills = models.CharField(max_length=1000)
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  # Ensures matching with sector choices
     resume = models.FileField(upload_to='resumes/')
     linkedin_profile = models.URLField(blank=True, null=True)
-    list_of_students = models.FileField(upload_to='list_of_students/')
+    list_of_students = models.FileField(upload_to='list_of_students/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
-
-
-# Company Profile
-# class Company(models.Model):
-#     # user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
-#     company_name = models.CharField(max_length=255)
-#     company_address = models.CharField(max_length=255)
-#     company_phone = models.CharField(max_length=15)
-#     company_description = models.TextField(blank=True, null=True)
-#     approved = models.BooleanField(default=False)  # This field indicates if the company has been approved by the admin
-
-#     def __str__(self):
-#         return self.company_name
 
 
 class Company(models.Model):
@@ -104,15 +100,27 @@ class InternshipCareerOffice(models.Model):
 def default_deadline():
     return (timezone.now() + datetime.timedelta(days=30)).date()
 
+def default_deadline():
+    return (timezone.now() + datetime.timedelta(days=30)).date()
+
 class Internship(models.Model):
+    SECTOR_CHOICES = [
+        ('Accounting', 'Accounting'),
+        ('Computer Science', 'Computer Science'),
+        ('Management', 'Management'),
+        ('Marketing', 'Marketing'),
+        ('THM', 'THM'),
+    ]
+    
     company = models.ForeignKey('Company', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
     location = models.CharField(max_length=255)
+    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES)  
     start_date = models.DateField()
     end_date = models.DateField()
-    deadline = models.DateField(null=True, default=default_deadline)  # Use a callable function here
+    deadline = models.DateField(null=True, default=default_deadline)
     posted_on = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, default='Open')  # Open or Closed
 
@@ -120,11 +128,9 @@ class Internship(models.Model):
         return self.title
 
     def is_expired(self):
-        """Method to check if the internship is expired based on the deadline."""
         return self.deadline < timezone.now().date()
 
     def close_if_expired(self):
-        """Automatically close internship if deadline has passed."""
         if self.is_expired():
             self.status = 'Closed'
             self.save()

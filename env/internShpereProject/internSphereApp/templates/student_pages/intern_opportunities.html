@@ -25,11 +25,26 @@
   
       <div class="opportunities-list">
           <div class="opportunity">
-              <h2>Software Developer Intern</h2>
-              <p>Company: Tech Corp</p>
-              <p>Location: Addis Ababa</p>
-              <input type="submit" class="btn1" value="Apply Now">
-              <a href="apply_internship.html" class="btn1">Apply Now</a>
+
+            {% if internships %}
+            <ul>
+                {% for internship in internships %}
+                    <li>
+                        <h2>{{ internship.title }}</h2>
+                        <p>{{ internship.description }}</p>
+                        <p><strong>Location:</strong> {{ internship.location }}</p>
+                        <p><strong>Requirements:</strong> {{ internship.requirement }}</p>
+                        <p><strong>Deadline:</strong> {{ internship.deadline }}</p>
+                    </li>
+                    <input type="submit" class="btn1" value="Apply Now">
+                    <a href="apply_internship.html" class="btn1">Apply Now</a>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No internships available for your department at the moment.</p>
+        {% endif %}
+
+
           </div>
   
           <div class="opportunity">

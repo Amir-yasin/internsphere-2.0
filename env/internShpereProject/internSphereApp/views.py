@@ -134,10 +134,6 @@ def Graduate_students(request):
     return render(request, 'student_pages/Graduate_students.html', {'current_page': 'Graduate_students'})
 
 @login_required
-def intern_opportunities(request):
-    return render(request, 'student_pages/intern_opportunities.html', {'current_page': 'intern_opportunities'})
-
-@login_required
 def Internships(request):
     return render(request, 'student_pages/Internships.html', {'current_page': 'Internships'})
 
@@ -193,7 +189,6 @@ def view_profile(request, user_id):
     student_user = get_object_or_404(CustomUser, id=user_id, user_type='Student')
     student_profile = get_object_or_404(stud_profile, user=student_user)  # Use stud_profile with lowercase 's'
 
-    # Prepare context for rendering
     context = {
         'student_user': student_user,
         'student_profile': student_profile,
@@ -201,6 +196,22 @@ def view_profile(request, user_id):
     }
     
     return render(request, 'student_pages/view_profile.html', context)
+
+@login_required
+def intern_opportunities(request):
+    try:
+        student_profile = stud_profile.objects.get(user=request.user)
+        if not student_profile.profile_completed:
+            return redirect('student_profile')
+        internships = Internship.objects.filter(sector=student_profile.department, status='Open')
+        context = {
+            'internships': internships,
+            'current_page': 'intern_opportunities'
+        }
+        return render(request, 'student_pages/intern_opportunities.html', context)
+    except stud_profile.DoesNotExist:
+        return redirect('student_profile')
+
 
 
 # company pages views
