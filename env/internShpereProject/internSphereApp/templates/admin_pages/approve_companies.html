@@ -1,0 +1,91 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+<style>
+    table, th ,td{
+        border:2px solid black;
+        padding:0px 7px;
+    }
+</style>
+{% if messages %}
+<ul class="text-Success">
+    {% for message in messages %}
+       <p>{{ message }}</p>
+    {% endfor %}
+</ul>
+{% endif %}
+<h2>Pending Company Approvals</h2>
+
+{% if pending_companies %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Company Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in pending_companies %}
+                <tr>
+                    <td>{{ company.company_name }}</td>
+                    <td>{{ company.company_address }}</td>
+                    <td>{{ company.company_phone }}</td>
+                    <td>
+                        {% if company.id %}
+                        <a href="{% url 'approve_company' company.id %}" class="btn btn-success">Approve</a>
+                        <a href="{% url 'view_company_info' company.id %}" class="btn btn-info">View Profile</a>
+                        <a href="{% url 'delete_company' company.id %}" class="btn btn-danger">Delete</a>
+                    {% else %}
+                        <p>Error: No company ID found</p>
+                    {% endif %}
+
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No pending companies for approval.</p>
+{% endif %}
+
+<h2>Approved Companies</h2>
+
+{% if approved_companies %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Company Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>approved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in approved_companies %}
+                <tr>
+                    <td>{{ company.company_name }}</td>
+                    <td>{{ company.company_address }}</td>
+                    <td>{{ company.company_phone }}</td>
+                    <td>{{ company.approved }}</td>
+
+                    <td>
+                        
+                        <a href="{% url 'view_company_info' company.id %}" class="btn btn-info">View Profile</a>
+                        <a href="{% url 'delete_company' company.id %}" class="btn btn-danger">Delete</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No approved companies yet.</p>
+{% endif %}
+
+{% endblock nav_and_footer %}

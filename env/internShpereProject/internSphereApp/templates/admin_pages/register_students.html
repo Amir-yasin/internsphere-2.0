@@ -4,7 +4,13 @@
 {% block nav_and_footer %}
     
     
-
+{% if messages %}
+<ul class="text-Success">
+    {% for message in messages %}
+       <p>{{ message }}</p>
+    {% endfor %}
+</ul>
+{% endif %}
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <label for="batch">Batch:</label>

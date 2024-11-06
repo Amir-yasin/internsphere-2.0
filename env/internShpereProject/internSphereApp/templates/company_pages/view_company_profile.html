@@ -1,0 +1,30 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+
+{% block nav_and_footer %}
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Company Profile</title>
+</head>
+<body>
+    <h1>Company Profile</h1>
+
+    <!-- Display company details -->
+    <p><strong>Company Name:</strong> {{ company.company_name }}</p>
+    <p><strong>Company Address:</strong> {{ company.company_address }}</p>
+    <p><strong>Company Phone:</strong> {{ company.company_phone }}</p>
+    <p><strong>Company Description:</strong> {{ company.company_description }}</p>
+    <p><strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}</p>
+    <a href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
+
+    {% comment %} <a href="{% url 'edit_company_profile' company.user.id %}">Edit Profile</a> <!-- If you want an edit link --> {% endcomment %}
+</body>
+</html>
+
+
+{% endblock nav_and_footer %}
+    
