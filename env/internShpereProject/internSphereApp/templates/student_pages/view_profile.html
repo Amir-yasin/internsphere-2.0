@@ -30,10 +30,15 @@
     <p><strong>Batch:</strong> {{ student_profile.batch }}</p>
     <p><strong>Section:</strong> {{ student_profile.section }}</p>
     <p><strong>Gender:</strong> {{ student_profile.gender }}</p>
-    <p><strong>year_of_study:</strong> {{ student_profile.year_of_study }}</p>
+    <p><strong>year of study:</strong> {{ student_profile.year_of_study }}</p>
     <p><strong>skills:</strong> {{ student_profile.skills }}</p>
-    <p><strong>resume:</strong> {{ student_profile.resume }}</p>
-    <p><strong>linkedin_profile:</strong> {{ student_profile.linkedin_profile }}</p>
+    {% if student_profile.resume %}
+    <p><strong>Resume:</strong> <a href="{{ student_profile.resume.url }}" target="_blank">Download</a></p>
+{% endif %}
+
+{% if student_profile.linkedin_profile %}
+    <p><strong>LinkedIn:</strong> <a href="{{ student_profile.linkedin_profile }}" target="_blank">{{ student_profile.linkedin_profile }}</a></p>
+{% endif %}
     <p><strong>profile_completed:</strong> {{ student_profile.profile_completed }}</p>
 
     <!-- Add more fields as needed from stud_profile model -->
