@@ -206,33 +206,21 @@ def view_profile(request, user_id):
 # company pages views
 @login_required
 def post_internship(request):
-    try:
-        company = request.user.company
-    except Company.DoesNotExist:
-        messages.error(request, "You need a company profile to post internships.")
-        return redirect('company_dashboard')
-
-    # Check if the company is approved
-    if not company.approved:
-        messages.error(request, "Your company must be approved by an admin to post internships.")
-        return redirect('company_dashboard')
-
-    if request.method == 'POST':
-        form = InternshipPostingForm(request.POST)
-        if form.is_valid():
-            internship = form.save(commit=False)
-            internship.company = company
-            internship.save()
-            messages.success(request, "Internship posted successfully.")
-            return redirect('company_dashboard')
+    if request.user.user_type == 'Company' and request.user.company.approved:
+        if request.method == 'POST':
+            form = InternshipPostingForm(request.POST)
+            if form.is_valid():
+                internship = form.save(commit=False)
+                internship.company = request.user.company  # Link the internship to the logged-in company
+                internship.save()
+                messages.success(request, "Internship posted successfully.")
+                return redirect('company_dashboard')
+        else:
+            form = InternshipPostingForm()
+        return render(request, 'company_pages/post_internship.html', {'form': form, 'current_page': 'post_internship'})
     else:
-        form = InternshipPostingForm()
-
-    return render(request, 'company_pages/post_internship.html', {
-        'form': form,
-        'current_page': 'post_internship'
-    })
-
+        messages.error(request, "Only approved companies can post internships.")
+        return redirect('company_dashboard')
 
 
 
