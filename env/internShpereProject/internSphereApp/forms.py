@@ -24,8 +24,7 @@ class StudentCreationForm(UserCreationForm):
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = stud_profile
-        fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
-        
+        fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']     
 
 class CompanyRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
