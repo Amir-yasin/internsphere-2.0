@@ -91,18 +91,29 @@ class InternshipCareerOffice(models.Model):
 
 # Internship Posting
 class Internship(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
     location = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
+    deadline = models.DateField()  
     posted_on = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, default='Open')  # Open or Closed
 
     def __str__(self):
         return self.title
+
+    def is_expired(self):
+        """Method to check if the internship is expired based on the deadline."""
+        return self.deadline < timezone.now().date()
+
+    def close_if_expired(self):
+        """Automatically close internship if deadline has passed."""
+        if self.is_expired():
+            self.status = 'Closed'
+            self.save()
 
 
 # Application model linking Student and Internship
