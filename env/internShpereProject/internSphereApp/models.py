@@ -100,9 +100,6 @@ class InternshipCareerOffice(models.Model):
 def default_deadline():
     return (timezone.now() + datetime.timedelta(days=30)).date()
 
-def default_deadline():
-    return (timezone.now() + datetime.timedelta(days=30)).date()
-
 class Internship(models.Model):
     SECTOR_CHOICES = [
         ('Accounting', 'Accounting'),

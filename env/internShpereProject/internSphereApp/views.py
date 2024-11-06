@@ -140,21 +140,27 @@ def Internships(request):
 @login_required
 def student_profile(request):
     student = request.user.stud_profile
+    
     if request.method == 'POST':
+        # Update student fields with the submitted form data
         student.email = request.POST['email']
         student.phone_number = request.POST['phone_number']
         student.gender = request.POST['gender']
         student.year_of_study = request.POST['year_of_study']
         student.skills = request.POST['skills']
         student.linkedin_profile = request.POST['linkedin_profile']
-        student.resume = request.FILES['resume']
+        student.resume = request.FILES.get('resume')
+        student.department = request.POST['department']  # New field
         student.profile_completed = True
         student.save()
-        messages.success(request, 'Profile created successfully!') 
+        
+        messages.success(request, 'Profile created successfully!')
         return redirect('student_dashboard')
     
-    return render(request, 'student_pages/student_profile.html', {'student': student})
-
+    return render(request, 'student_pages/student_profile.html', {
+        'student': student,
+        'department_choices': stud_profile.DEPARTMENT_CHOICES  # Passing choices to template
+    })
 @login_required
 def bi_weekly_report(request):
     if request.method == 'POST':
