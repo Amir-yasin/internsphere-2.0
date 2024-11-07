@@ -10,6 +10,7 @@ from django.utils.crypto import get_random_string
 import pandas as pd  
 from django.shortcuts import get_object_or_404
 
+
 # main pages views
 def home(request):
     return render(request, 'main_pages/index.html', {'current_page': 'home'})
