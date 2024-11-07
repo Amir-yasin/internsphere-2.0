@@ -6,6 +6,7 @@ from django.utils import timezone
 
 
 
+
 # CustomUser
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
