@@ -29,13 +29,12 @@
             {% if internships %}
             <ul>
                 {% for internship in internships %}
-                    <li>
-                        <h2>{{ internship.title }}</h2>
-                        <p>{{ internship.description }}</p>
-                        <p><strong>Location:</strong> {{ internship.location }}</p>
-                        <p><strong>Requirements:</strong> {{ internship.requirement }}</p>
-                        <p><strong>Deadline:</strong> {{ internship.deadline }}</p>
-                    </li>
+                        <h2> {{ internship.title }} </h2>
+                        <h6><strong>company:</strong> Abc comp{{ company.company_name }}</h6>
+                        {% comment %} <p>{{ internship.description }}</p> {% endcomment %}
+                        <h6><strong>Location:</strong> {{ internship.location }}</h6>
+                        {% comment %} <p><strong>Requirements:</strong> {{ internship.requirement }}</p> {% endcomment %}
+                        <h6><strong>Deadline:</strong> {{ internship.deadline }}</h6>
                     {% comment %} <input type="submit" class="btn1" value="Apply Now"> {% endcomment %}
                     <a href="apply_internship.html" class="btn1">Apply Now</a>
                 {% endfor %}

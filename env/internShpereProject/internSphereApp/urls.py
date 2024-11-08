@@ -24,6 +24,8 @@ path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
 path('applications', views.applications , name = 'applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
 
+path('api/internships/', views.internships_by_department, name='internships_by_department'),
+
 
 # company pages url
 path('post_internship', views.post_internship , name = 'post_internship'),

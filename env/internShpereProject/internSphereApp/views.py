@@ -218,6 +218,29 @@ def intern_opportunities(request):
     except stud_profile.DoesNotExist:
         return redirect('student_profile')
 
+# views.py
+import json
+from django.http import JsonResponse
+from .models import Internship
+
+def internships_by_department(request):
+    # Assume student's department is passed as a query parameter
+    department = request.GET.get('department', None)
+    if department:
+        internships = Internship.objects.filter(sector=department)
+        internships_data = [
+            {
+                'title': internship.title,
+                'description': internship.description,
+                'location': internship.location,
+                'start_date': internship.start_date,
+                'end_date': internship.end_date,
+            }
+            for internship in internships
+        ]
+        return JsonResponse({'internships': internships_data})
+    return JsonResponse({'error': 'Department not specified'}, status=400)
+
 
 
 # company pages views
