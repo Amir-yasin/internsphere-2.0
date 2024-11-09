@@ -12,6 +12,7 @@ class UserTypeForm(forms.Form):
         ('internship_office', 'Internship Office')
     ]
     
+    
     user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
 
 class StudentCreationForm(UserCreationForm):
