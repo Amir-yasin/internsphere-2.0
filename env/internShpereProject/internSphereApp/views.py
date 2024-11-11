@@ -311,8 +311,8 @@ def view_company_profile(request, user_id):
 
 @login_required
 def company_dashboard(request):
-    internship = Internship.objects.filter(company=request.user.company)
-    return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard', 'internship': internship})
+    internships = Internship.objects.filter(company=request.user.company)
+    return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard','internships': internships})
 
 
 @login_required
@@ -323,7 +323,6 @@ def post_internship(request):
         messages.error(request, "You need a company profile to post internships.")
         return redirect('company_dashboard')
 
-    # Check if the company is approved
     if not company.approved:
         messages.error(request, "Your company must be approved by an admin to post internships.")
         return redirect('company_dashboard')
@@ -347,8 +346,8 @@ def post_internship(request):
 
 @login_required
 def view_applicants(request, internship_id):
-    internship = Internship.objects.get(id=internship_id)
-    applicants = internship.applications.all()  # Use related_name if defined, otherwise filter by internship
+    internship = Internship.objects.get(Internship, id=internship_id)
+    applicants = internship.applications.all()  
     return render(request, 'company_pages/view_applicants.html', {'internship': internship, 'applicants': applicants})
 
 
