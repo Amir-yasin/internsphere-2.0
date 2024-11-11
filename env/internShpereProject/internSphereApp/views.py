@@ -311,6 +311,7 @@ def view_company_profile(request, user_id):
 
 @login_required
 def company_dashboard(request):
+    internship = Internship.objects.filter(company=request.user.company)
     return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard', 'internship': internship})
 
 
