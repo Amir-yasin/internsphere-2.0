@@ -134,15 +134,22 @@ class Internship(models.Model):
 
 # Application model linking Student and Internship
 class Application(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')])
-    applied_at = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+    ]
+    
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='applications')
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='applications')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='applications')
+    applied_on =  models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.internship.title}"
-
-
+        return f"{self.student.user.username} - {self.internship.title} ({self.status})"
+    
+    
 # BiWeeklyReport model
 class BiWeeklyReport(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)

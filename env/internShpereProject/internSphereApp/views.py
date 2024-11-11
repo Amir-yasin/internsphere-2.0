@@ -9,6 +9,9 @@ from .forms import *
 from django.utils.crypto import get_random_string
 import pandas as pd  
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_list_or_404
+
 
 # main pages views
 def home(request):
@@ -181,9 +184,37 @@ def student_dashboard(request):
         return redirect('home')
     return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
 
+
+
+@login_required
+def apply_to_internship(request, internship_id):
+    student_profile = request.user.stud_profile
+    internship = get_object_or_404(Internship, id=internship_id)
+
+    # Ensure one application per internship
+    if Application.objects.filter(student=student_profile, internship=internship).exists():
+        messages.error(request, 'You have already applied for this internship.')
+        return redirect('intern_opportunities')
+
+    # Create a new application
+    Application.objects.create(
+        student=student_profile,
+        internship=internship,
+        company=internship.company,
+        status='Pending'
+    )
+    messages.success(request, 'Your application was submitted successfully!')
+    return redirect('intern_opportunities')
+
 @login_required
 def applications(request):
-    return render(request, 'student_pages/applications.html', {'current_page': 'applications'})
+    student_profile = request.user.stud_profile
+    applications = Application.objects.filter(student=student_profile).select_related('internship', 'company')
+    context = {
+        'applications': applications,
+        'current_page': 'applications'
+    }
+    return render(request, 'student_pages/applications.html', context)
 
 @login_required
 def stud_notification(request):
@@ -218,65 +249,32 @@ def intern_opportunities(request):
     except stud_profile.DoesNotExist:
         return redirect('student_profile')
 
-# views.py
-import json
-from django.http import JsonResponse
-from .models import Internship
+# # views.py
+# import json
+# from django.http import JsonResponse
+# from .models import Internship
 
-def internships_by_department(request):
-    # Assume student's department is passed as a query parameter
-    department = request.GET.get('department', None)
-    if department:
-        internships = Internship.objects.filter(sector=department)
-        internships_data = [
-            {
-                'title': internship.title,
-                'description': internship.description,
-                'location': internship.location,
-                'start_date': internship.start_date,
-                'end_date': internship.end_date,
-            }
-            for internship in internships
-        ]
-        return JsonResponse({'internships': internships_data})
-    return JsonResponse({'error': 'Department not specified'}, status=400)
+# def internships_by_department(request):
+#     # Assume student's department is passed as a query parameter
+#     department = request.GET.get('department', None)
+#     if department:
+#         internships = Internship.objects.filter(sector=department)
+#         internships_data = [
+#             {
+#                 'title': internship.title,
+#                 'description': internship.description,
+#                 'location': internship.location,
+#                 'start_date': internship.start_date,
+#                 'end_date': internship.end_date,
+#             }
+#             for internship in internships
+#         ]
+#         return JsonResponse({'internships': internships_data})
+#     return JsonResponse({'error': 'Department not specified'}, status=400)
 
 
 
 # company pages views
-@login_required
-def post_internship(request):
-    try:
-        company = request.user.company
-    except Company.DoesNotExist:
-        messages.error(request, "You need a company profile to post internships.")
-        return redirect('company_dashboard')
-
-    # Check if the company is approved
-    if not company.approved:
-        messages.error(request, "Your company must be approved by an admin to post internships.")
-        return redirect('company_dashboard')
-
-    if request.method == 'POST':
-        form = InternshipPostingForm(request.POST)
-        if form.is_valid():
-            internship = form.save(commit=False)
-            internship.company = company
-            internship.save()
-            messages.success(request, "Internship posted successfully.")
-            return redirect('company_dashboard')
-    else:
-        form = InternshipPostingForm()
-
-    return render(request, 'company_pages/post_internship.html', {
-        'form': form,
-        'current_page': 'post_internship'
-    })
-
-
-
-
-
 def company_register(request):
     if request.method == 'POST':
         form = CompanyRegistrationForm(request.POST)
@@ -313,11 +311,60 @@ def view_company_profile(request, user_id):
 
 @login_required
 def company_dashboard(request):
-    return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard'})
+    return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard', 'internship': internship})
+
 
 @login_required
-def view_applicants(request):
-    return render(request, 'company_pages/view_applicants.html', {'current_page': 'view_applicants'})
+def post_internship(request):
+    try:
+        company = request.user.company
+    except Company.DoesNotExist:
+        messages.error(request, "You need a company profile to post internships.")
+        return redirect('company_dashboard')
+
+    # Check if the company is approved
+    if not company.approved:
+        messages.error(request, "Your company must be approved by an admin to post internships.")
+        return redirect('company_dashboard')
+
+    if request.method == 'POST':
+        form = InternshipPostingForm(request.POST)
+        if form.is_valid():
+            internship = form.save(commit=False)
+            internship.company = company
+            internship.save()
+            messages.success(request, "Internship posted successfully.")
+            return redirect('company_dashboard')
+    else:
+        form = InternshipPostingForm()
+
+    return render(request, 'company_pages/post_internship.html', {
+        'form': form,
+        'current_page': 'post_internship'
+    })
+
+
+@login_required
+def view_applicants(request, internship_id):
+    internship = get_object_or_404(Internship, id=internship_id, company=request.user.company)
+    applications = Application.objects.filter(internship=internship)
+    return render(request, 'company_pages/view_applicants.html', {'applications': applications, 'internship': internship})
+
+
+@login_required
+def update_application_status(request, application_id, status):
+    application = get_object_or_404(Application, id=application_id, internship__company=request.user.company)
+
+    # Update the status if it's valid
+    if status in ['Accepted', 'Rejected']:
+        application.status = status
+        application.save()
+        messages.success(request, f'Application status updated to {status}.')
+    else:
+        messages.error(request, 'Invalid status update.')
+
+    return redirect('view_applicants', internship_id=application.internship.id)
+
 
 @login_required
 def attendance(request):

@@ -44,12 +44,7 @@
             <p>Total: 3</p>
             <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
         </div>
-
-        <div class="dashboard-item">
-            <h2>Applications Received</h2>
-            <p>Total: 15</p>
-            <a href="{% url 'view_applicants' %}" class="btn1">View Applicants</a>
-        </div>
+        <a href="{% url 'view_applicants' internship.id %}" class="btn1">View Applicants</a>
 
         <div class="dashboard-item">
             <h2>Manage Interns</h2>

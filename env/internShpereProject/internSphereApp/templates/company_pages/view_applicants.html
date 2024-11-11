@@ -16,6 +16,17 @@
     <h1>View Applicants</h1>
 </div>
     <div class="applicants-list">
+        <h2>Applicants for {{ internship.title }}</h2>
+        {% for app in applications %}
+        <div class="applicant">
+            <p>{{ app.student.user.username }} - {{ app.student.department }}</p>
+            <p>Status: {{ app.status }}</p>
+            <a href="{% url 'update_application_status' app.id 'Accepted' %}">Accept</a> |
+            <a href="{% url 'update_application_status' app.id 'Rejected' %}">Reject</a>
+        </div>
+        {% endfor %}
+        
+
         <div class="applicant">
             <h2>John Doe</h2>
             <p>Position Applied: Software Developer Intern</p>
