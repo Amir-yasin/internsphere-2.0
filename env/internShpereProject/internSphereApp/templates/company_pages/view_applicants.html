@@ -19,7 +19,13 @@
         <h2>Applicants for {{ internship.title }}</h2>
         <ul>
             {% for applicant in applicants %}
-                <li>{{ applicant.student_name }} - {{ applicant.student_email }}</li>
+            <p>
+                application {{ applicant.id }}
+                 {{ applicant.company.company_name }}
+
+            </p>
+            internship id: {{ internship.id }}
+                <li>{{ applicant.student_id }} - {{ applicant.student.email }}</li>
             {% empty %}
                 <li>No applicants yet.</li>
             {% endfor %}

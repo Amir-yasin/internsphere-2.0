@@ -309,10 +309,12 @@ def view_company_profile(request, user_id):
     return render(request, 'company_pages/view_company_profile.html', context)
 
 
+
 @login_required
 def company_dashboard(request):
     internships = Internship.objects.filter(company=request.user.company)
-    return render(request, 'company_pages/company_dashboard.html', {'current_page': 'company_dashboard','internships': internships})
+    internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
+    return render(request, 'company_pages/company_dashboard.html', {'internship_list': internship_list})
 
 
 @login_required
@@ -343,13 +345,11 @@ def post_internship(request):
         'current_page': 'post_internship'
     })
 
-
 @login_required
 def view_applicants(request, internship_id):
-    internship = Internship.objects.get(Internship, id=internship_id)
-    applicants = internship.applications.all()  
+    internship = get_object_or_404(Internship, id=internship_id)
+    applicants = internship.applications.all()  # Fetch all applications for this internship
     return render(request, 'company_pages/view_applicants.html', {'internship': internship, 'applicants': applicants})
-
 
 @login_required
 def update_application_status(request, application_id, status):
