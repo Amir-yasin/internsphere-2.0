@@ -347,9 +347,9 @@ def post_internship(request):
 
 @login_required
 def view_applicants(request, internship_id):
-    internship = get_object_or_404(Internship, id=internship_id, company=request.user.company)
-    applications = Application.objects.filter(internship=internship)
-    return render(request, 'company_pages/view_applicants.html', {'applications': applications, 'internship': internship})
+    internship = Internship.objects.get(id=internship_id)
+    applicants = internship.applications.all()  # Use related_name if defined, otherwise filter by internship
+    return render(request, 'company_pages/view_applicants.html', {'internship': internship, 'applicants': applicants})
 
 
 @login_required
