@@ -21,19 +21,20 @@
         {% if applications %}
         <ul class="application">
             {% for app in applications %}
-                <li>
-                    <h3>{{ app.internship.title }} at {{ app.company.company_name }}</h3>
+               
+                    <h3>{{ app.internship.title }}</h3>
+                    <p>Company: {{ app.company.company_name }}</p>
                     <p>Applied on: {{ app.applied_on|date:"F d, Y" }}</p>
                     <p>Status: 
                         {% if app.status == "Pending" %}
                             <span style="color: orange;">{{ app.status }}</span>
                         {% elif app.status == "Accepted" %}
-                            <span style="color: green;">{{ app.status }}</span>
+                            <span style="color: green;">{{ app.status }}, We will contact you soon.</span>
                         {% elif app.status == "Rejected" %}
                             <span style="color: red;">{{ app.status }}</span>
                         {% endif %}
                     </p>
-                </li>
+               
             {% endfor %}
         </ul>
     {% else %}
