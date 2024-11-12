@@ -19,6 +19,14 @@
 
 <body>
     <h2 class="heading" >Internship Opportunities</h2>
+    
+    {% if messages %}
+    <ul class="text-Success">
+        {% for message in messages %}
+           <p>{{ message }}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
     <section class="content-container">
         <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
     </section >
