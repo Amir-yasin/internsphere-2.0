@@ -16,6 +16,7 @@ class UserTypeForm(forms.Form):
     
     user_type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
 
+
 class StudentCreationForm(UserCreationForm):
     class Meta:
         model = stud_profile
