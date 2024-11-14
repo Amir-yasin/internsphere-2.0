@@ -12,6 +12,11 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(stud_profile)
 admin.site.register(Company)
 admin.site.register(CustomUser)
+admin.site.register(Internship)
+admin.site.register(Application)
+# admin.site.register(Company)
+# admin.site.register(Company)
+# admin.site.register(Company)
 
 
 

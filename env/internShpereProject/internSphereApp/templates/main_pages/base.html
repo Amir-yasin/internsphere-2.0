@@ -76,8 +76,15 @@
                                     <a class="dropdown-item" href="{% url 'post_internship' %}">Post Internship</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'view_applicants' %}">Applicants</a>
+                                    {% if internship %}
+                                        <a class="dropdown-item" href="{% url 'view_applicants' internship_id=internship.id %}">Applicants</a>
+                                    {% else %}
+                                        <span class="dropdown-item disabled">Applicants</span>
+                                    {% endif %}
                                 </li>
+                                {% comment %} <li class="nav-item">
+                                    <a class="dropdown-item" href="{% url 'view_applicants' internship_id=internship.id %}">Applicants</a>
+                                </li> {% endcomment %}
                                 <li class="nav-item">
                                     <a class="dropdown-item" href="{% url 'accepted_interns' %}">Accepted Interns</a>
                                 </li>

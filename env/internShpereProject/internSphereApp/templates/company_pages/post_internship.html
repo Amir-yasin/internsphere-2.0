@@ -22,20 +22,9 @@
         <h2 class="para">Post an Internship</h2>
         <p class="para">If your company is interested in posting an internship opportunity on our website, please fill out the form below:</p>
 
-
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Post Internship</button>
-        </form>
-
         {% comment %} <form action="#" method="POST">
             <label for="company-name">Company Name:</label>
             <input type="text" id="company-name" name="company-name" required>
@@ -54,11 +43,11 @@
             <br>
 
             <label for="end-date">End Date:</label>
-            <input type="date" id="end-date" name="end-date" required>
+            <input type="date" id="end-date" name="end-date" required> {% endcomment %}
             <br>
 
             <input type="submit" value="Submit">
-        </form> {% endcomment %}
+        </form>
 
         <p class="para">If your company is interested in partnering with us to connect with talented students from universities across the country, please email us at <a href="mailto:partnerships@mywebsite.com">partnerships@mywebsite.com</a>.</p>
     </div>

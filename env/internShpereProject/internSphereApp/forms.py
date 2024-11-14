@@ -21,12 +21,10 @@ class StudentCreationForm(UserCreationForm):
 
 
 
-
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = stud_profile
-        fields = ['email', 'phone_number', 'gender', 'year_of_study', 'skills', 'resume', 'linkedin_profile']
-        
+        fields = ['email', 'phone_number', 'gender', 'department', 'year_of_study', 'skills', 'resume', 'linkedin_profile']     
 
 class CompanyRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -63,7 +61,7 @@ class LoginForm(forms.Form):
 class InternshipPostingForm(forms.ModelForm):
     class Meta:
         model = Internship
-        fields = ['title', 'description', 'requirement', 'location', 'start_date', 'end_date', 'deadline']
+        fields = ['title', 'description', 'requirement', 'location','sector', 'start_date', 'end_date', 'deadline']
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
