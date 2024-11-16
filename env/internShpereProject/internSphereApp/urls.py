@@ -52,6 +52,8 @@ path('approve_company/<int:company_id>/', views.approve_company, name='approve_c
 path('view_company_info/<int:company_id>/', views.view_company_info, name='view_company_info'),
 path('delete_company/<int:company_id>/', views.delete_company, name='delete_company'),
 
+# admin pages url(icu)
+path('register-internship-career-office/', views.register_internship_career_office, name='register_internship_career_office'),
 
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),

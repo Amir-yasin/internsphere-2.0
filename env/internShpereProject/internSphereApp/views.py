@@ -11,6 +11,7 @@ import pandas as pd
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_list_or_404
+from django.contrib.auth.decorators import user_passes_test
 
 
 # main pages views
@@ -47,6 +48,8 @@ def login_user(request):
                 return redirect('company_dashboard')
             elif user.is_superuser:
                 return redirect('admin_dashboard')
+            elif user.user_type == 'InternshipCareerOffice':
+                return redirect('icu_dashboard')
             else:
                 return redirect('homes')
         else:
@@ -389,3 +392,16 @@ def delete_company(request, company_id):
     return redirect('approve_companies')
 
 
+def is_admin(user):
+    return user.is_authenticated and user.user_type == 'Admin'
+
+@user_passes_test(is_admin)
+def register_internship_career_office(request):
+    if request.method == 'POST':
+        form = InternshipCareerOfficeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('career_office_list')  # Redirect to a page listing all career offices or a success page
+    else:
+        form = InternshipCareerOfficeForm()
+    return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})
