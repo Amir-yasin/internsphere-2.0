@@ -354,12 +354,13 @@ def icu_dashboard(request):
     evaluations = Evaluation.objects.all()
     attendance_records = Attendance.objects.all()
 
-    return render(request, 'icu_dashboard.html', {
+    return render(request, 'internship_office_pages/icu_dashboard.html', {
         'students': students,
         'reports': reports,
         'evaluations': evaluations,
         'attendance_records': attendance_records,
     })
+
 
 
 # Student dashboard view
