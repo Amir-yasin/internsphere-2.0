@@ -67,3 +67,28 @@ class InternshipPostingForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
             'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
+        
+
+
+class InternshipCareerOfficeForm(forms.ModelForm):
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = InternshipCareerOffice
+        fields = ['ICU_director']
+
+    def save(self, commit=True):
+        user = CustomUser(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            user_type='InternshipCareerOffice'
+        )
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+            career_office = super().save(commit=False)
+            career_office.user = user
+            career_office.save()
+        return career_office
