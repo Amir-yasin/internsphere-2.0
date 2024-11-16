@@ -53,7 +53,7 @@ path('view_company_info/<int:company_id>/', views.view_company_info, name='view_
 path('delete_company/<int:company_id>/', views.delete_company, name='delete_company'),
 
 
-# path('attendance', views.attendance , name = 'attendance'),
+path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),

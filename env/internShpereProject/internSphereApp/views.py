@@ -387,3 +387,170 @@ def admin_dashboard(request):
         return redirect('home')
     elif request.user.is_superuser or request.user.user_type == 'Admin':
         return render(request, 'admin_pages/admin_dashboard.html', {'current_page': 'admin_dashboard'})
+    
+
+
+
+    # internship and carrer office views
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import (
+    CustomUser, stud_profile, Company, Department, Supervisor,
+    InternshipCareerOffice, Internship, Application, BiWeeklyReport,
+    FinalReport, Attendance, Evaluation
+)
+from django.contrib import messages
+
+# Dashboard view for Internship Career Office
+@login_required
+def icu_dashboard(request):
+    # if request.user.customuser.user_type != 'InternshipCareerOffice':
+    #     messages.error(request, "You do not have access to this page.")
+    #     return redirect('home')
+
+    students = stud_profile.objects.all()
+    reports = BiWeeklyReport.objects.all()
+    evaluations = Evaluation.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    return render(request, 'icu_dashboard.html', {
+        'students': students,
+        'reports': reports,
+        'evaluations': evaluations,
+        'attendance_records': attendance_records,
+    })
+
+
+# Student dashboard view
+@login_required
+def student_dashboard(request):
+    if request.user.customuser.user_type != 'Student':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    student_profile = get_object_or_404(stud_profile, user=request.user)
+    applications = Application.objects.filter(student=student_profile)
+    reports = BiWeeklyReport.objects.filter(student=student_profile)
+    final_report = FinalReport.objects.filter(student=student_profile).first()
+    attendance_records = Attendance.objects.filter(student=student_profile)
+
+    return render(request, 'student_dashboard.html', {
+        'student_profile': student_profile,
+        'applications': applications,
+        'reports': reports,
+        'final_report': final_report,
+        'attendance_records': attendance_records,
+    })
+
+
+# Company dashboard view
+@login_required
+def company_dashboard(request):
+    if request.user.customuser.user_type != 'Company':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    company = get_object_or_404(Company, user=request.user)
+    internships = Internship.objects.filter(company=company)
+    applications = Application.objects.filter(company=company)
+    evaluations = Evaluation.objects.filter(company=company)
+
+    return render(request, 'company_dashboard.html', {
+        'company': company,
+        'internships': internships,
+        'applications': applications,
+        'evaluations': evaluations,
+    })
+
+
+# Department dashboard view
+@login_required
+def department_dashboard(request):
+    if request.user.customuser.user_type != 'Department':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    department = get_object_or_404(Department, user=request.user)
+    students = stud_profile.objects.filter(department=department.department_name)
+
+    return render(request, 'department_dashboard.html', {
+        'department': department,
+        'students': students,
+    })
+
+
+# Supervisor dashboard view
+@login_required
+def supervisor_dashboard(request):
+    if request.user.customuser.user_type != 'Supervisor':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    supervisor = get_object_or_404(Supervisor, user=request.user)
+    supervised_students = stud_profile.objects.filter(department=supervisor.department)
+
+    return render(request, 'supervisor_dashboard.html', {
+        'supervisor': supervisor,
+        'supervised_students': supervised_students,
+    })
+
+
+# Internship listing view
+@login_required
+def internship_list(request):
+    internships = Internship.objects.filter(status='Open').order_by('-posted_on')
+
+    return render(request, 'internship_list.html', {
+        'internships': internships,
+    })
+
+
+# Apply to internship view
+@login_required
+def apply_to_internship(request, internship_id):
+    internship = get_object_or_404(Internship, id=internship_id)
+    
+    if request.user.customuser.user_type != 'Student':
+        messages.error(request, "Only students can apply to internships.")
+        return redirect('home')
+
+    student_profile = get_object_or_404(stud_profile, user=request.user)
+    existing_application = Application.objects.filter(student=student_profile, internship=internship).first()
+
+    if existing_application:
+        messages.info(request, "You have already applied for this internship.")
+    else:
+        Application.objects.create(
+            student=student_profile,
+            internship=internship,
+            company=internship.company,
+            status='Pending'
+        )
+        messages.success(request, "Your application has been submitted.")
+
+    return redirect('internship_list')
+
+
+# View for ICU to send reports to the department
+@login_required
+def send_reports_to_department(request):
+    if request.user.customuser.user_type != 'InternshipCareerOffice':
+        messages.error(request, "You do not have permission to send reports.")
+        return redirect('home')
+
+    reports = BiWeeklyReport.objects.all()
+    # Additional logic to send reports can be added here, such as sending an email to department
+
+    messages.success(request, "Reports sent to the department.")
+    return redirect('icu_dashboard')
+
+
+# Function to close internships if expired
+def close_expired_internships():
+    internships = Internship.objects.filter(status='Open')
+    for internship in internships:
+        if internship.is_expired():
+            internship.close_if_expired()
+

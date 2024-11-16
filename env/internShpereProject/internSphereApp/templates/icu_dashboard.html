@@ -1,0 +1,83 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
+<body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="heading">
+        <h1>Internship and carrer office Dashboard</h1>
+    </div>
+    <header>
+        <h1>Welcome, {{ user.first_name }}</h1>
+        <p>You are logged in as a {{ user.user_type }}</p>
+    </header>
+    
+    
+    <div class="dashboard">
+        <div class="dashboard-item">
+            <h2>Manage Students</h2>
+            <p>View and manage student profiles and information.</p>
+            <a href="{% url 'intern_opportunities' %}" class="btn">View Student information</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Bi-Weekly Reports</h2>
+            <p>Access and review bi-weekly reports submitted by students.</p>
+            <a href="{% url 'applications' %}" class="btn">View report</a>
+        </div>
+        
+
+        <div class="dashboard-item">
+            <h2>Evaluation</h2>
+            <p>Review evaluations provided by companies for students.</p>
+        <!-- <a href="{% url 'student_profile' %}" class="btn"></a> -->
+            <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn">View Evaluation</a>
+
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Attendance Records</h2>
+            <p>Monitor and access student attendance records.</p>
+            <a href="{% url 'bi_weekly_report' %}" class="btn">View Attendance</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+
+
+
+    <script>
+        // Automatically hide the message after 5 seconds (5000 milliseconds)
+        setTimeout(function() {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000);  // 5000 milliseconds = 5 seconds
+    </script>
+
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    
