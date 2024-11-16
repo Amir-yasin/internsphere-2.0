@@ -38,18 +38,17 @@
             <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn1">View Profile</a>
 
         </div>
-
-        <div class="dashboard-item">
+        {% for internship in internship_list %}
+        <li class="nav-item">
+            <a class="dropdown-item" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a>
+        </li>
+    {% endfor %}
+        {% comment %} <div class="dashboard-item">
             <h2>Posted Internships</h2>
             <p>Total: 3</p>
             <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
         </div>
-
-        <div class="dashboard-item">
-            <h2>Applications Received</h2>
-            <p>Total: 15</p>
-            <a href="{% url 'view_applicants' %}" class="btn1">View Applicants</a>
-        </div>
+        <a class="dropdown-item" href="{% url 'view_applicants' internship_id=request.internship.id %}">Applicants</a> {% endcomment %}
 
         <div class="dashboard-item">
             <h2>Manage Interns</h2>

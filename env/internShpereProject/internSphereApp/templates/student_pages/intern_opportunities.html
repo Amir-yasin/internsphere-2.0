@@ -19,17 +19,39 @@
 
 <body>
     <h2 class="heading" >Internship Opportunities</h2>
+    
+    {% if messages %}
+    <ul class="text-Success">
+        {% for message in messages %}
+           <p>{{ message }}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
     <section class="content-container">
         <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
     </section >
   
       <div class="opportunities-list">
           <div class="opportunity">
-              <h2>Software Developer Intern</h2>
-              <p>Company: Tech Corp</p>
-              <p>Location: Addis Ababa</p>
-              <input type="submit" class="btn1" value="Apply Now">
-              <a href="apply_internship.html" class="btn1">Apply Now</a>
+
+            {% if internships %}
+            <ul>
+                {% for internship in internships %}
+                        <h2> {{ internship.title }} </h2>
+                        <h6><strong>company:</strong> Abc comp{{ company.company_name }}</h6>
+                        {% comment %} <p>{{ internship.description }}</p> {% endcomment %}
+                        <h6><strong>Location:</strong> {{ internship.location }}</h6>
+                        {% comment %} <p><strong>Requirements:</strong> {{ internship.requirement }}</p> {% endcomment %}
+                        <h6><strong>Deadline:</strong> {{ internship.deadline }}</h6>
+                    {% comment %} <input type="submit" class="btn1" value="Apply Now"> {% endcomment %}
+                    <a href="{% url 'apply_to_internship' internship.id %}">Apply</a>
+                    {% endfor %}
+            </ul>
+        {% else %}
+            <p>No internships available for your department at the moment.</p>
+        {% endif %}
+
+
           </div>
   
           <div class="opportunity">

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.utils import timezone
-
+import datetime
 
 
 
@@ -25,6 +25,14 @@ class CustomUser(AbstractUser):
 
 # Student Profile
 class stud_profile(models.Model):
+    DEPARTMENT_CHOICES = [
+        ('Accounting', 'Accounting'),
+        ('Computer Science', 'Computer Science'),
+        ('Management', 'Management'),
+        ('Marketing', 'Marketing'),
+        ('THM', 'THM'),
+    ]
+        
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
@@ -35,27 +43,25 @@ class stud_profile(models.Model):
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
     year_of_study = models.CharField(max_length=2)
     skills = models.CharField(max_length=1000)
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  # Ensures matching with sector choices
     resume = models.FileField(upload_to='resumes/')
     linkedin_profile = models.URLField(blank=True, null=True)
-    list_of_students = models.FileField(upload_to='list_of_students/')
+    list_of_students = models.FileField(upload_to='list_of_students/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
 
 
-# Company Profile
 class Company(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
     company_name = models.CharField(max_length=255)
     company_address = models.CharField(max_length=255)
     company_phone = models.CharField(max_length=15)
     company_description = models.TextField(blank=True, null=True)
-    approved = models.BooleanField(default=False)  # This field indicates if the company has been approved by the admin
-     
+    approved = models.BooleanField(default=False)  # Indicates if approved by admin
+
     def __str__(self):
         return self.company_name
-
-
 
 # Department Profile
 class Department(models.Model):
@@ -91,15 +97,28 @@ class InternshipCareerOffice(models.Model):
 
 
 # Internship Posting
+
+def default_deadline():
+    return (timezone.now() + datetime.timedelta(days=30)).date()
+
 class Internship(models.Model):
+    SECTOR_CHOICES = [
+        ('Accounting', 'Accounting'),
+        ('Computer Science', 'Computer Science'),
+        ('Management', 'Management'),
+        ('Marketing', 'Marketing'),
+        ('THM', 'THM'),
+    ]
+    
     company = models.ForeignKey('Company', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
     location = models.CharField(max_length=255)
+    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES)  
     start_date = models.DateField()
     end_date = models.DateField()
-    deadline = models.DateField()  
+    deadline = models.DateField(null=True, default=default_deadline)
     posted_on = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, default='Open')  # Open or Closed
 
@@ -107,27 +126,31 @@ class Internship(models.Model):
         return self.title
 
     def is_expired(self):
-        """Method to check if the internship is expired based on the deadline."""
         return self.deadline < timezone.now().date()
 
     def close_if_expired(self):
-        """Automatically close internship if deadline has passed."""
         if self.is_expired():
             self.status = 'Closed'
             self.save()
 
-
 # Application model linking Student and Internship
 class Application(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')])
-    applied_at = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+    ]
+    
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='applications')
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='applications')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='applications')
+    applied_on =  models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.internship.title}"
-
-
+        return f"{self.student.user.username} - {self.internship.title} ({self.status})"
+    
+    
 # BiWeeklyReport model
 class BiWeeklyReport(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
@@ -179,3 +202,86 @@ class Evaluation(models.Model):
 
 
 
+
+
+#  class Company(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='company_profile')
+#     company_name = models.CharField(max_length=100)
+#     address = models.CharField(max_length=255)
+
+# class Department(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='department_profile')
+#     department_name = models.CharField(max_length=100)
+#     contact_email = models.EmailField()
+
+#     def __str__(self):
+#         return self.department_name
+
+# class Supervisor(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor_profile')
+#     supervisor_name = models.CharField(max_length=100)
+#     contact_email = models.EmailField()
+#     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.supervisor_name
+
+
+
+# class Internship_Office(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='InternshipOffice_profile')
+
+
+# Internship model linked to Company
+# class Internship(models.Model):
+#     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+#     title = models.CharField(max_length=255)
+#     description = models.TextField()
+#     requirement = models.TextField()
+#     location = models.CharField(max_length=255)
+#     start_date = models.DateField()
+#     end_date = models.DateField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.title
+
+
+# Application model linking Student and Internship
+# class Application(models.Model):
+#     student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+#     internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
+#     status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')])
+#     applied_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"{self.student.full_name} - {self.internship.title}"
+
+
+# BiWeeklyReport model for Student
+
+
+
+
+# BiWeeklyReport model for Student
+# class BiWeeklyReport(models.Model):
+#     student = models.ForeignKey(student_Profile, on_delete=models.CASCADE)
+#     report_period_start = models.DateField()
+#     report_period_end = models.DateField()
+#     report_content = models.TextField()
+#     submitted_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"{self.student.full_name} - {self.report_period_start} to {self.report_period_end}"
+# Bi-Weekly Report
+# class BiWeeklyReport(models.Model):
+#     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+#     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+#     report_number = models.IntegerField()
+#     content = models.TextField()
+
+# Other relevant models (Final Reports, Evaluation, Attendance, etc.) follow similar structure.
+
+
+# Attendance model for Student
