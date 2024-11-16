@@ -17,26 +17,31 @@
 </div>
     <div class="applicants-list">
 
-        <h2>Applicants for {{ internship.title }}</h2>
-        <ul>
-            {% for applicant in applicants %}
-            <div class="applicant">
+       <!-- view_applicants.html -->
+       <h2>Applicants for {{ internship.title }}</h2>
+       <ul>
+           {% if pending_applicants.exists %}
+               {% for application in pending_applicants %}
+                   <li>{{ application.student.username }} - {{ application.student.email }}
+                       - Status: {{ application.status }}
+                       <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post">
+                           {% csrf_token %}
+                           <button type="submit" style="background-color: green;">Accept</button>
+                       </form>
+                       <form action="{% url 'update_application_status' application.id 'Rejected' %}" method="post">
+                           {% csrf_token %}
+                           <button type="submit" style="background-color: red;">Reject</button>
+                       </form>
+                   </li>
+               {% endfor %}
+           {% else %}
+               <li>No pending applicants yet.</li>
+           {% endif %}
+       </ul>
+       
+       
 
-            <p>
-                application {{ applicant.id }}
-                 {{ applicant.company.company_name }}
-
-            </p>
-            internship id: {{ internship.id }}
-                <p>student id: {{ applicant.student_id }} - {{ applicant.student.email }}</p>
-            </div>
-
-            {% empty %}
-                <li>No applicants yet.</li>
-            {% endfor %}
-            
-        </ul>
-
+{% comment %} 
         <div class="applicant">
             <h2>John Doe</h2>
             <p>Position Applied: Software Developer Intern</p>
@@ -47,7 +52,7 @@
             <h2>Jane Smith</h2>
             <p>Position Applied: Marketing Intern</p>
             <a href="{% url 'student_profile' %}" class="btn">View Profile</a>
-        </div>
+        </div> {% endcomment %}
     </div>
 </body>
 </html>

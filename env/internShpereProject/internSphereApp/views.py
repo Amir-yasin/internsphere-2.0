@@ -11,6 +11,7 @@ import pandas as pd
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_list_or_404
+from django.contrib.auth.decorators import user_passes_test
 
 
 # main pages views
@@ -47,6 +48,8 @@ def login_user(request):
                 return redirect('company_dashboard')
             elif user.is_superuser:
                 return redirect('admin_dashboard')
+            elif user.user_type == 'InternshipCareerOffice':
+                return redirect('icu_dashboard')
             else:
                 return redirect('homes')
         else:
@@ -58,78 +61,6 @@ def login_user(request):
 def logout(request):
     auth_logout(request)
     return redirect('login')
-
-
-
-
-
-#admin pages
-def register_students(request):
-    if request.method == 'POST':
-        batch = request.POST['batch']
-        section = request.POST['section']
-        excel_file = request.FILES['student_list']
-        
-        # Process Excel file
-        df = pd.read_excel(excel_file)
-        for index, row in df.iterrows():
-            temp_password = row['temporary_password']
-            user = CustomUser.objects.create_user(
-                username=row['id_number'], 
-                first_name=row['first_name'], 
-                last_name=row['last_name'], 
-                password=temp_password, 
-                user_type='Student'
-            )
-            stud_profile.objects.create(
-                user=user, 
-                batch=batch, 
-                section=section, 
-                temporary_password=temp_password
-            )
-        return redirect('student_list')
-    
-    return render(request, 'admin_pages/register_students.html')
-
-
-def student_list(request):
-    students = stud_profile.objects.all()
-    return render(request, 'admin_pages/student_list.html', {'students': students})
-
-def delete_student(request, student_id):
-    student = get_object_or_404(stud_profile, id=student_id)
-    student.user.delete()  
-    return redirect('student_list')
-
-@login_required
-def approve_companies(request):
-    pending_companies = Company.objects.filter(approved=False)
-    approved_companies = Company.objects.filter(approved=True)
-    return render(request, 'admin_pages/approve_companies.html', {'pending_companies': pending_companies, 'approved_companies': approved_companies})
-
-@login_required
-def approve_company(request, company_id):
-    if request.user.is_superuser: 
-        company = get_object_or_404(Company, id=company_id)
-        company.approved = True
-        company.save()
-        messages.success(request, f"{company.company_name} has been approved.")
-    return redirect('approve_companies')
-
-@login_required
-def view_company_info(request, company_id):
-    company = get_object_or_404(Company, id=company_id)
-    return render(request, 'admin_pages/view_company_info.html', {'company': company})
-
-@login_required
-def delete_company(request, company_id):
-    company = get_object_or_404(company, id=company_id)
-    company.user.delete()  
-    return redirect('approve_companies')
-
-
-
-
 
 # student pages views
 @login_required
@@ -345,12 +276,20 @@ def post_internship(request):
         'current_page': 'post_internship'
     })
 
+
 @login_required
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
     applicants = internship.applications.all()  # Fetch all applications for this internship
-    return render(request, 'company_pages/view_applicants.html', {'internship': internship, 'applicants': applicants})
-
+    
+    # Filter pending applicants
+    pending_applicants = applicants.filter(status="Pending")
+    
+    return render(request, 'company_pages/view_applicants.html', {
+        'internship': internship,
+        'applicants': applicants,
+        'pending_applicants': pending_applicants,
+    })
 @login_required
 def update_application_status(request, application_id, status):
     application = get_object_or_404(Application, id=application_id, internship__company=request.user.company)
@@ -554,3 +493,80 @@ def close_expired_internships():
         if internship.is_expired():
             internship.close_if_expired()
 
+def register_students(request):
+    if request.method == 'POST':
+        batch = request.POST['batch']
+        section = request.POST['section']
+        excel_file = request.FILES['student_list']
+        
+        # Process Excel file
+        df = pd.read_excel(excel_file)
+        for index, row in df.iterrows():
+            temp_password = row['temporary_password']
+            user = CustomUser.objects.create_user(
+                username=row['id_number'], 
+                first_name=row['first_name'], 
+                last_name=row['last_name'], 
+                password=temp_password, 
+                user_type='Student'
+            )
+            stud_profile.objects.create(
+                user=user, 
+                batch=batch, 
+                section=section, 
+                temporary_password=temp_password
+            )
+        return redirect('student_list')
+    
+    return render(request, 'admin_pages/register_students.html')
+
+
+def student_list(request):
+    students = stud_profile.objects.all()
+    return render(request, 'admin_pages/student_list.html', {'students': students})
+
+def delete_student(request, student_id):
+    student = get_object_or_404(stud_profile, id=student_id)
+    student.user.delete()  
+    return redirect('student_list')
+
+@login_required
+def approve_companies(request):
+    pending_companies = Company.objects.filter(approved=False)
+    approved_companies = Company.objects.filter(approved=True)
+    return render(request, 'admin_pages/approve_companies.html', {'pending_companies': pending_companies, 'approved_companies': approved_companies})
+
+@login_required
+def approve_company(request, company_id):
+    if request.user.is_superuser: 
+        company = get_object_or_404(Company, id=company_id)
+        company.approved = True
+        company.save()
+        messages.success(request, f"{company.company_name} has been approved.")
+    return redirect('approve_companies')
+
+@login_required
+def view_company_info(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+    return render(request, 'admin_pages/view_company_info.html', {'company': company})
+
+@login_required
+def delete_company(request, company_id):
+    company = get_object_or_404(company, id=company_id)
+    company.user.delete()  
+    return redirect('approve_companies')
+
+
+def is_admin(user):
+    return user.is_authenticated and user.user_type == 'Admin'
+
+@user_passes_test(is_admin)
+def register_internship_career_office(request):
+    if request.method == 'POST':
+        form = InternshipCareerOfficeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('career_office_list')  # Redirect to a page listing all career offices or a success page
+    else:
+        form = InternshipCareerOfficeForm()
+    return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})

@@ -14,6 +14,10 @@ admin.site.register(Company)
 admin.site.register(CustomUser)
 admin.site.register(Internship)
 admin.site.register(Application)
+@admin.register(InternshipCareerOffice)
+class InternshipCareerOfficeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'ICU_director']
+    search_fields = ['user__username', 'ICU_director']
 # admin.site.register(Company)
 # admin.site.register(Company)
 # admin.site.register(Company)

@@ -25,7 +25,7 @@ h1 {
     margin-top: 0;
 }
 
-.btn {
+.btn1 {
     padding: 10px 20px;
     background-color: purple;
     color: white;
@@ -33,6 +33,6 @@ h1 {
     border-radius: 4px;
 }
 
-.btn:hover {
+.btn1:hover {
     background-color: magenta;
 }
