@@ -19,34 +19,38 @@
 
        <!-- view_applicants.html -->
 
-<h2>Applicants for {{ internship.title }}</h2>
-<ul>
-    {% for application in applicants %}
-    
-    {% if application.status == 'Pending' %}
-                
-        <li>{{ application.student.username }} - {{ application.student.email }}
-            - Status: {{ application.status }}
-            <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post">
-                {% csrf_token %}
-                <button type="submit" style="background-color: green;">Accept</button>
-            </form>
-            <form action="{% url 'update_application_status' application.id 'Rejected' %}" method="post">
-                {% csrf_token %}
-                <button type="submit"style="background-color: red;">Reject</button>
-            </form>
-            
-        </li>
-        {% elif application.status != 'Pending' %}
-
-        {% else %}
-        <li>No pending applicants yet.</li>
-        {% endif %}
-
-
-    {% endfor %}
-
-</ul>
+       <h2>Applicants for {{ internship.title }}</h2>
+       <ul>
+           {% with has_pending=False %}
+               {% for application in applicants %}
+               
+                   {% if application.status == 'Pending' %}
+                       {% with has_pending=True %}
+                       {% endwith %}
+                       <div class="dashboard-item">
+                        <li>{{ application.student.user.first_name }} {{ application.student.user.last_name }} - {{ application.student.email }}
+                            - Status: {{ application.status }}
+                            <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" style="background-color: green;">Accept</button>
+                            </form>
+                            <form action="{% url 'update_application_status' application.id 'Rejected' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" style="background-color: red;">Reject</button>
+                            </form>
+                        </li>
+                    </div>
+                      
+                   {% endif %}
+       
+               {% endfor %}
+       
+               {% if not has_pending %}
+                   <li>No pending applicants yet.</li>
+               {% endif %}
+           {% endwith %}
+       </ul>
+       
 
 {% comment %} 
         <div class="applicant">
