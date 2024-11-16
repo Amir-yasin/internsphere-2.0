@@ -18,11 +18,9 @@
     <div class="applicants-list">
 
        <!-- view_applicants.html -->
-
        <h2>Applicants for {{ internship.title }}</h2>
-       {% with pending_applicants=applicants|filter:"status=Pending" %}
        <ul>
-           {% if pending_applicants %}
+           {% if pending_applicants.exists %}
                {% for application in pending_applicants %}
                    <li>{{ application.student.username }} - {{ application.student.email }}
                        - Status: {{ application.status }}
@@ -40,7 +38,6 @@
                <li>No pending applicants yet.</li>
            {% endif %}
        </ul>
-       {% endwith %}
        
        
 
