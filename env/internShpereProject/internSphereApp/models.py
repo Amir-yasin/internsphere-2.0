@@ -156,7 +156,7 @@ class Application(models.Model):
 class BiWeeklyReport(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    applicaion_status = models.ForeignKey(Application, on_delete=models.CASCADE)
+    # applicaion_status = models.ForeignKey(Application, on_delete=models.CASCADE)
     report_number = models.IntegerField()
     week_start = models.DateField()
     week_end = models.DateField()

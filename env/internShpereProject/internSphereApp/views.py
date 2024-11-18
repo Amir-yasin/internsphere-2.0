@@ -113,7 +113,7 @@ def bi_weekly_report(request):
 
     except AttributeError:
         messages.error(request, 'Student profile is missing.')
-        return redirect('student_dashboard')
+        return redirect('student_profile')
 
     if request.method == 'POST':
         form = BiWeeklyReportForm(request.POST)
