@@ -24,6 +24,8 @@ path('student_dashboard', views.student_dashboard , name = 'student_dashboard'),
 path('apply_to_internship/<int:internship_id>/apply/', views.apply_to_internship, name='apply_to_internship'),
 path('applications', views.applications, name='applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
+path('select_active_company', views.select_active_company , name = 'select_active_company'),
+
 
 # path('api/internships/', views.internships_by_department, name='internships_by_department'),
 

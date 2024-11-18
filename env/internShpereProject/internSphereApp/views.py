@@ -95,26 +95,33 @@ def student_profile(request):
         'student': student,
         'department_choices': stud_profile.DEPARTMENT_CHOICES  # Passing choices to template
     })
-       
 @login_required
 def bi_weekly_report(request):
     try:
-        student_profile = request.user.stud_profile  # Ensure student profile exists
+        # Ensure student profile exists and is completed
+        student_profile = request.user.stud_profile
         if not student_profile.profile_completed:
-            messages.error(request, 'Profile is not completed yet!')
-            return redirect('student_dashboard')  # Redirect if profile is incomplete
+            messages.error(request, 'Your profile is not completed yet!')
+            return redirect('student_dashboard')
+
+        # Check for the active company
+        active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+        if not active_application:
+            messages.error(request, 'You have not selected a company to work with. Please select one.')
+            return redirect('select_active_company')  # Redirect to company selection page
+
     except AttributeError:
-        return redirect('student_dashboard')  # Redirect if student profile is missing
+        messages.error(request, 'Student profile is missing.')
+        return redirect('student_dashboard')
 
     if request.method == 'POST':
         form = BiWeeklyReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
-            report.student_id = request.user.stud_profile.id  # Set the student_id
-            try:
-                report.company = student_profile.company  # Get the student's associated company
-            except CompanyProfile.DoesNotExist:
-                return redirect('student_dashboard')  # Redirect if no company is associated
+            report.student = student_profile  # Associate the student profile
+            report.company = active_application.company  # Use the active company
+            report.application_status = active_application  # Associate the application
             report.save()
             messages.success(request, 'Bi-weekly report submitted successfully!')
             return redirect('student_dashboard')
@@ -123,10 +130,9 @@ def bi_weekly_report(request):
 
     context = {
         'form': form,
-        'id_number': request.user.stud_profile.student_id,
-        'company': request.user.Company.company_id,
-        'accepted': request.user.application.status,
-        'section': request.user.stud_profile.section,
+        'id_number': student_profile.id,
+        'company': active_application.company.company_name if active_application else None,
+        'section': student_profile.section,
         'current_page': 'bi_weekly_report',
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
@@ -168,6 +174,29 @@ def applications(request):
         'current_page': 'applications'
     }
     return render(request, 'student_pages/applications.html', context)
+
+
+@login_required
+def select_active_company(request):
+    student_profile = request.user.stud_profile
+    accepted_applications = Application.objects.filter(student=student_profile, status='Accepted')
+
+    if request.method == 'POST':
+        selected_application_id = request.POST.get('application_id')
+        if selected_application_id:
+            # Reset all other applications to inactive
+            Application.objects.filter(student=student_profile).update(is_active=False)
+            # Set the selected application as active
+            selected_application = get_object_or_404(Application, id=selected_application_id)
+            selected_application.is_active = True
+            selected_application.save()
+            messages.success(request, f"You've successfully selected {selected_application.company.company_name} as your active company.")
+            return redirect('student_dashboard')
+
+    context = {
+        'accepted_applications': accepted_applications,
+    }
+    return render(request, 'student_pages/select_active_company.html', context)
 
 @login_required
 def stud_notification(request):
