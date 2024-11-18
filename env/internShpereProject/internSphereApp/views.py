@@ -95,19 +95,41 @@ def student_profile(request):
         'student': student,
         'department_choices': stud_profile.DEPARTMENT_CHOICES  # Passing choices to template
     })
+       
 @login_required
 def bi_weekly_report(request):
+    try:
+        student_profile = request.user.stud_profile  # Ensure student profile exists
+        if not student_profile.profile_completed:
+            messages.error(request, 'Profile is not completed yet!')
+            return redirect('student_dashboard')  # Redirect if profile is incomplete
+    except AttributeError:
+        return redirect('student_dashboard')  # Redirect if student profile is missing
+
     if request.method == 'POST':
         form = BiWeeklyReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
-            report.student = request.user.student_Profile
-            report.company = CompanyProfile.objects.get(user=request.user.student_Profile.company)
+            report.student_id = request.user.stud_profile.id  # Set the student_id
+            try:
+                report.company = student_profile.company  # Get the student's associated company
+            except CompanyProfile.DoesNotExist:
+                return redirect('student_dashboard')  # Redirect if no company is associated
             report.save()
+            messages.success(request, 'Bi-weekly report submitted successfully!')
             return redirect('student_dashboard')
     else:
         form = BiWeeklyReportForm()
-    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+
+    context = {
+        'form': form,
+        'id_number': request.user.stud_profile.student_id,
+        'company': request.user.Company.company_id,
+        'accepted': request.user.application.status,
+        'section': request.user.stud_profile.section,
+        'current_page': 'bi_weekly_report',
+    }
+    return render(request, 'student_pages/bi_weekly_report.html', context)
 
 @login_required
 def student_dashboard(request):
@@ -345,9 +367,9 @@ from django.contrib import messages
 # Dashboard view for Internship Career Office
 @login_required
 def icu_dashboard(request):
-    # if request.user.customuser.user_type != 'InternshipCareerOffice':
-    #     messages.error(request, "You do not have access to this page.")
-    #     return redirect('home')
+    if request.user.customuser.user_type != 'InternshipCareerOffice':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
 
     students = stud_profile.objects.all()
     reports = BiWeeklyReport.objects.all()
@@ -360,51 +382,7 @@ def icu_dashboard(request):
         'evaluations': evaluations,
         'attendance_records': attendance_records,
     })
-
-
-
-# Student dashboard view
-@login_required
-def student_dashboard(request):
-    if request.user.customuser.user_type != 'Student':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    student_profile = get_object_or_404(stud_profile, user=request.user)
-    applications = Application.objects.filter(student=student_profile)
-    reports = BiWeeklyReport.objects.filter(student=student_profile)
-    final_report = FinalReport.objects.filter(student=student_profile).first()
-    attendance_records = Attendance.objects.filter(student=student_profile)
-
-    return render(request, 'student_dashboard.html', {
-        'student_profile': student_profile,
-        'applications': applications,
-        'reports': reports,
-        'final_report': final_report,
-        'attendance_records': attendance_records,
-    })
-
-
-# Company dashboard view
-@login_required
-def company_dashboard(request):
-    if request.user.customuser.user_type != 'Company':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    company = get_object_or_404(Company, user=request.user)
-    internships = Internship.objects.filter(company=company)
-    applications = Application.objects.filter(company=company)
-    evaluations = Evaluation.objects.filter(company=company)
-
-    return render(request, 'company_dashboard.html', {
-        'company': company,
-        'internships': internships,
-        'applications': applications,
-        'evaluations': evaluations,
-    })
-
-
+    
 # Department dashboard view
 @login_required
 def department_dashboard(request):

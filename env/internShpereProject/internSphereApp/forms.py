@@ -29,6 +29,31 @@ class StudentProfileForm(forms.ModelForm):
         model = stud_profile
         fields = ['email', 'phone_number', 'gender', 'department', 'year_of_study', 'skills', 'resume', 'linkedin_profile']     
 
+
+
+class BiWeeklyReportForm(forms.ModelForm):
+    class Meta:
+        model = BiWeeklyReport
+        fields = [
+            'report_number',
+            'week_start',
+            'week_end',
+            'total_hours_completed',
+            'assignment_responsibilities',
+            'critical_analysis',
+            'observing_hours',
+            'administrative_hours',
+            'researching_hours',
+            'assisting_hours',
+            'misc_hours',
+            'meetings_discussions',
+            'course_relevance_suggestions'
+        ]
+        widgets = {
+            'week_start': forms.DateInput(attrs={'type': 'date'}),
+            'week_end': forms.DateInput(attrs={'type': 'date'}),
+        }
+
 class CompanyRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -95,3 +120,4 @@ class InternshipCareerOfficeForm(forms.ModelForm):
             career_office.user = user
             career_office.save()
         return career_office
+
