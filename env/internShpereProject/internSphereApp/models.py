@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.utils import timezone
 import datetime
+from django.utils.timezone import now
 
 
 
@@ -154,26 +155,47 @@ class Application(models.Model):
     
 # BiWeeklyReport model
 class BiWeeklyReport(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    # applicaion_status = models.ForeignKey(Application, on_delete=models.CASCADE)
-    report_number = models.IntegerField()
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="reports")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="reports")
+    application_status = models.ForeignKey(Application, on_delete=models.CASCADE)
+    report_number = models.PositiveIntegerField()
     week_start = models.DateField()
     week_end = models.DateField()
-    total_hours_completed = models.IntegerField()
+    total_hours_completed = models.PositiveIntegerField()
     assignment_responsibilities = models.TextField()
     critical_analysis = models.TextField()
-    observing_hours = models.IntegerField()
-    administrative_hours = models.IntegerField()
-    researching_hours = models.IntegerField()
-    assisting_hours = models.IntegerField()
-    misc_hours = models.IntegerField()
+    observing_hours = models.PositiveIntegerField()
+    administrative_hours = models.PositiveIntegerField()
+    researching_hours = models.PositiveIntegerField()
+    assisting_hours = models.PositiveIntegerField()
+    misc_hours = models.PositiveIntegerField()
     meetings_discussions = models.TextField()
     course_relevance_suggestions = models.TextField()
-    date_submitted = models.DateTimeField(default=timezone.now)
+    date_submitted = models.DateTimeField(default=now)
+
+    company_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
+    company_approval_date = models.DateTimeField(null=True, blank=True)
+    internship_office_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
+    internship_office_approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Report {self.report_number} by {self.student.user.username}"
+
+    def is_approved_by_company(self):
+        return self.company_approval_status == 'Approved'
+
+    def is_approved_by_office(self):
+        return self.internship_office_approval_status == 'Approved'
 
 
 # Final Report

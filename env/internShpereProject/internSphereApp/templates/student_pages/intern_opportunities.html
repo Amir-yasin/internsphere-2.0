@@ -38,7 +38,7 @@
             <ul>
                 {% for internship in internships %}
                         <h2> {{ internship.title }} </h2>
-                        <h6><strong>company:</strong> Abc comp{{ company.company_name }}</h6>
+                        <h6><strong>company:</strong> Abc comp{{ internship.company_id }}</h6>
                         {% comment %} <p>{{ internship.description }}</p> {% endcomment %}
                         <h6><strong>Location:</strong> {{ internship.location }}</h6>
                         {% comment %} <p><strong>Requirements:</strong> {{ internship.requirement }}</p> {% endcomment %}
