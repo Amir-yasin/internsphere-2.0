@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
+from django.utils import timezone
 
 
 # main pages views
@@ -383,15 +384,6 @@ def admin_dashboard(request):
 
     # internship and carrer office views
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from .models import (
-    CustomUser, stud_profile, Company, Department, Supervisor,
-    InternshipCareerOffice, Internship, Application, BiWeeklyReport,
-    FinalReport, Attendance, Evaluation
-)
-from django.contrib import messages
 
 # Dashboard view for Internship Career Office
 @login_required
@@ -453,31 +445,6 @@ def internship_list(request):
         'internships': internships,
     })
 
-
-# Apply to internship view
-@login_required
-def apply_to_internship(request, internship_id):
-    internship = get_object_or_404(Internship, id=internship_id)
-    
-    if request.user.customuser.user_type != 'Student':
-        messages.error(request, "Only students can apply to internships.")
-        return redirect('home')
-
-    student_profile = get_object_or_404(stud_profile, user=request.user)
-    existing_application = Application.objects.filter(student=student_profile, internship=internship).first()
-
-    if existing_application:
-        messages.info(request, "You have already applied for this internship.")
-    else:
-        Application.objects.create(
-            student=student_profile,
-            internship=internship,
-            company=internship.company,
-            status='Pending'
-        )
-        messages.success(request, "Your application has been submitted.")
-
-    return redirect('internship_list')
 
 
 # View for ICU to send reports to the department
