@@ -26,7 +26,6 @@ path('applications', views.applications, name='applications'),
 path('stud_notification', views.stud_notification , name = 'stud_notification'),
 path('select_active_company', views.select_active_company , name = 'select_active_company'),
 
-
 # path('api/internships/', views.internships_by_department, name='internships_by_department'),
 
 # company pages url
@@ -40,6 +39,8 @@ path('update_application_status/<int:application_id>/status/<str:status>/', view
 path('attendance', views.attendance , name = 'attendance'),
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
 path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
+path('reports/<str:approver_type>/<int:report_id>/approve/', views.approve_report, name='approve_report'),
+
 
 
 #admin pages url(students)
@@ -57,7 +58,12 @@ path('delete_company/<int:company_id>/', views.delete_company, name='delete_comp
 # admin pages url(icu)
 path('register-internship-career-office/', views.register_internship_career_office, name='register_internship_career_office'),
 
+
+
+#icu pages url
 path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
+path('reports/<str:approver_type>/', views.report_list, name='report_list'),
+
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),

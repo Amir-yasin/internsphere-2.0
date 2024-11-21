@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
+from django.utils.timezone import now
 
 
 # main pages views
@@ -137,6 +138,66 @@ def bi_weekly_report(request):
         'current_page': 'bi_weekly_report',
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
+
+
+@login_required
+def report_list(request, approver_type):
+    """View list of reports based on the approver type."""
+    if approver_type == 'company':
+        reports = BiWeeklyReport.objects.filter(
+            company=request.user.company_profile,
+            company_approval_status='Pending'
+        )
+    elif approver_type == 'office':
+        reports = BiWeeklyReport.objects.filter(
+            company_approval_status='Approved',
+            internship_office_approval_status='Pending'
+        )
+    else:
+        messages.error(request, "Invalid approver type.")
+        return redirect('home')
+
+    template = f"{approver_type}_pages/reports_list.html"
+    context = {'reports': reports}
+    return render(request, template, context)
+
+
+@login_required
+def approve_report(request, approver_type, report_id):
+    """Approve or reject a report based on approver type."""
+    report = get_object_or_404(BiWeeklyReport, id=report_id)
+
+    # Determine the approver's context
+    if approver_type == 'company' and report.company == request.user.company_profile:
+        approval_field = 'company_approval_status'
+        approval_date_field = 'company_approval_date'
+        redirect_url = 'company_reports'
+    elif approver_type == 'office' and report.is_approved_by_company():
+        approval_field = 'internship_office_approval_status'
+        approval_date_field = 'internship_office_approval_date'
+        redirect_url = 'office_reports'
+    else:
+        messages.error(request, "You do not have permission to approve this report.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'approve':
+            setattr(report, approval_field, 'Approved')
+            setattr(report, approval_date_field, now())
+            report.save()
+            messages.success(request, "Report approved successfully.")
+        elif action == 'reject':
+            setattr(report, approval_field, 'Rejected')
+            report.save()
+            messages.error(request, "Report rejected.")
+        else:
+            messages.error(request, "Invalid action.")
+        return redirect(redirect_url)
+
+    template = f"{approver_type}_pages/report_approve.html"
+    context = {'report': report}
+    return render(request, template, context)
 
 @login_required
 def student_dashboard(request):
