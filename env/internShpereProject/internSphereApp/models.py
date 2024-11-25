@@ -74,23 +74,17 @@ class Department(models.Model):
         ('THM', 'THM'),
     ]
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, 
+        CustomUser, 
         on_delete=models.CASCADE, 
-        related_name='department_profile', 
+        related_name='department_profile',
         limit_choices_to={'user_type': 'Department'}
     )
     department_name = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     department_head = models.CharField(max_length=100)
 
-    def save(self, *args, **kwargs):
-        if not self.user.username:
-            # Assign the department head name as the username
-            self.user.username = self.department_head.replace(" ", "").lower()
-            self.user.save()
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return self.department_name
+        return f"{self.department_name} - {self.department_head}"
+
     
     
 class Supervisor(models.Model):

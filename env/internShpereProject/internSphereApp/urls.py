@@ -60,6 +60,7 @@ path('register-internship-career-office/', views.register_internship_career_offi
 
 # admin pages url(department)
 path('register/department/', views.register_department, name='register_department'),
+path('department_list', views.department_list , name = 'department_list'),
 
 # admin pages url(supervisor)
 path('register/supervisor/', views.register_supervisor, name='register_supervisor'),

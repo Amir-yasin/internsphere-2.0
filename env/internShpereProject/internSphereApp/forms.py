@@ -123,11 +123,36 @@ class InternshipCareerOfficeForm(forms.ModelForm):
 
 
 
+class DepartmentRegistrationForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True)
+    email = forms.EmailField(required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    department_name = forms.ChoiceField(choices=Department.DEPARTMENT_CHOICES, required=True)
+    department_head = forms.CharField(max_length=100, required=True)
 
-class DepartmentForm(forms.ModelForm):
     class Meta:
-        model = Department
-        fields = ['department_name', 'department_head']
+        model = CustomUser
+        fields = ['username', 'password']
+
+    def save(self, commit=True):
+        # Save CustomUser data
+        user = CustomUser(
+            username=self.cleaned_data['username'],  # Username provided by admin
+            user_type='Department'
+        )
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+
+        # Save Department data
+        department = Department(
+            user=user,
+            department_name=self.cleaned_data['department_name'],
+            department_head=self.cleaned_data['department_head']
+        )
+        department.save()
+
+        return user
 
 class SupervisorForm(forms.ModelForm):
     class Meta:

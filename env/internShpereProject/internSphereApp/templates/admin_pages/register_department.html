@@ -2,10 +2,21 @@
 {% load static %}
 
 {% block nav_and_footer %}
+<h2>Register a Department</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
 
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register Department</button>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Register Department</button>
 </form>
+  
+
 {% endblock nav_and_footer %}

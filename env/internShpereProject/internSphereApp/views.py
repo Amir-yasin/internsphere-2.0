@@ -550,28 +550,31 @@ def register_internship_career_office(request):
 
 
 
+@login_required
 def register_department(request):
-    if request.method == 'POST':
+    if not request.user.is_superuser:  # Only allow superusers to register departments
+        messages.error(request, "You do not have permission to register a department.")
+        return redirect('home')  # Replace 'home' with the appropriate URL name
+
+    if request.method == "POST":
         form = DepartmentRegistrationForm(request.POST)
         if form.is_valid():
-            # Save the user object
-            user = form.save(commit=False)
-            user.user_type = 'Department'  # Set the user type to 'Department'
-            user.save()  # Save the user instance
-            
-            # Create the related department object
-            Department.objects.create(
-                user=user,
-                department_name=form.cleaned_data['department_name'],
-                department_head=form.cleaned_data['department_head']
-            )
-            
-            messages.success(request, "Department registered successfully!")
-            return redirect('login')
+            try:
+                form.save()
+                messages.success(request, "Department registered successfully!")
+                return redirect('department_list')  # Replace with the URL name for department list
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = DepartmentRegistrationForm()
-    return render(request, 'department_pages/register_department.html', {'form': form})
 
+    return render(request, 'admin_pages/register_department.html', {'form': form})
+
+def department_list(request):
+    departments = Department.objects.all()
+    return render(request, 'admin_pages/department_list.html', {'departments': departments})
 
 
 def register_supervisor(request):
