@@ -121,3 +121,15 @@ class InternshipCareerOfficeForm(forms.ModelForm):
             career_office.save()
         return career_office
 
+
+
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ['department_name', 'department_head']
+
+class SupervisorForm(forms.ModelForm):
+    class Meta:
+        model = Supervisor
+        fields = ['supervisor_name', 'department']

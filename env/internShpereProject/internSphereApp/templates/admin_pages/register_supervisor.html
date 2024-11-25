@@ -1,0 +1,11 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register Supervisor</button>
+</form>
+{% endblock nav_and_footer %}
