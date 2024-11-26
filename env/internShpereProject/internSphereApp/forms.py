@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import *
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
 class UserTypeForm(forms.Form):
@@ -125,7 +126,6 @@ class InternshipCareerOfficeForm(forms.ModelForm):
 
 class DepartmentRegistrationForm(forms.ModelForm):
     username = forms.CharField(max_length=150, required=True)
-    email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
     department_name = forms.ChoiceField(choices=Department.DEPARTMENT_CHOICES, required=True)
     department_head = forms.CharField(max_length=100, required=True)
@@ -154,7 +154,38 @@ class DepartmentRegistrationForm(forms.ModelForm):
 
         return user
 
-class SupervisorForm(forms.ModelForm):
+
+CustomUser = get_user_model()
+
+class SupervisorRegistrationForm(forms.ModelForm):
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        help_text="Username for the supervisor"
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        required=True,
+        help_text="Password for the supervisor"
+    )
+
     class Meta:
         model = Supervisor
         fields = ['supervisor_name', 'department']
+
+    def save(self, commit=True):
+        supervisor = super().save(commit=False)
+
+        # Create or update the user instance for the supervisor
+        user_data = {
+            'username': self.cleaned_data['username'],
+        }
+        if commit:
+            user = CustomUser.objects.create_user(
+                **user_data,
+                password=self.cleaned_data['password'],
+                user_type='Supervisor'
+            )
+            supervisor.user = user
+            supervisor.save()
+        return supervisor

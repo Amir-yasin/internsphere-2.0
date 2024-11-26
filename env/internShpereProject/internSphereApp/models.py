@@ -73,12 +73,7 @@ class Department(models.Model):
         ('Marketing', 'Marketing'),
         ('THM', 'THM'),
     ]
-    user = models.OneToOneField(
-        CustomUser, 
-        on_delete=models.CASCADE, 
-        related_name='department_profile',
-        limit_choices_to={'user_type': 'Department'}
-    )
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='department_profile',limit_choices_to={'user_type': 'Department'})
     department_name = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     department_head = models.CharField(max_length=100)
 
@@ -88,25 +83,12 @@ class Department(models.Model):
     
     
 class Supervisor(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
-        related_name='supervisor_profile', 
-        limit_choices_to={'user_type': 'Supervisor'}
-    )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='supervisor_profile',limit_choices_to={'user_type': 'Supervisor'})
     supervisor_name = models.CharField(max_length=100)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-
-    def save(self, *args, **kwargs):
-        if not self.user.username:
-            # Assign the supervisor name as the username
-            self.user.username = self.supervisor_name.replace(" ", "").lower()
-            self.user.save()
-        super().save(*args, **kwargs)
+    department = models.ForeignKey('Department',  on_delete=models.SET_NULL,null=True,blank=False,related_name='supervisors')
 
     def __str__(self):
-        return self.supervisor_name
-
+        return f"{self.supervisor_name} ({self.department.department_name})"
     
     
     

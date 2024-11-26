@@ -3,9 +3,19 @@
 
 {% block nav_and_footer %}
 
+<h2>Register a Supervisor</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register Supervisor</button>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Register Supervisor</button>
 </form>
 {% endblock nav_and_footer %}

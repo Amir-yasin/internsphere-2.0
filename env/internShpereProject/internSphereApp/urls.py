@@ -56,14 +56,16 @@ path('view_company_info/<int:company_id>/', views.view_company_info, name='view_
 path('delete_company/<int:company_id>/', views.delete_company, name='delete_company'),
 
 # admin pages url(icu)
-path('register-internship-career-office/', views.register_internship_career_office, name='register_internship_career_office'),
+path('register-internship-career-office', views.register_internship_career_office, name='register_internship_career_office'),
+path('icu_list', views.icu_list , name = 'icu_list'),
 
 # admin pages url(department)
-path('register/department/', views.register_department, name='register_department'),
+path('register/department', views.register_department, name='register_department'),
 path('department_list', views.department_list , name = 'department_list'),
 
 # admin pages url(supervisor)
-path('register/supervisor/', views.register_supervisor, name='register_supervisor'),
+path('register_supervisor', views.register_supervisor, name='register_supervisor'),
+path('supervisor_list', views.supervisor_list , name = 'supervisor_list'),
 
 #icu pages url
 path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),

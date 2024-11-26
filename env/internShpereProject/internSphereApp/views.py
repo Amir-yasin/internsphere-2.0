@@ -549,6 +549,10 @@ def register_internship_career_office(request):
     return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})
 
 
+@login_required
+def icu_list(request):
+    icu_list = InternshipCareerOffice.objects.all()
+    return render(request, 'admin_pages/icu_list.html', {'icu_list': icu_list})
 
 @login_required
 def register_department(request):
@@ -572,20 +576,35 @@ def register_department(request):
 
     return render(request, 'admin_pages/register_department.html', {'form': form})
 
+@login_required
 def department_list(request):
     departments = Department.objects.all()
     return render(request, 'admin_pages/department_list.html', {'departments': departments})
 
 
+@login_required
 def register_supervisor(request):
+    if not request.user.is_superuser:  # Only allow superusers to register supervisors
+        messages.error(request, "You do not have permission to register a supervisor.")
+        return redirect('home')  # Replace 'home' with the appropriate URL name
+
     if request.method == "POST":
-        form = SupervisorForm(request.POST)
+        form = SupervisorRegistrationForm(request.POST)
         if form.is_valid():
-            supervisor = form.save(commit=False)
-            supervisor.user.user_type = 'Supervisor'  # Ensure the user is set as supervisor
-            supervisor.user.save()
-            supervisor.save()
-            return redirect('success_page')  # Redirect to a success page
+            try:
+                form.save()
+                messages.success(request, "Supervisor registered successfully!")
+                return redirect('supervisor_list')  # Replace with the URL name for supervisor list
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = SupervisorForm()
-    return render(request, 'admin_pages/create_supervisor.html', {'form': form})
+        form = SupervisorRegistrationForm()
+
+    return render(request, 'admin_pages/register_supervisor.html', {'form': form})
+
+@login_required
+def supervisor_list(request):
+    supervisors = Supervisor.objects.all()
+    return render(request, 'admin_pages/supervisor_list.html', {'supervisors': supervisors})
