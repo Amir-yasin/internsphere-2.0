@@ -34,7 +34,7 @@ class stud_profile(models.Model):
         ('THM', 'THM'),
     ]
         
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Student'})
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='stud_profile' , limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
     temporary_password = models.CharField(max_length=100)
@@ -201,9 +201,12 @@ class BiWeeklyReport(models.Model):
 
 # Final Report
 class FinalReport(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    report = models.FileField(upload_to='final-reports/')
+    student = models.OneToOneField(stud_profile, on_delete=models.CASCADE, related_name='final_report', limit_choices_to={'user_type': 'Student'})
+    report_file = models.FileField(upload_to='final_reports/')
+    submitted_at = models.DateTimeField(auto_now_add=True, null=True)
 
+    def __str__(self):
+        return f"Final Report by {self.student.first_name or self.student.username}"
 
 # Attendance model
 class Attendance(models.Model):

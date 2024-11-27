@@ -189,3 +189,12 @@ class SupervisorRegistrationForm(forms.ModelForm):
             supervisor.user = user
             supervisor.save()
         return supervisor
+    
+    
+class FinalReportForm(forms.ModelForm):
+    class Meta:
+        model = FinalReport
+        fields = ['report_file']
+        widgets = {
+            'report_file': forms.ClearableFileInput(attrs={'accept': '.pdf'}),
+        }

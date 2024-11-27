@@ -141,6 +141,41 @@ def bi_weekly_report(request):
 
 
 @login_required
+def final_report(request):
+    # Ensure only students can submit reports
+    if request.user.user_type != 'Student':
+        messages.error(request, "You do not have permission to submit a report.")
+        return redirect('home')  # Replace 'home' with the appropriate URL
+
+    try:
+        # Access the student's profile (assuming stud_profile is related to User)
+        stud_profile_instance = request.user.stud_profile  # Access the related stud_profile instance
+
+        # Check if the student has already submitted a report
+        report_instance = FinalReport.objects.get(student=stud_profile_instance)
+        form = FinalReportForm(request.POST or None, request.FILES or None, instance=report_instance)
+    except FinalReport.DoesNotExist:
+        form = FinalReportForm(request.POST or None, request.FILES or None)
+    except stud_profile.DoesNotExist:
+        # Handle the case where stud_profile doesn't exist for the user
+        messages.error(request, "No profile found for the current user.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        if form.is_valid():
+            final_report = form.save(commit=False)
+            final_report.student = stud_profile_instance  # Set the related stud_profile instance
+            final_report.save()
+            messages.success(request, "Your final report has been submitted successfully!")
+            return redirect('student_dashboard')  # Replace with the URL name for viewing the report
+        else:
+            messages.error(request, "Please correct the errors below.")
+
+    return render(request, 'student_pages/final_report.html', {'form': form})
+
+
+
+@login_required
 def student_dashboard(request):
     if request.user.user_type != 'Student':
         return redirect('home')
@@ -608,3 +643,5 @@ def register_supervisor(request):
 def supervisor_list(request):
     supervisors = Supervisor.objects.all()
     return render(request, 'admin_pages/supervisor_list.html', {'supervisors': supervisors})
+
+
