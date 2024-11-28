@@ -162,51 +162,52 @@ class BiWeeklyReport(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="reports")
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="reports")
-    application_status = models.ForeignKey(Application, on_delete=models.CASCADE)
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name="biweekly_reports")
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name="biweekly_reports")
+    application_status = models.ForeignKey('Application', on_delete=models.CASCADE, related_name="biweekly_reports")
     report_number = models.PositiveIntegerField()
     week_start = models.DateField()
     week_end = models.DateField()
     total_hours_completed = models.PositiveIntegerField()
     assignment_responsibilities = models.TextField()
     critical_analysis = models.TextField()
-    observing_hours = models.PositiveIntegerField()
-    administrative_hours = models.PositiveIntegerField()
-    researching_hours = models.PositiveIntegerField()
-    assisting_hours = models.PositiveIntegerField()
-    misc_hours = models.PositiveIntegerField()
+    observing_hours = models.PositiveIntegerField(default=0)
+    administrative_hours = models.PositiveIntegerField(default=0)
+    researching_hours = models.PositiveIntegerField(default=0)
+    assisting_hours = models.PositiveIntegerField(default=0)
+    misc_hours = models.PositiveIntegerField(default=0)
     meetings_discussions = models.TextField()
     course_relevance_suggestions = models.TextField()
     date_submitted = models.DateTimeField(default=now)
-
-    company_approval_status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default='Pending'
-    )
+    
+    company_approval_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     company_approval_date = models.DateTimeField(null=True, blank=True)
-    internship_office_approval_status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default='Pending'
-    )
+    internship_office_approval_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     internship_office_approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Report {self.report_number} by {self.student.user.username}"
 
-    def is_approved_by_company(self):
-        return self.company_approval_status == 'Approved'
-
-    def is_approved_by_office(self):
-        return self.internship_office_approval_status == 'Approved'
-
 
 # Final Report
 class FinalReport(models.Model):
-    student = models.OneToOneField(stud_profile, on_delete=models.CASCADE, related_name='final_report', limit_choices_to={'user_type': 'Student'})
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
+    student = models.OneToOneField('stud_profile',on_delete=models.CASCADE,related_name='final_report',limit_choices_to={'user_type': 'Student'},)
     report_file = models.FileField(upload_to='final_reports/')
     submitted_at = models.DateTimeField(auto_now_add=True, null=True)
+    
+    approval_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    approval_date = models.DateTimeField(null=True, blank=True)
+    comments = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Final Report by {self.student.first_name or self.student.username}"
+        return f"Final Report by {self.student.user.username}"
+
 
 # Attendance model
 class Attendance(models.Model):
