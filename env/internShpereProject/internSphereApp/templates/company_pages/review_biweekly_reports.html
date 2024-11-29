@@ -1,0 +1,16 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<h2>BiWeekly Reports for Review</h2>
+<ul>
+    {% for report in reports %}
+        <li>
+            {{ report.student.user.username }} - Report {{ report.report_number }}
+            <a href="{% url 'approve_biweekly_report' report.id %}">Review</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock nav_and_footer %}

@@ -139,6 +139,64 @@ def bi_weekly_report(request):
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
 
+@login_required
+def review_biweekly_reports(request):
+    user = request.user
+
+    if user.user_type == "Company":
+        reports = BiWeeklyReport.objects.filter(
+            company=user.company, company_approval_status="Pending"
+        )
+    elif user.user_type == "InternshipCareerOffice":
+        reports = BiWeeklyReport.objects.filter(
+            company_approval_status="Approved",
+            internship_office_approval_status="Pending"
+        )
+    elif user.user_type == "Department":
+        reports = BiWeeklyReport.objects.filter(
+            internship_office_approval_status="Approved",
+            department_approval_status="Pending",
+            student__department=user.department_profile.department_name,
+        )
+    elif user.user_type == "Supervisor":
+        reports = BiWeeklyReport.objects.filter(
+            department_approval_status="Approved",
+            supervisor_approval_status="Pending",
+            student__department=user.supervisor_profile.department.department_name,
+        )
+    else:
+        reports = None
+
+    return render(request, "company_pages/review_biweekly_reports.html", {"reports": reports})
+
+
+@login_required
+def approve_biweekly_report(request, report_id):
+    report = get_object_or_404(BiWeeklyReport, id=report_id)
+    user = request.user
+
+    if request.method == "POST":
+        form = ApproveReportForm(request.POST, instance=report)
+        if form.is_valid():
+            if user.user_type == "Company":
+                report.company_approval_status = "Approved"
+                report.company_approval_date = timezone.now()
+            elif user.user_type == "InternshipCareerOffice":
+                report.internship_office_approval_status = "Approved"
+                report.internship_office_approval_date = timezone.now()
+            elif user.user_type == "Department":
+                report.department_approval_status = "Approved"
+                report.department_approval_date = timezone.now()
+            elif user.user_type == "Supervisor":
+                report.supervisor_approval_status = "Approved"
+                report.supervisor_approval_date = timezone.now()
+
+            report.save()
+            return redirect("review_biweekly_reports")
+
+    form = ApproveReportForm(instance=report)
+    return render(request, "approve_biweekly_report.html", {"form": form})
+
 
 @login_required
 def final_report(request):
@@ -173,6 +231,43 @@ def final_report(request):
 
     return render(request, 'student_pages/final_report.html', {'form': form})
 
+
+
+@login_required
+def review_final_reports(request, role):
+    """Handles reviewing and approving final reports based on the user role."""
+    if user.user_type == 'Company':
+        reports = FinalReport.objects.filter(company_approval_status='Pending')
+    elif user.user_type == 'InternshipCareerOffice':
+        reports = FinalReport.objects.filter(
+            company_approval_status='Approved', internship_office_approval_status='Pending'
+        )
+    elif user.user_type == 'Department':
+        reports = FinalReport.objects.filter(
+            internship_office_approval_status='Approved', department_approval_status='Pending'
+        )
+    elif user.user_type == 'Supervisor':
+        reports = FinalReport.objects.filter(
+            department_approval_status='Approved', supervisor_approval_status='Pending'
+        )
+    else:
+        return redirect('dashboard')
+
+    return render(request, f'{user.user_type}_pages/review_final_reports.html', {'reports': reports})
+
+
+@login_required
+def approve_final_report(request, report_id, role):
+    """Approve a final report based on the current role."""
+    report = get_object_or_404(FinalReport, pk=report_id)
+    if request.method == 'POST':
+        form = FinalReportApprovalForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+            return redirect('review_final_reports', role=role)
+    else:
+        form = FinalReportApprovalForm(instance=report)
+    return render(request, 'final_report/approve_final_report.html', {'form': form, 'report': report})
 
 
 
@@ -258,8 +353,11 @@ def view_profile(request, user_id):
 @login_required
 def intern_opportunities(request):
     try:
-        student_profile = stud_profile.objects.get(user=request.user)
-        if not student_profile.profile_completed:
+        try:
+            student_profile = stud_profile.objects.get(user=request.user)
+        except stud_profile.DoesNotExist:
+            messages.error(request, "Student profile does not exist.")
+            student_profile = None        
             return redirect('student_profile')
         internships = Internship.objects.filter(sector=student_profile.department, status='Open')
         context = {
@@ -565,13 +663,18 @@ def view_company_info(request, company_id):
 
 @login_required
 def delete_company(request, company_id):
-    company = get_object_or_404(company, id=company_id)
-    company.user.delete()  
+    # company = get_object_or_404(company, id=company_id)
+    # company.user.delete()  
+    if request.user.is_superuser: 
+        company = get_object_or_404(Company, id=company_id)
+        company.approved = False
+        company.save()
+        messages.success(request, f"{company.company_name} has been dis-approved.")
     return redirect('approve_companies')
 
 
 def is_admin(user):
-    return user.is_authenticated and user.user_type == 'Admin'
+    return user.is_authenticated and user.is_superuser
 
 @user_passes_test(is_admin)
 def register_internship_career_office(request):
@@ -579,7 +682,7 @@ def register_internship_career_office(request):
         form = InternshipCareerOfficeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('career_office_list')  # Redirect to a page listing all career offices or a success page
+            return redirect('icu_list')  # Redirect to a page listing all career offices or a success page
     else:
         form = InternshipCareerOfficeForm()
     return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})

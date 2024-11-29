@@ -1,0 +1,13 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<h2>Approve BiWeekly Report</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Approve</button>
+</form>
+
+{% endblock nav_and_footer %}
