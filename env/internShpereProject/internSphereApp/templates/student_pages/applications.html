@@ -15,13 +15,15 @@
     <link rel="stylesheet" href="{% static 'css/applications.css' %}">
 </head>
 <body>
+<div class="heading">
     <h1>My Applications</h1>
 
+</div>
     <div class="applications-list">
         {% if applications %}
-        <ul class="application">
             {% for app in applications %}
-               
+            <ul class="application">
+
                     <h3>{{ app.internship.title }}</h3>
                     <p>Company: {{ app.company.company_name }}</p>
                     <p>Applied on: {{ app.applied_on|date:"F d, Y" }}</p>
@@ -34,27 +36,25 @@
                             <span style="color: red;">{{ app.status }}</span>
                         {% endif %}
                     </p>
-               
+                </ul>
+
             {% endfor %}
-        </ul>
     {% else %}
-        <p>You haven't applied to any internships yet.</p>
+    <ul class="application">
+
+        <p> <strong>You haven't applied to any Internships yet.</strong></p>
+        <p><strong>Search and Apply for Internships <a href="intern_opportunities">here</a></strong></p>
+    </ul>
+
     {% endif %}
         
 
-        <div class="application">
-            <h2>Software Developer Intern</h2>
-            <p>Company: Tech Corp</p>
-            <p>Status: Pending</p>
-            <button class="btn">View Application</button>
-        </div>
-
-        <div class="application">
+        {% comment %} <div class="application">
             <h2>Marketing Intern</h2>
             <p>Company: Marketing Solutions</p>
             <p>Status: Approved</p>
             <button class="btn">View Application</button>
-        </div>
+        </div> {% endcomment %}
     </div>
 </body>
 </html>

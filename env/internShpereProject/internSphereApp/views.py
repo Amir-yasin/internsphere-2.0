@@ -52,8 +52,12 @@ def login_user(request):
                 return redirect('admin_dashboard')
             elif user.user_type == 'InternshipCareerOffice':
                 return redirect('icu_dashboard')
+            elif user.user_type == 'Supervisor':
+                return redirect('supervisor_dashboard')
+            elif user.user_type == 'Department':
+                return redirect('department_dashboard')
             else:
-                return redirect('homes')
+                return redirect('home')
         else:
             messages.error(request, 'Invalid credentials')
             return render(request, 'main_pages/login.html')
@@ -75,28 +79,34 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
+    # Ensure the user has a student profile
+    if not hasattr(request.user, 'stud_profile'):
+        return redirect('error_page')  # Redirect if no profile exists
+
     student = request.user.stud_profile
-    
+
     if request.method == 'POST':
-        # Update student fields with the submitted form data
-        student.email = request.POST['email']
-        student.phone_number = request.POST['phone_number']
-        student.gender = request.POST['gender']
-        student.year_of_study = request.POST['year_of_study']
-        student.skills = request.POST['skills']
-        student.linkedin_profile = request.POST['linkedin_profile']
-        student.resume = request.FILES.get('resume')
-        student.department = request.POST['department']  # New field
-        student.profile_completed = True
+        # Safeguard: Handle missing fields gracefully
+        student.email = request.POST.get('email', student.email)
+        student.phone_number = request.POST.get('phone_number', student.phone_number)
+        student.gender = request.POST.get('gender', student.gender)
+        student.year_of_study = request.POST.get('year_of_study', student.year_of_study)
+        student.skills = request.POST.get('skills', student.skills)
+        student.resume = request.FILES.get('resume', student.resume)
+        student.linkedin_profile = request.POST.get('linkedin_profile', student.linkedin_profile)
+        student.department = request.POST.get('department', student.department)
+        student.profile_completed = True  # Mark profile as completed
         student.save()
         
-        messages.success(request, 'Profile created successfully!')
+        messages.success(request, 'Profile updated successfully!')
         return redirect('student_dashboard')
-    
+
+    # Render the profile completion form
     return render(request, 'student_pages/student_profile.html', {
         'student': student,
-        'department_choices': stud_profile.DEPARTMENT_CHOICES  # Passing choices to template
+        'department_choices': stud_profile.DEPARTMENT_CHOICES,
     })
+    
 @login_required
 def bi_weekly_report(request):
     try:
@@ -111,7 +121,7 @@ def bi_weekly_report(request):
 
         if not active_application:
             messages.error(request, 'You have not selected a company to work with. Please select one.')
-            return redirect('select_active_company')  # Redirect to company selection page
+            return redirect('select_active_company')  
 
     except AttributeError:
         messages.error(request, 'Student profile is missing.')
@@ -204,6 +214,23 @@ def final_report(request):
     if request.user.user_type != 'Student':
         messages.error(request, "You do not have permission to submit a report.")
         return redirect('home')  # Replace 'home' with the appropriate URL
+    try:
+        # Ensure student profile exists and is completed
+        student_profile = request.user.stud_profile
+        if not student_profile.profile_completed:
+            messages.error(request, 'Your profile is not completed yet!')
+            return redirect('student_dashboard')
+
+        # Check for the active company
+        active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+        if not active_application:
+            messages.error(request, 'You have not selected a company to work with. Please select one.')
+            return redirect('select_active_company')  
+
+    except AttributeError:
+        messages.error(request, 'Student profile is missing.')
+        return redirect('student_profile')
 
     try:
         # Access the student's profile (assuming stud_profile is related to User)
@@ -297,7 +324,7 @@ def apply_to_internship(request, internship_id):
         status='Pending'
     )
     messages.success(request, 'Your application was submitted successfully!')
-    return redirect('intern_opportunities')
+    return redirect('student_dashboard')
 
 @login_required
 def applications(request):
@@ -360,7 +387,9 @@ def intern_opportunities(request):
             student_profile = None        
             return redirect('student_profile')
         internships = Internship.objects.filter(sector=student_profile.department, status='Open')
+        company = Internship.objects.select_related('Company').all()
         context = {
+            'company' : company,
             'internships': internships,
             'current_page': 'intern_opportunities'
         }
@@ -469,13 +498,15 @@ def post_internship(request):
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
     applicants = internship.applications.all()  # Fetch all applications for this internship
-    
+    student = Internship.objects.select_related('stud_profile').all()
+
     # Filter pending applicants
     pending_applicants = applicants.filter(status="Pending")
     
     return render(request, 'company_pages/view_applicants.html', {
         'internship': internship,
         'applicants': applicants,
+        'student': student,
         'pending_applicants': pending_applicants,
     })
 @login_required

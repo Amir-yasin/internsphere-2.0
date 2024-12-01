@@ -54,7 +54,7 @@ class stud_profile(models.Model):
 
 
 class Company(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Company'})
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='company', limit_choices_to={'user_type': 'Company'})
     company_name = models.CharField(max_length=255)
     company_address = models.CharField(max_length=255)
     company_phone = models.CharField(max_length=15)

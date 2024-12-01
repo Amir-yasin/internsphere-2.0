@@ -12,6 +12,15 @@
     <link rel="stylesheet" href="{% static 'css/view_applicants.css' %}">
 </head>
 <body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 <div class="heading">
     <h1>View Applicants</h1>
 </div>
@@ -22,8 +31,26 @@
        <ul>
            {% if pending_applicants.exists %}
                {% for application in pending_applicants %}
-                   <li>{{ application.student.username }} - {{ application.student.email }}
-                       - Status: {{ application.status }}
+                   <li>{{ application.student.username }} - {{ application.student.email }}   
+                        <h4><strong>Name:</strong> {{ application.first_name }} {{ application.last_name }}</h4>
+                        <p><strong>ID Number:</strong> {{ student_user.username }}</p>
+                        <p><strong>Email:</strong> {{ student_profile.email }}</p>
+                        <p><strong>Department:</strong> {{ student_profile.department }}</p>
+                        <p><strong>phone_number:</strong> {{ student_profile.phone_number }}</p>
+                        <p><strong>Batch:</strong> {{ student_profile.batch }}</p>
+                        <p><strong>Section:</strong> {{ student_profile.section }}</p>
+                        <p><strong>Gender:</strong> {{ student_profile.gender }}</p>
+                        <p><strong>year of study:</strong> {{ student_profile.year_of_study }}</p>
+                        <p><strong>skills:</strong> {{ student_profile.skills }}</p>
+                        {% if student_profile.resume %}
+                        <p><strong>Resume:</strong> <a href="{{ student_profile.resume.url }}" target="_blank">Download</a></p>
+                       
+                    {% endif %}
+
+                    {% if student_profile.linkedin_profile %}
+                        <p><strong>LinkedIn:</strong> <a href="{{ student_profile.linkedin_profile }}" target="_blank">{{ student_profile.linkedin_profile }}</a></p>
+                    {% endif %}
+                       <p><strong>Status: </strong>{{ application.status }}</p>
                        <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post">
                            {% csrf_token %}
                            <button type="submit" style="background-color: green;">Accept</button>

@@ -9,18 +9,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Company Profile</title>
-</head>
+    <link rel="stylesheet" href="{% static 'css/applications.css' %}"></head>
 <body>
-    <h1>Company Profile</h1>
+    <div class="heading">
+        <h1>Company Profile</h1>
 
-    <!-- Display company details -->
+    </div>
+    <div class="applications-list">
+        <div class="application">
     <p><strong>Company Name:</strong> {{ company.company_name }}</p>
     <p><strong>Company Address:</strong> {{ company.company_address }}</p>
     <p><strong>Company Phone:</strong> {{ company.company_phone }}</p>
     <p><strong>Company Description:</strong> {{ company.company_description }}</p>
     <p><strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}</p>
-    <a href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
-
+    <a class="btn" href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
+    </div>
+</div>
     {% comment %} <a href="{% url 'edit_company_profile' company.user.id %}">Edit Profile</a> <!-- If you want an edit link --> {% endcomment %}
 </body>
 </html>

@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/company_dashboard.css' %}">
 </head>
 <body>
     {% if messages %}
@@ -26,7 +26,7 @@
     </div>
     <header>
         <h1>Welcome, {{ user.username }}</h1>
-        <p>You are logged in as a {{ user.user_type }}</p>
+        <p class="text-center">You are logged in as an Admin</p>
     </header>
     
     {% if messages %}
@@ -41,37 +41,37 @@
     <div class="dashboard">
         <div class="dashboard-item">
             <h2>Register Students</h2>
-            <p>Register the students that are going to take internship.</p>
-            <a href="{% url 'register_students' %}" class="btn">Register</a>
-            <a href="{% url 'student_list' %}" class="btn">list of students</a>
+            <p>Register the students.</p>
+            <a href="{% url 'register_students' %}" class="btn1">Register</a>
+            <a href="{% url 'student_list' %}" class="btn1">list of students</a>
         </div>
 
         <div class="dashboard-item">
             <h2>Approve Companies</h2>
-            <p>Approve the Companies that are going to post the internships.</p>
-            <a href="{% url 'approve_companies' %}" class="btn">Approve Now</a>
-            {% comment %} <a href="{% url 'student_list' %}" class="btn">list of students</a> {% endcomment %}
+            <p>Approve the Companies.</p>
+            <a href="{% url 'approve_companies' %}" class="btn1">Approve Now</a>
+            {% comment %} <a href="{% url 'student_list' %}" class="btn1">list of students</a> {% endcomment %}
         </div>
 
         <div class="dashboard-item">
             <h2>Register Department</h2>
             <p>Register the Department.</p>
-            <a href="{% url 'register_department' %}" class="btn">Register</a>
-            <a href="{% url 'department_list' %}" class="btn">list of departments</a>
+            <a href="{% url 'register_department' %}" class="btn1">Register</a>
+            <a href="{% url 'department_list' %}" class="btn1">list of departments</a>
         </div>
 
         <div class="dashboard-item">
             <h2>Register ICU</h2>
             <p>Register the Internship Office.</p>
-            <a href="{% url 'register_internship_career_office' %}" class="btn">Register</a>
-            <a href="{% url 'icu_list' %}" class="btn">list of icu</a>
+            <a href="{% url 'register_internship_career_office' %}" class="btn1">Register</a>
+            <a href="{% url 'icu_list' %}" class="btn1">list of icu</a>
         </div>
 
         <div class="dashboard-item">
             <h2>Register Supervisors</h2>
             <p>Register the supervisors.</p>
-            <a href="{% url 'register_supervisor' %}" class="btn">Register</a>
-            <a href="{% url 'supervisor_list' %}" class="btn">list of Supervisors</a>
+            <a href="{% url 'register_supervisor' %}" class="btn1">Register</a>
+            <a href="{% url 'supervisor_list' %}" class="btn1">list of Supervisors</a>
         </div>
     </div>
     <br>

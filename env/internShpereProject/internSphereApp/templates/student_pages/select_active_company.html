@@ -2,7 +2,17 @@
 {% load static %}
 
 {% block nav_and_footer %}
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <link rel="stylesheet" href="{% static 'css/applications.css' %}">
+</head>
+<div class="heading">
+    <h1>Select Your Active Company</h1>
+</div>
 {% if messages %}
 <div id="message-container">
     {% for message in messages %}
@@ -12,19 +22,31 @@
     {% endfor %}
 </div>
 {% endif %}
-<div class="heading">
-    <h1>Select Your Active Company</h1>
-</div>
+
 <form method="post">
+
     {% csrf_token %}
+
+    {% if accepted_applications %}
     {% for application in accepted_applications %}
+    <div class="applications-list">
+    <div class="application">
         <label>
             <input type="radio" name="application_id" value="{{ application.id }}">
             {{ application.company.name }} - {{ application.internship.title }}
         </label>
         <br>
-    {% endfor %}
-    <button type="submit">Submit</button>
+    </div>
+</div>
+{% endfor %}
+<button type="submit">Submit</button>
+    {% else %}
+    <div class="applications-list">
+        <div class="application">
+            <p><strong>You Don't Have Any Accepted Internship Applications Yet.</strong></p>
+</div>
+</div>
+    {% endif %}
 </form>
 
 

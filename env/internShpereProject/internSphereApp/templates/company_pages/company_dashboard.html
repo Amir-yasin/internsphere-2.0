@@ -39,32 +39,39 @@
 
         </div>
         <div class="dashboard-item">
+            <h2>Posted Internships</h2>
+            <p>Post Your Internships</p>
+            <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
+        </div>
+        <div class="dashboard-item">
             <h2>Applicants</h2>
-            <p>Total: 2</p>
-
+            {% if internship_list %} 
         {% for internship in internship_list %}
        <ul>
+        <p>Total: 2</p>
        <a class="btn1" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a></li> 
 
        </ul>
-    {% endfor %}
-</div>
-<div class="dashboard-item">
-    <h2>Manage Interns 123</h2>
-    <p>Total: 8</p>
-    <a href="{% url 'review_biweekly_reports' %}" class="btn1">Manage Attendance</a>
-</div>
-        {% comment %} <div class="dashboard-item">
-            <h2>Posted Internships</h2>
-            <p>Total: 3</p>
-            <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
+        {% endfor %}
+        {% else %}
+        <p><strong>No Applicants Yet.</strong></p>
+        {% endif %}
         </div>
-        <a class="dropdown-item" href="{% url 'view_applicants' internship_id=request.internship.id %}">Applicants</a> {% endcomment %}
-
+        {% comment %} <a class="dropdown-item" href="{% url 'view_applicants' internship_id=request.internship.id %}">Applicants</a> {% endcomment %}
+        <div class="dashboard-item">
+            <h2>Review Bi-weekly Reports</h2>
+            <p>Review and Approve</p>
+            <a href="{% url 'review_biweekly_reports' %}" class="btn1">View Bi-weekly Reports</a>
+        </div>
         <div class="dashboard-item">
             <h2>Manage Interns</h2>
             <p>Total: 8</p>
             <a href="{% url 'attendance' %}" class="btn1">Manage Attendance</a>
+        </div>
+        <div class="dashboard-item">
+            <h2>Review Final Report</h2>
+            <p>Review and Approve</p>
+            <a href="{% url 'review_biweekly_reports' %}" class="btn1">View Final Reports</a>
         </div>
     </div>
 </body>

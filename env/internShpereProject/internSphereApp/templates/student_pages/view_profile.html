@@ -26,7 +26,8 @@
     <h4><strong>Name:</strong> {{ student_user.first_name }} {{ student_user.last_name }}</h4>
     <p><strong>ID Number:</strong> {{ student_user.username }}</p>
     <p><strong>Email:</strong> {{ student_profile.email }}</p>
-    <p><strong>Department:</strong> {{ student_profile.phone_number }}</p>
+    <p><strong>Department:</strong> {{ student_profile.department }}</p>
+    <p><strong>phone_number:</strong> {{ student_profile.phone_number }}</p>
     <p><strong>Batch:</strong> {{ student_profile.batch }}</p>
     <p><strong>Section:</strong> {{ student_profile.section }}</p>
     <p><strong>Gender:</strong> {{ student_profile.gender }}</p>
@@ -34,6 +35,8 @@
     <p><strong>skills:</strong> {{ student_profile.skills }}</p>
     {% if student_profile.resume %}
     <p><strong>Resume:</strong> <a href="{{ student_profile.resume.url }}" target="_blank">Download</a></p>
+    {% else %}
+    <p><strong>Resume:</strong>
 {% endif %}
 
 {% if student_profile.linkedin_profile %}
