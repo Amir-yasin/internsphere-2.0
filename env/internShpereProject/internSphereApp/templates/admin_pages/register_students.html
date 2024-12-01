@@ -11,7 +11,10 @@
     {% endfor %}
 </ul>
 {% endif %}
+<div class="heading"><h2>Register Students</h2></div>
 <form method="POST" enctype="multipart/form-data">
+    <div class="container">
+
     {% csrf_token %}
     <label for="batch">Batch:</label>
     <input type="text" name="batch" required><br>
@@ -25,6 +28,7 @@
     <button type="submit">Upload Students</button>
 </form>
 
+</div>
 
 
 {% endblock nav_and_footer %}

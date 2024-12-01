@@ -3,12 +3,7 @@
 
 {% block nav_and_footer %}
     
-<style>
-    table, th ,td{
-        border:2px solid black;
-        padding:0px 7px;
-    }
-</style>
+
 {% if messages %}
 <ul class="text-Success">
     {% for message in messages %}
@@ -16,11 +11,14 @@
     {% endfor %}
 </ul>
 {% endif %}
-<h2>Pending Company Approvals</h2>
+
+<div class="heading"><h2>Approve Companies</h2>
+</div>
+<h2 class="text-center">Pending Companies to be Approved</h2>
 
 {% if pending_companies %}
-    <table border="1">
-        <thead>
+<table class="table table-striped">
+    <thead>
             <tr>
                 <th>Company Name</th>
                 <th>Address</th>
@@ -50,14 +48,14 @@
         </tbody>
     </table>
 {% else %}
-    <p>No pending companies for approval.</p>
+    <p class="text-center">No pending companies for approval.</p>
 {% endif %}
-
-<h2>Approved Companies</h2>
+<hr>
+<h2 class="text-center">Approved Companies</h2>
 
 {% if approved_companies %}
-    <table border="1">
-        <thead>
+<table class="table table-striped">
+    <thead>
             <tr>
                 <th>Company Name</th>
                 <th>Address</th>
@@ -77,7 +75,7 @@
                     <td>
                         
                         <a href="{% url 'view_company_info' company.id %}" class="btn btn-info">View Profile</a>
-                        <a href="{% url 'delete_company' company.id %}" class="btn btn-danger">Delete</a>
+                        <a href="{% url 'dis_approve_company' company.id %}" class="btn btn-danger">Suspend</a>
 
                     </td>
                 </tr>
@@ -85,7 +83,7 @@
         </tbody>
     </table>
 {% else %}
-    <p>No approved companies yet.</p>
+    <p class="text-center">No approved companies yet.</p>
 {% endif %}
 
 {% endblock nav_and_footer %}

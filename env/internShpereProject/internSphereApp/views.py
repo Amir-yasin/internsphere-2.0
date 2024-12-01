@@ -149,6 +149,11 @@ def bi_weekly_report(request):
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
 
+def view_biweekly_report(request, report_id):
+    # Retrieve the report for viewing
+    report = get_object_or_404(BiWeeklyReport, id=report_id)
+    return render(request, 'company_pages/view_biweekly_report.html', {'report': report})
+
 @login_required
 def review_biweekly_reports(request):
     user = request.user
@@ -181,32 +186,42 @@ def review_biweekly_reports(request):
 
 
 @login_required
-def approve_biweekly_report(request, report_id):
+def approve_biweekly_report(request, report_id, action):
     report = get_object_or_404(BiWeeklyReport, id=report_id)
     user = request.user
 
     if request.method == "POST":
-        form = BiweeklyReportApprovalForm(request.POST, instance=report)
-        if form.is_valid():
+        if action == "approve":
             if user.user_type == "Company":
                 report.company_approval_status = "Approved"
-                report.company_approval_date = timezone.now()
+                report.company_approval_date = now()
             elif user.user_type == "InternshipCareerOffice":
                 report.internship_office_approval_status = "Approved"
-                report.internship_office_approval_date = timezone.now()
+                report.internship_office_approval_date = now()
             elif user.user_type == "Department":
                 report.department_approval_status = "Approved"
-                report.department_approval_date = timezone.now()
+                report.department_approval_date = now()
             elif user.user_type == "Supervisor":
                 report.supervisor_approval_status = "Approved"
-                report.supervisor_approval_date = timezone.now()
+                report.supervisor_approval_date = now()
+        elif action == "reject":
+            if user.user_type == "Company":
+                report.company_approval_status = "Rejected"
+                report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                report.internship_office_approval_status = "Rejected"
+                report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                report.department_approval_status = "Rejected"
+                report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                report.supervisor_approval_status = "Rejected"
+                report.supervisor_approval_date = now()
 
-            report.save()
-            return redirect("review_biweekly_reports")
+        report.save()
+        return redirect("review_biweekly_reports")
 
-    form = BiweeklyReportApprovalForm(instance=report)
-    return render(request, "company_pages/approve_biweekly_report.html", {"form": form})
-
+    return render(request, "company_pages/approve_biweekly_report.html", {"report": report})
 
 @login_required
 def final_report(request):
@@ -693,7 +708,7 @@ def view_company_info(request, company_id):
     return render(request, 'admin_pages/view_company_info.html', {'company': company})
 
 @login_required
-def delete_company(request, company_id):
+def dis_approve_company(request, company_id):
     # company = get_object_or_404(company, id=company_id)
     # company.user.delete()  
     if request.user.is_superuser: 
@@ -703,6 +718,10 @@ def delete_company(request, company_id):
         messages.success(request, f"{company.company_name} has been dis-approved.")
     return redirect('approve_companies')
 
+@login_required
+def delete_company(request, company_id):
+    company = get_object_or_404(company, id=company_id)
+    company.user.delete()  
 
 def is_admin(user):
     return user.is_authenticated and user.is_superuser

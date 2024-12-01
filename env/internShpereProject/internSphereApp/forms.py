@@ -201,11 +201,24 @@ class FinalReportForm(forms.ModelForm):
         
 
 class BiweeklyReportApprovalForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop("fields", None)
+        super().__init__(*args, **kwargs)
+        if fields:
+            # Collect fields to remove
+            fields_to_remove = [field_name for field_name in self.fields if field_name not in fields]
+            # Remove fields after iteration
+            for field_name in fields_to_remove:
+                self.fields.pop(field_name)
+
     class Meta:
         model = BiWeeklyReport
-        fields = ["company_approval_status", "internship_office_approval_status", "department_approval_status", "supervisor_approval_status"]
-        
-
+        fields = [
+            "company_approval_status",
+            "internship_office_approval_status",
+            "department_approval_status",
+            "supervisor_approval_status",
+        ]
 class FinalReportApprovalForm(forms.ModelForm):
     class Meta:
         model = FinalReport

@@ -3,12 +3,24 @@
 
 {% block nav_and_footer %}
 
-<h2>BiWeekly Reports for Review</h2>
+<h2>Bi-Weekly Reports for Review</h2>
 <ul>
     {% for report in reports %}
         <li>
-            {{ report.student.user.username }} - Report {{ report.report_number }}
-            <a href="{% url 'approve_biweekly_report' report.id %}">Review</a>
+            Bi-Weekly Report {{ report.report_number }} by {{ report.student.user.first_name }} {{ report.student.user.last_name }} 
+            
+            <!-- View Report Button -->
+            <a href="{% url 'view_biweekly_report' report.id %}" class="btn btn-info">View Report</a>
+
+            <!-- Approve and Reject Buttons -->
+            <form method="post" action="{% url 'approve_biweekly_report' report.id 'approve' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+            <form method="post" action="{% url 'approve_biweekly_report' report.id 'reject' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
         </li>
     {% endfor %}
 </ul>

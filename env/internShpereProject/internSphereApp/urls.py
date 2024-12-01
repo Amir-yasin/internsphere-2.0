@@ -54,6 +54,7 @@ path('delete_student/<int:student_id>/', views.delete_student, name='delete_stud
 path('approve_companies/', views.approve_companies, name='approve_companies'),
 path('approve_company/<int:company_id>/', views.approve_company, name='approve_company'),
 path('view_company_info/<int:company_id>/', views.view_company_info, name='view_company_info'),
+path('dis_approve_company/<int:company_id>/', views.dis_approve_company, name='dis_approve_company'),
 path('delete_company/<int:company_id>/', views.delete_company, name='delete_company'),
 
 # admin pages url(icu)
@@ -89,6 +90,7 @@ path('review_final_reports/<str:role>/', views.review_final_reports, name='revie
 path('approve_final_report/<int:report_id>/<str:role>/', views.approve_final_report, name='approve_final_report'),
 
 path("review_biweekly_reports/", views.review_biweekly_reports, name="review_biweekly_reports"),
-path("approve_biweekly_report/<int:report_id>/", views.approve_biweekly_report, name="approve_biweekly_report"),
+path('approve_biweekly_report/<int:report_id>/<str:action>/', views.approve_biweekly_report, name='approve_biweekly_report'),
+path('biweekly-report/<int:report_id>/view/', views.view_biweekly_report, name='view_biweekly_report'),
 
 ]

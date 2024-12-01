@@ -2,13 +2,7 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    <style>
-        table, th ,td{
-            border:2px solid black;
-            padding:0px 7px;
-        
-        }
-    </style>
+
 
 
     <!-- admin_pages/student_list.html -->
@@ -25,8 +19,11 @@
         {% endfor %}
     </ul>
 {% endif %}
+<div class="heading">
     <h1>Student List</h1>
-    <table border="1">
+
+</div>
+<table class="table table-striped">
         <tr>
             <th>Student ID</th>
             <th>First Name</th>
