@@ -1,5 +1,17 @@
 {% extends "main_pages/base.html" %}
+{% load static %}
+
 {% block nav_and_footer %}
+<link rel="stylesheet" href="{% static 'css/applications.css' %}">
+{% if messages %}
+<div id="message-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 <div class="heading">
     <h2>View Bi-Weekly Report</h2>
@@ -67,9 +79,10 @@
             <td>{{ report.date_submitted }}</td>
         </tr>
     </table>
+    <a href="{% url 'review_biweekly_reports' %}" class="btn btn-primary">Back to Reports</a>
+
 </div>
 </div>
 
-<a href="{% url 'review_biweekly_reports' %}" class="btn btn-primary">Back to Reports</a>
 
 {% endblock nav_and_footer %}

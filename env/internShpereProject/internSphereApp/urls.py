@@ -62,7 +62,7 @@ path('register-internship-career-office', views.register_internship_career_offic
 path('icu_list', views.icu_list , name = 'icu_list'),
 
 # admin pages url(department)
-path('register/department', views.register_department, name='register_department'),
+path('department', views.register_department, name='register_department'),
 path('department_list', views.department_list , name = 'department_list'),
 
 # admin pages url(supervisor)

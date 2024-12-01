@@ -570,7 +570,7 @@ def admin_dashboard(request):
 # Dashboard view for Internship Career Office
 @login_required
 def icu_dashboard(request):
-    if request.user.customuser.user_type != 'InternshipCareerOffice':
+    if request.user.user_type != 'InternshipCareerOffice':
         messages.error(request, "You do not have access to this page.")
         return redirect('home')
 

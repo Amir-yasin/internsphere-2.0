@@ -3,11 +3,8 @@
 
 {% block nav_and_footer %}
 
-<h2>Bi-Weekly Reports for Review </h2>
+<h2>Bi-Weekly Reports for Review</h2>
 <ul>
-    
-    {% if reports %}
-        
     {% for report in reports %}
         <li>
             Bi-Weekly Report {{ report.report_number }} by {{ report.student.user.first_name }} {{ report.student.user.last_name }} 
@@ -26,9 +23,6 @@
             </form>
         </li>
     {% endfor %}
-{% else %}
-<p><strong>There Are No Bi-Weekly Reports Submitted Yet.</strong> </p>
-{% endif %}
 </ul>
 
 {% endblock nav_and_footer %}
