@@ -33,13 +33,13 @@
     <div class="application">
         <label>
             <input type="radio" name="application_id" value="{{ application.id }}">
-            {{ application.company.name }} - {{ application.internship.title }}
+            {{ application.internship.title }} -  {{ application.company.company_name }} 
         </label>
         <br>
     </div>
 </div>
 {% endfor %}
-<button type="submit">Submit</button>
+<button class="btn ms-5" type="submit">Submit</button>
     {% else %}
     <div class="applications-list">
         <div class="application">

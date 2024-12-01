@@ -186,7 +186,7 @@ def approve_biweekly_report(request, report_id):
     user = request.user
 
     if request.method == "POST":
-        form = ApproveReportForm(request.POST, instance=report)
+        form = BiweeklyReportApprovalForm(request.POST, instance=report)
         if form.is_valid():
             if user.user_type == "Company":
                 report.company_approval_status = "Approved"
@@ -204,8 +204,8 @@ def approve_biweekly_report(request, report_id):
             report.save()
             return redirect("review_biweekly_reports")
 
-    form = ApproveReportForm(instance=report)
-    return render(request, "approve_biweekly_report.html", {"form": form})
+    form = BiweeklyReportApprovalForm(instance=report)
+    return render(request, "company_pages/approve_biweekly_report.html", {"form": form})
 
 
 @login_required
@@ -497,16 +497,16 @@ def post_internship(request):
 @login_required
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
-    applicants = internship.applications.all()  # Fetch all applications for this internship
-    student = Internship.objects.select_related('stud_profile').all()
+    # applicants = internship.applications.all()  # Fetch all applications for this internship
+    applications = internship.applications.select_related('student__user')  # Optimized query
 
     # Filter pending applicants
-    pending_applicants = applicants.filter(status="Pending")
+    pending_applicants = applications.filter(status="Pending")
     
     return render(request, 'company_pages/view_applicants.html', {
         'internship': internship,
-        'applicants': applicants,
-        'student': student,
+        # 'applicants': applicants,
+        'applications': applications,
         'pending_applicants': pending_applicants,
     })
 @login_required
