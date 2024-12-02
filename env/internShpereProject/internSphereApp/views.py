@@ -275,43 +275,55 @@ def final_report(request):
 
 
 
-@login_required
-def review_final_reports(request, role):
-    """Handles reviewing and approving final reports based on the user role."""
-    if user.user_type == 'Company':
-        reports = FinalReport.objects.filter(company_approval_status='Pending')
-    elif user.user_type == 'InternshipCareerOffice':
-        reports = FinalReport.objects.filter(
-            company_approval_status='Approved', internship_office_approval_status='Pending'
-        )
-    elif user.user_type == 'Department':
-        reports = FinalReport.objects.filter(
-            internship_office_approval_status='Approved', department_approval_status='Pending'
-        )
-    elif user.user_type == 'Supervisor':
-        reports = FinalReport.objects.filter(
-            department_approval_status='Approved', supervisor_approval_status='Pending'
-        )
+
+def review_final_reports(request):
+    if request.user.user_type == "Company":
+        reports = FinalReport.objects.filter(company_approval_status="Pending")
+    elif request.user.user_type == "InternshipCareerOffice":
+        reports = FinalReport.objects.filter(company_approval_status="Approved")
     else:
-        return redirect('dashboard')
+        reports = FinalReport.objects.all()
 
-    return render(request, f'{user.user_type}_pages/review_final_reports.html', {'reports': reports})
-
+    return render(request, "company_pages/review_final_reports.html", {"reports": reports})
 
 @login_required
-def approve_final_report(request, report_id, role):
-    """Approve a final report based on the current role."""
-    report = get_object_or_404(FinalReport, pk=report_id)
-    if request.method == 'POST':
-        form = FinalReportApprovalForm(request.POST, instance=report)
-        if form.is_valid():
-            form.save()
-            return redirect('review_final_reports', role=role)
-    else:
-        form = FinalReportApprovalForm(instance=report)
-    return render(request, 'final_report/approve_final_report.html', {'form': form, 'report': report})
+def approve_final_report(request, report_id, action):
+    final_report = get_object_or_404(FinalReport, id=report_id)
+    user = request.user
 
+    if request.method == "POST":
+        if action == "approve":
+            if user.user_type == "Company":
+                final_report.company_approval_status = "Approved"
+                final_report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                final_report.internship_office_approval_status = "Approved"
+                final_report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                final_report.department_approval_status = "Approved"
+                final_report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                final_report.supervisor_approval_status = "Approved"
+                final_report.supervisor_approval_date = now()
+        elif action == "reject":
+            if user.user_type == "Company":
+                final_report.company_approval_status = "Rejected"
+                final_report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                final_report.internship_office_approval_status = "Rejected"
+                final_report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                final_report.department_approval_status = "Rejected"
+                final_report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                final_report.supervisor_approval_status = "Rejected"
+                final_report.supervisor_approval_date = now()
 
+        final_report.save()
+        messages.success(request, f"Final report has been {action}d successfully!")
+        return redirect("review_final_reports")
+
+    return render(request, "approve_final_report.html", {"final_report": final_report})
 
 @login_required
 def student_dashboard(request):

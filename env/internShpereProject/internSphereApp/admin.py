@@ -14,6 +14,7 @@ admin.site.register(Company)
 admin.site.register(CustomUser)
 admin.site.register(Internship)
 admin.site.register(BiWeeklyReport)
+admin.site.register(FinalReport)
 admin.site.register(Application)
 @admin.register(InternshipCareerOffice)
 class InternshipCareerOfficeAdmin(admin.ModelAdmin):

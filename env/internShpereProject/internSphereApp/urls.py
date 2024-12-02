@@ -86,8 +86,8 @@ path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
 # path('attendance', views.attendance , name = 'attendance'),
 
 
-path('review_final_reports/<str:role>/', views.review_final_reports, name='review_final_reports'),
-path('approve_final_report/<int:report_id>/<str:role>/', views.approve_final_report, name='approve_final_report'),
+path("review_final_reports/", views.review_final_reports, name="review_final_reports"),
+path("approve_final_report/<int:report_id>/<str:action>/",views.approve_final_report,name="approve_final_report"),
 
 path("review_biweekly_reports/", views.review_biweekly_reports, name="review_biweekly_reports"),
 path('approve_biweekly_report/<int:report_id>/<str:action>/', views.approve_biweekly_report, name='approve_biweekly_report'),

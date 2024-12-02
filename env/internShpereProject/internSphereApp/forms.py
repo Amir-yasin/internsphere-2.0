@@ -222,19 +222,23 @@ class BiweeklyReportApprovalForm(forms.ModelForm):
 class FinalReportApprovalForm(forms.ModelForm):
     class Meta:
         model = FinalReport
-        fields = ['company_approval_status', 'internship_office_approval_status', 
-                  'department_approval_status', 'supervisor_approval_status']
+        fields = [
+            "company_approval_status",
+            "internship_office_approval_status",
+            "department_approval_status",
+            "supervisor_approval_status",
+        ]
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        if instance.company_approval_status == 'Approved':
-            instance.company_approval_date = timezone.now()
-        if instance.internship_office_approval_status == 'Approved':
-            instance.internship_office_approval_date = timezone.now()
-        if instance.department_approval_status == 'Approved':
-            instance.department_approval_date = timezone.now()
-        if instance.supervisor_approval_status == 'Approved':
-            instance.supervisor_approval_date = timezone.now()
+        if instance.company_approval_status == "Approved" and not instance.company_approval_date:
+            instance.company_approval_date = now()
+        if instance.internship_office_approval_status == "Approved" and not instance.internship_office_approval_date:
+            instance.internship_office_approval_date = now()
+        if instance.department_approval_status == "Approved" and not instance.department_approval_date:
+            instance.department_approval_date = now()
+        if instance.supervisor_approval_status == "Approved" and not instance.supervisor_approval_date:
+            instance.supervisor_approval_date = now()
         if commit:
             instance.save()
         return instance
