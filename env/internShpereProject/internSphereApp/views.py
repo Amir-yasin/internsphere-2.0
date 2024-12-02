@@ -281,8 +281,10 @@ def review_final_reports(request):
         reports = FinalReport.objects.filter(company_approval_status="Pending")
     elif request.user.user_type == "InternshipCareerOffice":
         reports = FinalReport.objects.filter(company_approval_status="Approved")
-    else:
-        reports = FinalReport.objects.all()
+    elif user.user_type == "Department":
+        reports = FinalReport.objects.filter(internship_office_approval_status="Approved")
+    elif user.user_type == "Supervisor":
+        reports = FinalReport.objects.filter(department_approval_status="Approved")
 
     return render(request, "company_pages/review_final_reports.html", {"reports": reports})
 
@@ -330,6 +332,7 @@ def student_dashboard(request):
     if request.user.user_type != 'Student':
         return redirect('home')
     return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
+
 
 
 
@@ -811,3 +814,23 @@ def supervisor_list(request):
     return render(request, 'admin_pages/supervisor_list.html', {'supervisors': supervisors})
 
 
+# Dashboard view for Internship Career Office
+@login_required
+def department_dashboard(request):
+    if request.user.user_type != 'Department':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    students = stud_profile.objects.all()
+    reports = BiWeeklyReport.objects.all()
+    final_reports = FinalReport.objects.all()
+    evaluations = Evaluation.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    return render(request, 'internship_office_pages/icu_dashboard.html', {
+        'students': students,
+        'reports': reports,
+        'final_reports': final_reports,
+        'evaluations': evaluations,
+        'attendance_records': attendance_records,
+    })
