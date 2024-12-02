@@ -281,9 +281,9 @@ def review_final_reports(request):
         reports = FinalReport.objects.filter(company_approval_status="Pending")
     elif request.user.user_type == "InternshipCareerOffice":
         reports = FinalReport.objects.filter(company_approval_status="Approved")
-    elif user.user_type == "Department":
+    elif  request.user.user_type == "Department":
         reports = FinalReport.objects.filter(internship_office_approval_status="Approved")
-    elif user.user_type == "Supervisor":
+    elif  request.user.user_type == "Supervisor":
         reports = FinalReport.objects.filter(department_approval_status="Approved")
 
     return render(request, "company_pages/review_final_reports.html", {"reports": reports})
@@ -827,7 +827,28 @@ def department_dashboard(request):
     evaluations = Evaluation.objects.all()
     attendance_records = Attendance.objects.all()
 
-    return render(request, 'internship_office_pages/icu_dashboard.html', {
+    return render(request, 'department_pages/department_dashboard.html', {
+        'students': students,
+        'reports': reports,
+        'final_reports': final_reports,
+        'evaluations': evaluations,
+        'attendance_records': attendance_records,
+    })
+    
+    
+@login_required
+def supervisor_dashboard(request):
+    if request.user.user_type != 'Supervisor':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    students = stud_profile.objects.all()
+    reports = BiWeeklyReport.objects.all()
+    final_reports = FinalReport.objects.all()
+    evaluations = Evaluation.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    return render(request, 'supervisor_pages/supervisor_dashboard.html', {
         'students': students,
         'reports': reports,
         'final_reports': final_reports,

@@ -72,6 +72,12 @@ path('supervisor_list', views.supervisor_list , name = 'supervisor_list'),
 #icu pages url
 path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
 
+
+path('supervisor_dashboard', views.supervisor_dashboard , name = 'supervisor_dashboard'),
+
+path('department_dashboard', views.department_dashboard , name = 'department_dashboard'),
+
+
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
 # path('attendance', views.attendance , name = 'attendance'),
