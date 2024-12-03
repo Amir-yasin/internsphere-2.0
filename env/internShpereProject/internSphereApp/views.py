@@ -154,35 +154,91 @@ def view_biweekly_report(request, report_id):
     report = get_object_or_404(BiWeeklyReport, id=report_id)
     return render(request, 'company_pages/view_biweekly_report.html', {'report': report})
 
+
 @login_required
 def review_biweekly_reports(request):
     user = request.user
 
     if user.user_type == "Company":
-        reports = BiWeeklyReport.objects.filter(
+        biweekly_reports = BiWeeklyReport.objects.filter(
             company=user.company, company_approval_status="Pending"
         )
+        final_reports = FinalReport.objects.filter(
+            company_approval_status="Pending"
+        )
     elif user.user_type == "InternshipCareerOffice":
-        reports = BiWeeklyReport.objects.filter(
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            company_approval_status="Approved",
+            internship_office_approval_status="Pending"
+        )
+        final_reports = FinalReport.objects.filter(
             company_approval_status="Approved",
             internship_office_approval_status="Pending"
         )
     elif user.user_type == "Department":
-        reports = BiWeeklyReport.objects.filter(
+        biweekly_reports = BiWeeklyReport.objects.filter(
             internship_office_approval_status="Approved",
             department_approval_status="Pending",
             student__department=user.department_profile.department_name,
         )
+        final_reports = FinalReport.objects.filter(
+            internship_office_approval_status="Approved",
+            department_approval_status="Pending"
+        )
     elif user.user_type == "Supervisor":
-        reports = BiWeeklyReport.objects.filter(
+        biweekly_reports = BiWeeklyReport.objects.filter(
             department_approval_status="Approved",
             supervisor_approval_status="Pending",
             student__department=user.supervisor_profile.department.department_name,
         )
+        final_reports = FinalReport.objects.filter(
+            department_approval_status="Approved",
+            supervisor_approval_status="Pending"
+        )
     else:
-        reports = None
+        biweekly_reports = None
+        final_reports = None
 
-    return render(request, "company_pages/review_biweekly_reports.html", {"reports": reports})
+    # Group reports by student
+    reports_by_student = {}
+    for report in biweekly_reports:
+        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["biweekly"].append(report)
+    for report in final_reports:
+        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["final"].append(report)
+
+    return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
+
+
+
+# @login_required
+# def review_biweekly_reports(request):
+#     user = request.user
+
+#     if user.user_type == "Company":
+#         reports = BiWeeklyReport.objects.filter(
+#             company=user.company, company_approval_status="Pending"
+#         )
+#     elif user.user_type == "InternshipCareerOffice":
+#         reports = BiWeeklyReport.objects.filter(
+#             company_approval_status="Approved",
+#             internship_office_approval_status="Pending"
+#         )
+#     elif user.user_type == "Department":
+#         reports = BiWeeklyReport.objects.filter(
+#             internship_office_approval_status="Approved",
+#             department_approval_status="Pending",
+#             student__department=user.department_profile.department_name,
+#         )
+#     elif user.user_type == "Supervisor":
+#         reports = BiWeeklyReport.objects.filter(
+#             department_approval_status="Approved",
+#             supervisor_approval_status="Pending",
+#             student__department=user.supervisor_profile.department.department_name,
+#         )
+#     else:
+#         reports = None
+
+#     return render(request, "company_pages/review_biweekly_reports.html", {"reports": reports})
 
 
 @login_required
@@ -276,17 +332,17 @@ def final_report(request):
 
 
 
-def review_final_reports(request):
-    if request.user.user_type == "Company":
-        reports = FinalReport.objects.filter(company_approval_status="Pending")
-    elif request.user.user_type == "InternshipCareerOffice":
-        reports = FinalReport.objects.filter(company_approval_status="Approved")
-    elif  request.user.user_type == "Department":
-        reports = FinalReport.objects.filter(internship_office_approval_status="Approved")
-    elif  request.user.user_type == "Supervisor":
-        reports = FinalReport.objects.filter(department_approval_status="Approved")
+# def review_final_reports(request):
+#     if request.user.user_type == "Company":
+#         reports = FinalReport.objects.filter(company_approval_status="Pending")
+#     elif request.user.user_type == "InternshipCareerOffice":
+#         reports = FinalReport.objects.filter(company_approval_status="Approved" , internship_office_approval_status = "Pending")
+#     elif  request.user.user_type == "Department":
+#         reports = FinalReport.objects.filter(internship_office_approval_status="Approved", department_approval_status="Pending")
+#     elif  request.user.user_type == "Supervisor":
+#         reports = FinalReport.objects.filter(department_approval_status="Approved", supervisor_approval_status="Pending")
 
-    return render(request, "company_pages/review_final_reports.html", {"reports": reports})
+#     return render(request, "company_pages/review_final_reports.html", {"reports": reports})
 
 @login_required
 def approve_final_report(request, report_id, action):
@@ -323,7 +379,7 @@ def approve_final_report(request, report_id, action):
 
         final_report.save()
         messages.success(request, f"Final report has been {action}d successfully!")
-        return redirect("review_final_reports")
+        return redirect("review_biweekly_reports")
 
     return render(request, "approve_final_report.html", {"final_report": final_report})
 
@@ -601,69 +657,7 @@ def icu_dashboard(request):
         'attendance_records': attendance_records,
     })
     
-# Department dashboard view
-@login_required
-def department_dashboard(request):
-    if request.user.customuser.user_type != 'Department':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
 
-    department = get_object_or_404(Department, user=request.user)
-    students = stud_profile.objects.filter(department=department.department_name)
-
-    return render(request, 'department_dashboard.html', {
-        'department': department,
-        'students': students,
-    })
-
-
-# Supervisor dashboard view
-@login_required
-def supervisor_dashboard(request):
-    if request.user.customuser.user_type != 'Supervisor':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    supervisor = get_object_or_404(Supervisor, user=request.user)
-    supervised_students = stud_profile.objects.filter(department=supervisor.department)
-
-    return render(request, 'supervisor_dashboard.html', {
-        'supervisor': supervisor,
-        'supervised_students': supervised_students,
-    })
-
-
-# Internship listing view
-@login_required
-def internship_list(request):
-    internships = Internship.objects.filter(status='Open').order_by('-posted_on')
-
-    return render(request, 'internship_list.html', {
-        'internships': internships,
-    })
-
-
-
-# View for ICU to send reports to the department
-@login_required
-def send_reports_to_department(request):
-    if request.user.customuser.user_type != 'InternshipCareerOffice':
-        messages.error(request, "You do not have permission to send reports.")
-        return redirect('home')
-
-    reports = BiWeeklyReport.objects.all()
-    # Additional logic to send reports can be added here, such as sending an email to department
-
-    messages.success(request, "Reports sent to the department.")
-    return redirect('icu_dashboard')
-
-
-# Function to close internships if expired
-def close_expired_internships():
-    internships = Internship.objects.filter(status='Open')
-    for internship in internships:
-        if internship.is_expired():
-            internship.close_if_expired()
 
 def register_students(request):
     if request.method == 'POST':
