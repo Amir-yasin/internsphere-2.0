@@ -209,38 +209,6 @@ def review_biweekly_reports(request):
     return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
 
 
-
-# @login_required
-# def review_biweekly_reports(request):
-#     user = request.user
-
-#     if user.user_type == "Company":
-#         reports = BiWeeklyReport.objects.filter(
-#             company=user.company, company_approval_status="Pending"
-#         )
-#     elif user.user_type == "InternshipCareerOffice":
-#         reports = BiWeeklyReport.objects.filter(
-#             company_approval_status="Approved",
-#             internship_office_approval_status="Pending"
-#         )
-#     elif user.user_type == "Department":
-#         reports = BiWeeklyReport.objects.filter(
-#             internship_office_approval_status="Approved",
-#             department_approval_status="Pending",
-#             student__department=user.department_profile.department_name,
-#         )
-#     elif user.user_type == "Supervisor":
-#         reports = BiWeeklyReport.objects.filter(
-#             department_approval_status="Approved",
-#             supervisor_approval_status="Pending",
-#             student__department=user.supervisor_profile.department.department_name,
-#         )
-#     else:
-#         reports = None
-
-#     return render(request, "company_pages/review_biweekly_reports.html", {"reports": reports})
-
-
 @login_required
 def approve_biweekly_report(request, report_id, action):
     report = get_object_or_404(BiWeeklyReport, id=report_id)
@@ -330,19 +298,6 @@ def final_report(request):
     return render(request, 'student_pages/final_report.html', {'form': form})
 
 
-
-
-# def review_final_reports(request):
-#     if request.user.user_type == "Company":
-#         reports = FinalReport.objects.filter(company_approval_status="Pending")
-#     elif request.user.user_type == "InternshipCareerOffice":
-#         reports = FinalReport.objects.filter(company_approval_status="Approved" , internship_office_approval_status = "Pending")
-#     elif  request.user.user_type == "Department":
-#         reports = FinalReport.objects.filter(internship_office_approval_status="Approved", department_approval_status="Pending")
-#     elif  request.user.user_type == "Supervisor":
-#         reports = FinalReport.objects.filter(department_approval_status="Approved", supervisor_approval_status="Pending")
-
-#     return render(request, "company_pages/review_final_reports.html", {"reports": reports})
 
 @login_required
 def approve_final_report(request, report_id, action):
@@ -636,8 +591,6 @@ def admin_dashboard(request):
 
 
     # internship and carrer office views
-
-
 # Dashboard view for Internship Career Office
 @login_required
 def icu_dashboard(request):
