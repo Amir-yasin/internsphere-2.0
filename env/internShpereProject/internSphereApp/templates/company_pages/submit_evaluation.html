@@ -1,0 +1,21 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<h2>Submit Evaluation</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="student">Select Student:</label>
+    <select name="student" id="student" required>
+        {% for student in students %}
+        <option value="{{ student.id }}">{{ student.get_full_name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="content">Evaluation Content:</label>
+    <textarea name="content" id="content" rows="5" required></textarea>
+    <br>
+    <button type="submit">Submit Evaluation</button>
+</form>
+
+{% endblock nav_and_footer %}

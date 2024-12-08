@@ -1,0 +1,18 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<h2>Approve Evaluation</h2>
+<div class="evaluation-card">
+    <h4>Student: {{ evaluation.student.get_full_name }}</h4>
+    <p>Company: {{ evaluation.company.get_full_name }}</p>
+    <p>Submitted on: {{ evaluation.submission_date }}</p>
+    <p>Content:</p>
+    <p>{{ evaluation.content }}</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="approve">Approve</button>
+    <button type="submit" name="action" value="reject">Reject</button>
+</form>
+{% endblock nav_and_footer %}

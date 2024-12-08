@@ -39,7 +39,6 @@ path('view_applicants/<int:internship_id>/', views.view_applicants, name='view_a
 path('update_application_status/<int:application_id>/status/<str:status>/', views.update_application_status, name='update_application_status'),
 path('attendance', views.attendance , name = 'attendance'),
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
-path('evaluate_intern', views.evaluate_intern , name = 'evaluate_intern'),
 # path('reports/<str:approver_type>/<int:report_id>/approve/', views.approve_report, name='approve_report'),
 
 
@@ -100,4 +99,8 @@ path("review_biweekly_reports/", views.review_biweekly_reports, name="review_biw
 path('approve_biweekly_report/<int:report_id>/<str:action>/', views.approve_biweekly_report, name='approve_biweekly_report'),
 path('biweekly-report/<int:report_id>/view/', views.view_biweekly_report, name='view_biweekly_report'),
 
+
+path('submit-evaluation/', views.submit_evaluation, name='submit_evaluation'),
+path('review-evaluations/', views.review_evaluations, name='review_evaluations'),
+path('approve-evaluation/<int:evaluation_id>/<str:action>/', views.approve_evaluation, name='approve_evaluation'),
 ]

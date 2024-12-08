@@ -249,13 +249,34 @@ class Attendance(models.Model):
 
 
 # Evaluation model linking Student and Company
+
+
+from django.conf import settings
+
 class Evaluation(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    score = models.DecimalField(max_digits=5, decimal_places=2)  # out of 100
+    student = models.ForeignKey(
+        stud_profile, on_delete=models.CASCADE, related_name="student_evaluations"
+    )
+    company = models.ForeignKey(
+        'Company', on_delete=models.CASCADE, related_name="company_evaluations"
+    )
+    content = models.TextField()
+    submission_date = models.DateTimeField(auto_now_add=True)
+    icu_approval_status = models.CharField(
+        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
+    )
+    icu_approval_date = models.DateTimeField(null=True, blank=True)
+    department_approval_status = models.CharField(
+        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
+    )
+    department_approval_date = models.DateTimeField(null=True, blank=True)
+    supervisor_approval_status = models.CharField(
+        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
+    )
+    supervisor_approval_date = models.DateTimeField(null=True, blank=True)
+    assigned_supervisor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="supervisor_evaluations"
+    )
 
     def __str__(self):
-        return f"Evaluation for {self.student.user.username} by {self.company.company_name}"
-
-
+        return f"Evaluation for {self.student.get_full_name()}"

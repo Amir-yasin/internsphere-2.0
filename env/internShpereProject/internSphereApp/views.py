@@ -574,9 +574,76 @@ def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
 @login_required
-def evaluate_intern(request):
-    return render(request, 'company_pages/evaluate_intern.html', {'current_page': 'evaluate_intern'})
+def submit_evaluation(request):
+    if request.user.user_type != "Company":
+        messages.error(request, "You are not authorized to submit evaluations.")
+        return redirect('dashboard')
+    
+    if request.method == "POST":
+        student_id = request.POST.get('student')
+        content = request.POST.get('content')
+        
+        # Create the evaluation
+        evaluation = Evaluation.objects.create(
+            student_id=student_id,
+            company=request.user,
+            content=content
+        )
+        messages.success(request, "Evaluation submitted successfully.")
+        return redirect('dashboard')
 
+    students = User.objects.filter(user_type="Student")
+    return render(request, "evaluation/submit_evaluation.html", {"students": students})
+
+
+@login_required
+def review_evaluations(request):
+    user = request.user
+
+    if user.user_type == "InternshipCareerOffice":
+        evaluations = Evaluation.objects.filter(icu_approval_status="Pending")
+    elif user.user_type == "Department":
+        evaluations = Evaluation.objects.filter(icu_approval_status="Approved", department_approval_status="Pending")
+    elif user.user_type == "Supervisor":
+        evaluations = Evaluation.objects.filter(department_approval_status="Approved", supervisor_approval_status="Pending", assigned_supervisor=user)
+    else:
+        evaluations = None
+
+    return render(request, "evaluation/review_evaluations.html", {"evaluations": evaluations})
+
+
+@login_required
+def approve_evaluation(request, evaluation_id, action):
+    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
+    user = request.user
+
+    if request.method == "POST":
+        if action == "approve":
+            if user.user_type == "InternshipCareerOffice":
+                evaluation.icu_approval_status = "Approved"
+                evaluation.icu_approval_date = now()
+            elif user.user_type == "Department":
+                evaluation.department_approval_status = "Approved"
+                evaluation.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                evaluation.supervisor_approval_status = "Approved"
+                evaluation.supervisor_approval_date = now()
+        elif action == "reject":
+            if user.user_type == "InternshipCareerOffice":
+                evaluation.icu_approval_status = "Rejected"
+                evaluation.icu_approval_date = now()
+            elif user.user_type == "Department":
+                evaluation.department_approval_status = "Rejected"
+                evaluation.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                evaluation.supervisor_approval_status = "Rejected"
+                evaluation.supervisor_approval_date = now()
+
+        evaluation.save()
+        messages.success(request, f"Evaluation has been {action}d successfully!")
+        return redirect('review_evaluations')
+
+    return render(request, "evaluation/approve_evaluation.html", {"evaluation": evaluation})
 
 
 # Admin Views
