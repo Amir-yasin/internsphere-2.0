@@ -249,18 +249,22 @@ class Attendance(models.Model):
 
 
 # Evaluation model linking Student and Company
+class EvaluationQuestion(models.Model):
+    text = models.TextField()  # The question text
+    order = models.PositiveIntegerField(unique=True)  # Order of questions
 
+    def __str__(self):
+        return f"{self.order}. {self.text}"
 
-from django.conf import settings
 
 class Evaluation(models.Model):
     student = models.ForeignKey(
-        stud_profile, on_delete=models.CASCADE, related_name="student_evaluations"
+        'stud_profile', on_delete=models.CASCADE, related_name="student_evaluations"
     )
     company = models.ForeignKey(
         'Company', on_delete=models.CASCADE, related_name="company_evaluations"
     )
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)  # Optional comments
     submission_date = models.DateTimeField(auto_now_add=True)
     icu_approval_status = models.CharField(
         max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
@@ -277,6 +281,25 @@ class Evaluation(models.Model):
     assigned_supervisor = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="supervisor_evaluations"
     )
+    total_score = models.FloatField(default=0)  # Total score for evaluation
 
     def __str__(self):
-        return f"Evaluation for {self.student.get_full_name()}"
+        return f"Evaluation for {self.student}"
+
+    def calculate_total_score(self):
+        total = sum(answer.score for answer in self.answers.all())
+        self.total_score = total
+        self.save()
+
+
+class EvaluationAnswer(models.Model):
+    evaluation = models.ForeignKey(
+        Evaluation, on_delete=models.CASCADE, related_name="answers"
+    )
+    question = models.ForeignKey(
+        EvaluationQuestion, on_delete=models.CASCADE, related_name="answers"
+    )
+    score = models.FloatField(choices=[(5, "Excellent"), (4, "Good"), (3, "Average"), (2, "Fair"), (1, "Poor")])
+
+    def __str__(self):
+        return f"Q: {self.question.text} | Score: {self.score}"

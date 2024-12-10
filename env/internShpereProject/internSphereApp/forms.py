@@ -242,3 +242,25 @@ class FinalReportApprovalForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    
+    
+class EvaluationForm(forms.ModelForm):
+    class Meta:
+        model = Evaluation
+        fields = ['student', 'company', 'content', 'assigned_supervisor']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for question in EvaluationQuestion.objects.all().order_by('order'):
+            self.fields[f"score_{question.id}"] = forms.ChoiceField(
+                choices=[
+                    (5, "Excellent"),
+                    (4, "Good"),
+                    (3, "Average"),
+                    (2, "Fair"),
+                    (1, "Poor"),
+                ],
+                widget=forms.RadioSelect,
+                label=question.text,
+                required=True,
+            )

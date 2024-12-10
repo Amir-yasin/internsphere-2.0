@@ -573,78 +573,51 @@ def attendance(request):
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
-@login_required
-def submit_evaluation(request):
-    if request.user.user_type != "Company":
-        messages.error(request, "You are not authorized to submit evaluations.")
-        return redirect('dashboard')
-    
-    if request.method == "POST":
-        student_id = request.POST.get('student')
-        content = request.POST.get('content')
-        
-        # Create the evaluation
-        evaluation = Evaluation.objects.create(
-            student_id=student_id,
-            company=request.user,
-            content=content
-        )
-        messages.success(request, "Evaluation submitted successfully.")
-        return redirect('dashboard')
-
-    students = User.objects.filter(user_type="Student")
-    return render(request, "evaluation/submit_evaluation.html", {"students": students})
-
-
-@login_required
-def review_evaluations(request):
-    user = request.user
-
-    if user.user_type == "InternshipCareerOffice":
-        evaluations = Evaluation.objects.filter(icu_approval_status="Pending")
-    elif user.user_type == "Department":
-        evaluations = Evaluation.objects.filter(icu_approval_status="Approved", department_approval_status="Pending")
-    elif user.user_type == "Supervisor":
-        evaluations = Evaluation.objects.filter(department_approval_status="Approved", supervisor_approval_status="Pending", assigned_supervisor=user)
+def evaluation_create(request):
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST)
+        if form.is_valid():
+            evaluation = form.save()
+            # Save answers for each question
+            for question in EvaluationQuestion.objects.all():
+                score = request.POST.get(f"score_{question.id}")
+                if score:
+                    EvaluationAnswer.objects.create(
+                        evaluation=evaluation,
+                        question=question,
+                        score=int(score),
+                    )
+            evaluation.calculate_total_score()  # Calculate total score after saving answers
+            return redirect('evaluation_list')  # Redirect to the evaluation list or dashboard
     else:
-        evaluations = None
+        form = EvaluationForm()
 
-    return render(request, "evaluation/review_evaluations.html", {"evaluations": evaluations})
+    return render(request, 'evaluations/evaluation_form.html', {'form': form})
 
 
-@login_required
-def approve_evaluation(request, evaluation_id, action):
-    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
+# Evaluation Approval View
+def evaluation_approve(request, pk):
+    evaluation = get_object_or_404(Evaluation, pk=pk)
     user = request.user
 
-    if request.method == "POST":
-        if action == "approve":
-            if user.user_type == "InternshipCareerOffice":
-                evaluation.icu_approval_status = "Approved"
-                evaluation.icu_approval_date = now()
-            elif user.user_type == "Department":
-                evaluation.department_approval_status = "Approved"
-                evaluation.department_approval_date = now()
-            elif user.user_type == "Supervisor":
-                evaluation.supervisor_approval_status = "Approved"
-                evaluation.supervisor_approval_date = now()
-        elif action == "reject":
-            if user.user_type == "InternshipCareerOffice":
-                evaluation.icu_approval_status = "Rejected"
-                evaluation.icu_approval_date = now()
-            elif user.user_type == "Department":
-                evaluation.department_approval_status = "Rejected"
-                evaluation.department_approval_date = now()
-            elif user.user_type == "Supervisor":
-                evaluation.supervisor_approval_status = "Rejected"
-                evaluation.supervisor_approval_date = now()
+    if request.method == 'POST':
+        # ICU approval
+        if hasattr(user, 'is_in_icunit') and user.is_in_icunit:
+            evaluation.icu_approval_status = "Approved"
+            evaluation.icu_approval_date = timezone.now()
+        # Department approval
+        elif hasattr(user, 'is_in_department') and user.is_in_department:
+            evaluation.department_approval_status = "Approved"
+            evaluation.department_approval_date = timezone.now()
+        # Supervisor approval
+        elif user == evaluation.assigned_supervisor:
+            evaluation.supervisor_approval_status = "Approved"
+            evaluation.supervisor_approval_date = timezone.now()
 
         evaluation.save()
-        messages.success(request, f"Evaluation has been {action}d successfully!")
-        return redirect('review_evaluations')
+        return redirect('evaluation_list')  # Redirect to evaluation list or dashboard
 
-    return render(request, "evaluation/approve_evaluation.html", {"evaluation": evaluation})
-
+    return render(request, 'evaluations/evaluation_approve.html', {'evaluation': evaluation})
 
 # Admin Views
 @login_required
