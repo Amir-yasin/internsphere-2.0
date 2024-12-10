@@ -78,17 +78,6 @@ path('department_dashboard', views.department_dashboard , name = 'department_das
 
 
 # path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
-# path('attendance', views.attendance , name = 'attendance'),
 
 
 # path("review_final_reports/", views.review_final_reports, name="review_final_reports"),
