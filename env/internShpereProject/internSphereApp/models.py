@@ -303,3 +303,4 @@ class EvaluationAnswer(models.Model):
 
     def __str__(self):
         return f"Q: {self.question.text} | Score: {self.score}"
+    
