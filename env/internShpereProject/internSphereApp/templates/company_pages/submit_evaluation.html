@@ -2,31 +2,14 @@
 {% load static %}
 
 {% block nav_and_footer %}
-<h2>Submit Evaluation</h2>
-<form method="post">
+  <h2>Submit Evaluation for {{ student.user.username }}</h2>
+  <form method="post">
     {% csrf_token %}
-    {{ form.non_field_errors }}
-  
-    <h3>Intern Evaluation</h3>
-  
-    {{ form.student.label_tag }} {{ form.student }}
-    {{ form.company.label_tag }} {{ form.company }}
-    {{ form.content.label_tag }} {{ form.content }}
-  
-    <h4>Evaluation Questions</h4>
-    <ul>
-      {% for field in form %}
-        {% if field.name.startswith "score_" %}
-          <li>
-            <label>{{ field.label }}</label>
-            {{ field }}
-          </li>
-        {% endif %}
-      {% endfor %}
-    </ul>
-  
-    <button type="submit">Submit Evaluation</button>
-  </form>
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit Evaluation</button>
+</form>
+
+
   
 
 {% endblock nav_and_footer %}

@@ -89,7 +89,8 @@ path('approve_biweekly_report/<int:report_id>/<str:action>/', views.approve_biwe
 path('biweekly-report/<int:report_id>/view/', views.view_biweekly_report, name='view_biweekly_report'),
 
 
-path('evaluation/new/', views.evaluation_create, name='evaluation_new'),
-path('evaluation/approve/<int:pk>/', views.evaluation_approve, name='evaluation_approve'),
-# path('review-evaluations/', views.review_evaluations, name='review_evaluations'),
+    path('evaluation/submit/<int:student_id>/', views.submit_evaluation, name='submit_evaluation'),
+    path('evaluation/approve/<int:evaluation_id>/<str:action>/', views.approve_evaluation, name='approve_evaluation'),
+    path('evaluation/list/', views.evaluation_list, name='evaluation_list'),
+
 ]

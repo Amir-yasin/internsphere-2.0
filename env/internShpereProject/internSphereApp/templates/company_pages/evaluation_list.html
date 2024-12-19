@@ -1,0 +1,27 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<table>
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Total Score</th>
+            <th>Company Approval</th>
+            <th>ICU Approval</th>
+            <th>Department Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for evaluation in evaluations %}
+        <tr>
+            <td>{{ evaluation.student.user.get_full_name }}</td>
+            <td>{{ evaluation.total_score }}</td>
+            <td>{{ evaluation.company_approval_status }}</td>
+            <td>{{ evaluation.internship_office_approval_status }}</td>
+            <td>{{ evaluation.department_approval_status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock nav_and_footer %}

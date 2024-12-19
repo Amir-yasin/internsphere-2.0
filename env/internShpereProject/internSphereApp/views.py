@@ -501,9 +501,24 @@ def view_company_profile(request, user_id):
 
 @login_required
 def company_dashboard(request):
+    # Ensure the user is a company
+    if not hasattr(request.user, 'company'):
+        return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
+
+    # Get all internships for the logged-in company
     internships = Internship.objects.filter(company=request.user.company)
     internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
-    return render(request, 'company_pages/company_dashboard.html', {'internship_list': internship_list})
+
+    # Fetch students linked to applications with is_active=True for this company
+    active_applications = Application.objects.filter(company=request.user.company, is_active=True)
+    students = stud_profile.objects.filter(applications__in=active_applications).distinct()
+
+    # Pass both internship list and students to the template
+    context = {
+        'internship_list': internship_list,
+        'students': students,  # List of students for evaluation
+    }
+    return render(request, 'company_pages/company_dashboard.html', context)
 
 
 @login_required
@@ -573,51 +588,111 @@ def attendance(request):
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
-def evaluation_create(request):
+@login_required
+def submit_evaluation(request, student_id):
+    company = get_object_or_404(Company, user=request.user)
+    students = stud_profile.objects.filter(applications__company=company, applications__is_active=True)
+
+    # Debugging print statement
+    print("Debug: Active applications for the company:")
+    print(Application.objects.filter(company=company, is_active=True))
+
+    # Fetch the student through the Application model based on is_active
+    application = get_object_or_404(
+        Application, 
+        student_id=student_id, 
+        company=company, 
+        is_active=True
+    )
+    student = application.student
+
+    questions = EvaluationQuestion.objects.all()
+    
+    try:
+        evaluation = Evaluation.objects.get(student=student, company=company)
+    except Evaluation.DoesNotExist:
+        evaluation = None
+
     if request.method == 'POST':
-        form = EvaluationForm(request.POST)
+        form = EvaluationForm(request.POST, questions=questions)
         if form.is_valid():
-            evaluation = form.save()
-            # Save answers for each question
-            for question in EvaluationQuestion.objects.all():
-                score = request.POST.get(f"score_{question.id}")
-                if score:
-                    EvaluationAnswer.objects.create(
-                        evaluation=evaluation,
-                        question=question,
-                        score=int(score),
-                    )
-            evaluation.calculate_total_score()  # Calculate total score after saving answers
-            return redirect('evaluation_list')  # Redirect to the evaluation list or dashboard
+            if not evaluation:
+                evaluation = Evaluation(student=student, company=company)
+                evaluation.save()
+
+            # Save answers
+            EvaluationAnswer.objects.filter(evaluation=evaluation).delete()  # Clear old answers
+            total_score = 0
+            for question in questions:
+                score = int(form.cleaned_data[f'question_{question.id}'])
+                total_score += score
+                EvaluationAnswer.objects.create(
+                    evaluation=evaluation,
+                    question=question,
+                    score=score
+                )
+            evaluation.total_score = total_score
+            evaluation.save()
+
+            messages.success(request, 'Evaluation submitted successfully.')
+            return redirect('evaluation_list')  # Replace with appropriate redirect
     else:
-        form = EvaluationForm()
+        form = EvaluationForm(questions=questions)
 
-    return render(request, 'evaluations/evaluation_form.html', {'form': form})
+    return render(request, 'company_pages/submit_evaluation.html', {
+        'form': form,
+        'student': student
+    })
 
 
-# Evaluation Approval View
-def evaluation_approve(request, pk):
-    evaluation = get_object_or_404(Evaluation, pk=pk)
+
+@login_required
+def approve_evaluation(request, evaluation_id, action):
+    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
     user = request.user
 
     if request.method == 'POST':
-        # ICU approval
-        if hasattr(user, 'is_in_icunit') and user.is_in_icunit:
-            evaluation.icu_approval_status = "Approved"
-            evaluation.icu_approval_date = timezone.now()
-        # Department approval
-        elif hasattr(user, 'is_in_department') and user.is_in_department:
-            evaluation.department_approval_status = "Approved"
-            evaluation.department_approval_date = timezone.now()
-        # Supervisor approval
-        elif user == evaluation.assigned_supervisor:
-            evaluation.supervisor_approval_status = "Approved"
-            evaluation.supervisor_approval_date = timezone.now()
+        if action == 'approve':
+            if user.user_type == 'Company':
+                evaluation.company_approval_status = 'Approved'
+                evaluation.company_approval_date = now()
+            elif user.user_type == 'InternshipCareerOffice':
+                evaluation.internship_office_approval_status = 'Approved'
+                evaluation.internship_office_approval_date = now()
+            elif user.user_type == 'Department':
+                evaluation.department_approval_status = 'Approved'
+                evaluation.department_approval_date = now()
+        elif action == 'reject':
+            if user.user_type == 'Company':
+                evaluation.company_approval_status = 'Rejected'
+                evaluation.company_approval_date = now()
+            elif user.user_type == 'InternshipCareerOffice':
+                evaluation.internship_office_approval_status = 'Rejected'
+                evaluation.internship_office_approval_date = now()
+            elif user.user_type == 'Department':
+                evaluation.department_approval_status = 'Rejected'
+                evaluation.department_approval_date = now()
 
         evaluation.save()
-        return redirect('evaluation_list')  # Redirect to evaluation list or dashboard
+        messages.success(request, f"Evaluation has been {action}d.")
+        return redirect('evaluation_list')
 
-    return render(request, 'evaluations/evaluation_approve.html', {'evaluation': evaluation})
+    return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
+
+@login_required
+def evaluation_list(request):
+    user = request.user
+    if user.user_type == 'Company':
+        evaluations = Evaluation.objects.filter(company=user.company)
+    elif user.user_type == 'InternshipCareerOffice':
+        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
+    elif user.user_type == 'Department':
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
+    else:
+        evaluations = None
+
+    return render(request, 'evaluations/evaluation_list.html', {'evaluations': evaluations})
+
 
 # Admin Views
 @login_required

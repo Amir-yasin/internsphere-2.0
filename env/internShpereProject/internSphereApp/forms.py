@@ -242,25 +242,17 @@ class FinalReportApprovalForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-    
-    
 class EvaluationForm(forms.ModelForm):
     class Meta:
         model = Evaluation
-        fields = ['student', 'company', 'content', 'assigned_supervisor']
+        fields = []  # We will dynamically handle question inputs in the template
 
     def __init__(self, *args, **kwargs):
+        questions = kwargs.pop('questions', [])
         super().__init__(*args, **kwargs)
-        for question in EvaluationQuestion.objects.all().order_by('order'):
-            self.fields[f"score_{question.id}"] = forms.ChoiceField(
-                choices=[
-                    (5, "Excellent"),
-                    (4, "Good"),
-                    (3, "Average"),
-                    (2, "Fair"),
-                    (1, "Poor"),
-                ],
+        for question in questions:
+            self.fields[f'question_{question.id}'] = forms.ChoiceField(
+                choices=[(i, i) for i in range(1, 6)],
                 widget=forms.RadioSelect,
-                label=question.text,
-                required=True,
+                label=question.text
             )

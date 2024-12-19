@@ -247,60 +247,25 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.student.user.username} - {self.date} - {self.status}"
 
-
-# Evaluation model linking Student and Company
-class EvaluationQuestion(models.Model):
-    text = models.TextField()  # The question text
-    order = models.PositiveIntegerField(unique=True)  # Order of questions
-
-    def __str__(self):
-        return f"{self.order}. {self.text}"
-
-
 class Evaluation(models.Model):
-    student = models.ForeignKey(
-        'stud_profile', on_delete=models.CASCADE, related_name="student_evaluations"
-    )
-    company = models.ForeignKey(
-        'Company', on_delete=models.CASCADE, related_name="company_evaluations"
-    )
-    content = models.TextField(blank=True, null=True)  # Optional comments
-    submission_date = models.DateTimeField(auto_now_add=True)
-    icu_approval_status = models.CharField(
-        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
-    )
-    icu_approval_date = models.DateTimeField(null=True, blank=True)
-    department_approval_status = models.CharField(
-        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
-    )
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='evaluations')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
+    submitted_at = models.DateTimeField(default=now)
+    total_score = models.IntegerField(default=0)
+
+    company_approval_status = models.CharField(max_length=20, default='Pending')
+    company_approval_date = models.DateTimeField(null=True, blank=True)
+
+    internship_office_approval_status = models.CharField(max_length=20, default='Pending')
+    internship_office_approval_date = models.DateTimeField(null=True, blank=True)
+
+    department_approval_status = models.CharField(max_length=20, default='Pending')
     department_approval_date = models.DateTimeField(null=True, blank=True)
-    supervisor_approval_status = models.CharField(
-        max_length=10, choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")], default="Pending"
-    )
-    supervisor_approval_date = models.DateTimeField(null=True, blank=True)
-    assigned_supervisor = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="supervisor_evaluations"
-    )
-    total_score = models.FloatField(default=0)  # Total score for evaluation
 
-    def __str__(self):
-        return f"Evaluation for {self.student}"
-
-    def calculate_total_score(self):
-        total = sum(answer.score for answer in self.answers.all())
-        self.total_score = total
-        self.save()
-
+class EvaluationQuestion(models.Model):
+    text = models.CharField(max_length=255)
 
 class EvaluationAnswer(models.Model):
-    evaluation = models.ForeignKey(
-        Evaluation, on_delete=models.CASCADE, related_name="answers"
-    )
-    question = models.ForeignKey(
-        EvaluationQuestion, on_delete=models.CASCADE, related_name="answers"
-    )
-    score = models.FloatField(choices=[(5, "Excellent"), (4, "Good"), (3, "Average"), (2, "Fair"), (1, "Poor")])
-
-    def __str__(self):
-        return f"Q: {self.question.text} | Score: {self.score}"
-    
+    evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(EvaluationQuestion, on_delete=models.CASCADE)
+    score = models.IntegerField()
