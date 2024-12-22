@@ -140,16 +140,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Evaluation',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('feedback', models.TextField()),
-                ('score', models.DecimalField(decimal_places=2, max_digits=5)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='internSphereApp.company')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='internSphereApp.stud_profile')),
-            ],
-        ),
-        migrations.CreateModel(
             name='BiWeeklyReport',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

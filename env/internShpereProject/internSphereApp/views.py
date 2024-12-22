@@ -497,26 +497,27 @@ def view_company_profile(request, user_id):
     }
     return render(request, 'company_pages/view_company_profile.html', context)
 
-
-
 @login_required
 def company_dashboard(request):
     # Ensure the user is a company
     if not hasattr(request.user, 'company'):
         return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
 
-    # Get all internships for the logged-in company
-    internships = Internship.objects.filter(company=request.user.company)
-    internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
-
-    # Fetch students linked to applications with is_active=True for this company
+    # Fetch all active applications for the company's internships
     active_applications = Application.objects.filter(company=request.user.company, is_active=True)
-    students = stud_profile.objects.filter(applications__in=active_applications).distinct()
 
-    # Pass both internship list and students to the template
+    # Fetch the students and their associated internships
+    students_with_internships = [
+        {
+            'student': application.student,  # Student linked to the application
+            'internship': application.internship,  # Internship for the application
+        }
+        for application in active_applications
+    ]
+
+    # Pass the student-internship pairs to the template
     context = {
-        'internship_list': internship_list,
-        'students': students,  # List of students for evaluation
+        'students_with_internships': students_with_internships,
     }
     return render(request, 'company_pages/company_dashboard.html', context)
 
@@ -588,63 +589,86 @@ def attendance(request):
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
-@login_required
-def submit_evaluation(request, student_id):
-    company = get_object_or_404(Company, user=request.user)
-    students = stud_profile.objects.filter(applications__company=company, applications__is_active=True)
-
-    # Debugging print statement
-    print("Debug: Active applications for the company:")
-    print(Application.objects.filter(company=company, is_active=True))
-
-    # Fetch the student through the Application model based on is_active
-    application = get_object_or_404(
-        Application, 
-        student_id=student_id, 
-        company=company, 
-        is_active=True
-    )
-    student = application.student
-
-    questions = EvaluationQuestion.objects.all()
-    
+def submit_evaluation(request, student_id, internship_id):
+    # Check if the company user has permission
     try:
-        evaluation = Evaluation.objects.get(student=student, company=company)
-    except Evaluation.DoesNotExist:
-        evaluation = None
+        company = request.user.company
+    except AttributeError:
+        messages.error(request, "You do not have permission to evaluate.")
+        return redirect('dashboard')
 
+    # Fetch student and internship objects
+    student = get_object_or_404(stud_profile, id=student_id)
+    internship = get_object_or_404(Internship, id=internship_id)
+
+    # Check if an evaluation already exists for this student and company
+    if Evaluation.objects.filter(student=student, company=company, internship=internship).exists():
+        messages.error(request, "You have already submitted an evaluation for this student.")
+        return redirect('evaluation_list')
+
+    # Handle form submission
     if request.method == 'POST':
-        form = EvaluationForm(request.POST, questions=questions)
+        form = EvaluationForm(request.POST)
         if form.is_valid():
-            if not evaluation:
-                evaluation = Evaluation(student=student, company=company)
-                evaluation.save()
-
-            # Save answers
-            EvaluationAnswer.objects.filter(evaluation=evaluation).delete()  # Clear old answers
+            # Create evaluation object
+            evaluation = Evaluation.objects.create(
+                student=student,
+                company=company,
+                internship=internship,
+                total_score=0  # Will calculate below
+            )
             total_score = 0
-            for question in questions:
-                score = int(form.cleaned_data[f'question_{question.id}'])
-                total_score += score
+
+            # Save answers and calculate total score
+            for question, answer in form.cleaned_data.items():
+                question_obj = EvaluationQuestion.objects.get(id=question.split("_")[1])  # Extract question ID
                 EvaluationAnswer.objects.create(
                     evaluation=evaluation,
-                    question=question,
-                    score=score
+                    question=question_obj,
+                    answer=int(answer)
                 )
+                total_score += int(answer)
+
+            # Update evaluation with total score
             evaluation.total_score = total_score
             evaluation.save()
 
-            messages.success(request, 'Evaluation submitted successfully.')
-            return redirect('evaluation_list')  # Replace with appropriate redirect
+            messages.success(request, "Evaluation submitted successfully!")
+            return redirect('evaluation_list')
+        else:
+            messages.error(request, "There was an error with your submission. Please try again.")
     else:
-        form = EvaluationForm(questions=questions)
+        form = EvaluationForm()
 
-    return render(request, 'company_pages/submit_evaluation.html', {
-        'form': form,
-        'student': student
-    })
+    return render(request, 'company_pages/submit_evaluation.html', {'form': form})
 
 
+
+@login_required
+def evaluation_list(request):
+    evaluations = Evaluation.objects.filter(company=request.user.company)
+    user = request.user
+    if hasattr(user, 'company'):
+        evaluations = Evaluation.objects.filter(company=user.company)
+    elif user.user_type == 'InternshipCareerOffice':
+        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
+    elif user.user_type == 'Department':
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
+    else:
+        evaluations = None
+
+    return render(request, 'company_pages/evaluation_list.html', {'evaluations': evaluations})
+
+@login_required
+def view_evaluation(request, evaluation_id):
+    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
+    answers = EvaluationAnswer.objects.filter(evaluation=evaluation)
+
+    context = {
+        'evaluation': evaluation,
+        'answers': answers,
+    }
+    return render(request, 'company_pages/view_evaluation.html', context)
 
 @login_required
 def approve_evaluation(request, evaluation_id, action):
@@ -678,22 +702,6 @@ def approve_evaluation(request, evaluation_id, action):
         return redirect('evaluation_list')
 
     return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
-
-@login_required
-def evaluation_list(request):
-    user = request.user
-    if user.user_type == 'Company':
-        evaluations = Evaluation.objects.filter(company=user.company)
-    elif user.user_type == 'InternshipCareerOffice':
-        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
-    elif user.user_type == 'Department':
-        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
-    else:
-        evaluations = None
-
-    return render(request, 'evaluations/evaluation_list.html', {'evaluations': evaluations})
-
-
 # Admin Views
 @login_required
 def admin_dashboard(request):

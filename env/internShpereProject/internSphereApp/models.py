@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 import datetime
 from django.utils.timezone import now
+from django.contrib.auth import get_user_model
 
 
 
@@ -247,12 +248,17 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.student.user.username} - {self.date} - {self.status}"
 
+# User = get_user_model()
+
 class Evaluation(models.Model):
     student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='evaluations')
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='evaluations')
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
     submitted_at = models.DateTimeField(default=now)
     total_score = models.IntegerField(default=0)
+    submitted = models.BooleanField(default=False)
 
+    # Approval fields
     company_approval_status = models.CharField(max_length=20, default='Pending')
     company_approval_date = models.DateTimeField(null=True, blank=True)
 
@@ -262,10 +268,21 @@ class Evaluation(models.Model):
     department_approval_status = models.CharField(max_length=20, default='Pending')
     department_approval_date = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return f"Evaluation for {self.student.user.get_full_name()} by {self.company.name}"
+
+
 class EvaluationQuestion(models.Model):
     text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.text
+
 
 class EvaluationAnswer(models.Model):
     evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(EvaluationQuestion, on_delete=models.CASCADE)
-    score = models.IntegerField()
+    answer = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.question.text}: {self.answer}"

@@ -2,26 +2,74 @@
 {% load static %}
 
 {% block nav_and_footer %}
-<table>
-    <thead>
-        <tr>
-            <th>Student</th>
-            <th>Total Score</th>
-            <th>Company Approval</th>
-            <th>ICU Approval</th>
-            <th>Department Approval</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for evaluation in evaluations %}
-        <tr>
-            <td>{{ evaluation.student.user.get_full_name }}</td>
-            <td>{{ evaluation.total_score }}</td>
-            <td>{{ evaluation.company_approval_status }}</td>
-            <td>{{ evaluation.internship_office_approval_status }}</td>
-            <td>{{ evaluation.department_approval_status }}</td>
-        </tr>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+
+    .btn{
+        background: #c923a5;
+        color:white;
+    }
+    .btn:hover{
+        background:magenta;
+        color:white;
+
+    }
+</style>
+<div class="container">
+    {% if messages %}
+    <div class="alert alert-success" role="alert">
+        {% for message in messages %}
+            {{ message }}
         {% endfor %}
-    </tbody>
-</table>
+    </div>
+    {% endif %}
+</div>
+<div class="heading">
+    <h1>Evaluation List</h1>
+
+</div>
+{% if evaluations %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Internship</th>
+                <th>Total Score</th>
+                <th>Submitted At</th>
+                <th>Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for evaluation in evaluations %}
+                <tr>
+                    <td>{{ evaluation.student.user.first_name }} {{ evaluation.student.user.last_name }}</td>
+                    <td>{{ evaluation.company.company_name }}</td>
+                    <td>{{ evaluation.internship.title }}</td>
+                    <td>{{ evaluation.total_score }}</td>
+                    <td>{{ evaluation.submitted_at }}</td>
+                    <td>
+                        <a href="{% url 'view_evaluation' evaluation.id %}" class="btn">View Evaluation</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No evaluations submitted yet.</p>
+{% endif %}
+
 {% endblock nav_and_footer %}

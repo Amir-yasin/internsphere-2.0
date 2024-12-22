@@ -69,20 +69,21 @@
 
         <div class="dashboard-item">
             <h2>Submit Evaluations</h2>
-            {% if students %}
-                <p>List of Interns for Evaluation:</p>
+            {% if students_with_internships %}
                 <ul>
-                    {% for student in students %}
-                        <li>
-                            {{ student.user.get_full_name }} <!-- Adjust for your model's field -->
-                            <a href="{% url 'submit_evaluation' student.id %}" class="btn1">Evaluate</a>
-                        </li>
+                    {% for item in students_with_internships %}
+                        
+                            {{ item.student.user.get_full_name }} <!-- Adjust field as per your model -->
+                            {% comment %} - Internship: {{ item.internship.title }} {% endcomment %}
+                            <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn1" style="background: purple; color: white">Evaluate</a>
+                        
                     {% endfor %}
                 </ul>
             {% else %}
                 <p><strong>No Interns Available for Evaluation.</strong></p>
             {% endif %}
         </div>
+        
     </div>
 </body>
 </html>

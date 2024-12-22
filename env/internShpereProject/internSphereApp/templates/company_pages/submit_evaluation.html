@@ -2,12 +2,74 @@
 {% load static %}
 
 {% block nav_and_footer %}
-  <h2>Submit Evaluation for {{ student.user.username }}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit Evaluation</button>
-</form>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+      }
+      th, td {
+          padding: 10px;
+          text-align: left;
+          border: 1px solid #ddd;
+      }
+      th {
+          background-color: #f4f4f4;
+      }
+  </style>
+</head>
+<body>
+    <div class="container">
+        {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="heading">
+          <h2 class="mb-4">Evaluation Form</h2>
+
+        </div>
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>1</th>
+                        <th>2</th>
+                        <th>3</th>
+                        <th>4</th>
+                        <th>5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for field in form %}
+                      <tr>
+                          <td>{{ field.label }}</td>
+                          {% for subwidget in field %}
+                              <td>{{ subwidget }}</td>
+                          {% endfor %}
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Submit Evaluation</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 
   

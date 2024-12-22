@@ -242,17 +242,178 @@ class FinalReportApprovalForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-class EvaluationForm(forms.ModelForm):
-    class Meta:
-        model = Evaluation
-        fields = []  # We will dynamically handle question inputs in the template
+from django import forms
 
+# class EvaluationForm(forms.Form):
+#     question_1 = forms.ChoiceField(
+#         label="Demonstrates the ability to complete assigned tasks on time",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_2 = forms.ChoiceField(
+#         label="Produces work that meets or exceeds quality standards",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_3 = forms.ChoiceField(
+#         label="Shows initiative in taking on additional responsibilities",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_4 = forms.ChoiceField(
+#         label="Effectively manages time and priorities",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_5 = forms.ChoiceField(
+#         label="Follows instructions and procedures accurately",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_6 = forms.ChoiceField(
+#         label="Demonstrates competence in using tools and software relevant to the internship",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_7 = forms.ChoiceField(
+#         label="Learns and applies new technical skills effectively",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_8 = forms.ChoiceField(
+#         label="Solves technical problems independently or with minimal assistance",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_9 = forms.ChoiceField(
+#         label="Contributes innovative ideas or solutions to technical challenges",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_10 = forms.ChoiceField(
+#         label="Communicates clearly and effectively with team members and supervisors",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_11 = forms.ChoiceField(
+#         label="Responds promptly and appropriately to emails and messages",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_12 = forms.ChoiceField(
+#         label="Provides clear and concise written reports or documentation",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_13 = forms.ChoiceField(
+#         label="Cooperates and collaborates effectively with others",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_14 = forms.ChoiceField(
+#         label="Demonstrates respect and professionalism in team settings",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_15 = forms.ChoiceField(
+#         label="Supports and assists colleagues when needed",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_16 = forms.ChoiceField(
+#         label="Adapts to new tasks, challenges, or work environments with ease",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_17 = forms.ChoiceField(
+#         label="Accepts feedback and makes necessary improvements",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_18 = forms.ChoiceField(
+#         label="Remains calm and composed under pressure",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_19 = forms.ChoiceField(
+#         label="Analyzes problems and identifies appropriate solutions",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_20 = forms.ChoiceField(
+#         label="Thinks creatively to overcome challenges or obstacles",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_21 = forms.ChoiceField(
+#         label="Makes sound decisions based on available information",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_22 = forms.ChoiceField(
+#         label="Maintains a positive and professional attitude throughout the internship",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+#     question_23 = forms.ChoiceField(
+#         label="Demonstrates punctuality and reliable attendance",
+#         choices=[(i, str(i)) for i in range(1, 6)],
+#         widget=forms.RadioSelect,
+#         required=True
+#     )
+
+# class EvaluationForm(forms.Form):
+#     def __init__(self, *args, **kwargs):
+#         questions = kwargs.pop('questions', [])
+#         super().__init__(*args, **kwargs)
+
+#         for question in questions:
+#             self.fields[f'question_{question.id}'] = forms.ChoiceField(
+#                 label=question.text,
+#                 choices=[(i, str(i)) for i in range(1, 6)],
+#                 widget=forms.RadioSelect,
+#                 required=True,
+#             )
+            
+class EvaluationForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        questions = kwargs.pop('questions', [])
         super().__init__(*args, **kwargs)
+
+        # Dynamically create fields based on evaluation questions
+        questions = EvaluationQuestion.objects.all()
         for question in questions:
             self.fields[f'question_{question.id}'] = forms.ChoiceField(
-                choices=[(i, i) for i in range(1, 6)],
-                widget=forms.RadioSelect,
-                label=question.text
+                label=question.text,
+                choices=[
+                    (1, '1'),
+                    (2, '2'),
+                    (3, '3'),
+                    (4, '4'),
+                    (5, '5'),
+                ],
+                widget=forms.RadioSelect(
+                    attrs={'class': 'form-check-input'}
+                ),
             )
