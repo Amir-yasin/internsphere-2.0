@@ -18,7 +18,7 @@
     }
 
     .btn-purple:hover {
-        background-color: #5a36a1; /* Darker Purple */
+        background-color: magenta; /* Darker Purple */
     }
 
     h2.text-white.bg-purple {
@@ -34,13 +34,16 @@
         font-weight: bold;
         font-size: 1.2rem;
     }
+    .bg-orange{
+        background: orange;
+    }
 </style>
-<div class="container mt-5">
-    <!-- Page Heading -->
-    <div class="text-center">
-        <h2 class="text-white bg-purple py-3 rounded shadow-sm">Evaluation Details</h2>
-    </div>
 
+    <!-- Page Heading -->
+    <div class="heading">
+        <h2 class="">Evaluation Details</h2>
+    </div>
+    <div class="container mt-5">
     <div class="card shadow-sm mt-4 border-0">
         <div class="card-header bg-purple text-white">
             <h4 class="mb-0">Student and Internship Details</h4>
@@ -82,7 +85,9 @@
                                 <span class="badge 
                                     {% if answer.answer == 5 %}
                                         bg-success
-                                    {% elif answer.answer >= 3 %}
+                                    {% elif answer.answer == 4 %}
+                                        bg-orange
+                                    {% elif answer.answer == 3 %}
                                         bg-warning
                                     {% else %}
                                         bg-danger
