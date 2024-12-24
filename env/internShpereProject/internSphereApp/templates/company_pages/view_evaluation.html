@@ -1,0 +1,116 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<!-- Custom Styling -->
+<style>
+    .bg-purple {
+        background-color: #c923a5; /* Purple */
+    }
+
+    .bg-light-purple {
+        background-color: #c923a5; /* Lighter Purple */
+    }
+
+    .btn-purple {
+        background-color: #c923a5; /* Purple */
+        border: none;
+    }
+
+    .btn-purple:hover {
+        background-color: magenta; /* Darker Purple */
+    }
+
+    h2.text-white.bg-purple {
+        background-color: #c923a5;
+        font-size: 2rem;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    .card-header {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .bg-orange{
+        background: orange;
+    }
+</style>
+
+    <!-- Page Heading -->
+    <div class="heading">
+        <h2 class="">Evaluation Details</h2>
+    </div>
+    <div class="container mt-5">
+    <div class="card shadow-sm mt-4 border-0">
+        <div class="card-header bg-purple text-white">
+            <h4 class="mb-0">Student and Internship Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Student Name:</strong> {{ evaluation.student.user.first_name }} {{ evaluation.student.user.last_name }}</p>
+                    <p><strong>Company Name:</strong> {{ evaluation.company.company_name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Internship Title:</strong> {{ evaluation.internship.title }}</p>
+                    <p><strong>Total Score:</strong> 
+                        <span class="badge bg-purple text-white px-3 py-2 fs-6">{{ evaluation.total_score }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluation Answers -->
+    <div class="card mt-4 shadow-sm border-0">
+        <div class="card-header bg-purple text-white">
+            <h4 class="mb-0">Evaluation Answers</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead class="bg-light-purple text-white">
+                    <tr>
+                        <th>Question</th>
+                        <th>Answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer in answers %}
+                        <tr>
+                            <td>{{ answer.question.text }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if answer.answer == 5 %}
+                                        bg-success
+                                    {% elif answer.answer == 4 %}
+                                        bg-orange
+                                    {% elif answer.answer == 3 %}
+                                        bg-warning
+                                    {% else %}
+                                        bg-danger
+                                    {% endif %}
+                                ">
+                                    {{ answer.answer }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'evaluation_list' %}" class="btn btn-purple px-4 py-2 text-white shadow-sm">
+            <i class="bi bi-arrow-left-circle"></i> Back to Evaluation List
+        </a>
+    </div>
+</div>
+
+
+
+{% endblock nav_and_footer %}

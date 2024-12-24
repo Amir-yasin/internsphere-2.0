@@ -1,0 +1,30 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<h2>Review Evaluations</h2>
+{% if evaluations %}
+    {% for evaluation in evaluations %}
+    <div class="evaluation-card">
+        <h4>Student: {{ evaluation.student.get_full_name }}</h4>
+        <p>Company: {{ evaluation.company.get_full_name }}</p>
+        <p>Submitted on: {{ evaluation.submission_date }}</p>
+        <p>Status: 
+            {% if evaluation.icu_approval_status == "Pending" %}
+            Pending ICU Approval
+            {% elif evaluation.department_approval_status == "Pending" %}
+            Pending Department Approval
+            {% elif evaluation.supervisor_approval_status == "Pending" %}
+            Pending Supervisor Approval
+            {% else %}
+            Approved
+            {% endif %}
+        </p>
+        <a href="{% url 'approve_evaluation' evaluation.id 'approve' %}">Approve</a> |
+        <a href="{% url 'approve_evaluation' evaluation.id 'reject' %}">Reject</a>
+    </div>
+    {% endfor %}
+{% else %}
+<p>No evaluations to review.</p>
+{% endif %}
+{% endblock nav_and_footer %}

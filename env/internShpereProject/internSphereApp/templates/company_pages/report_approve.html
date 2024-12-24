@@ -1,0 +1,19 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<h2>Review Report {{ report.report_number }}</h2>
+<p><strong>Student:</strong> {{ report.student.user.username }}</p>
+<p><strong>Total Hours Completed:</strong> {{ report.total_hours_completed }}</p>
+<p><strong>Responsibilities:</strong> {{ report.assignment_responsibilities }}</p>
+<p><strong>Critical Analysis:</strong> {{ report.critical_analysis }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="approve">Approve</button>
+    <button type="submit" name="action" value="reject">Reject</button>
+</form>
+
+
+{% endblock nav_and_footer %}

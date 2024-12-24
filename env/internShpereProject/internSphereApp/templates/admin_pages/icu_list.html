@@ -1,0 +1,50 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+
+
+    <!-- admin_pages/student_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student List</title>
+</head>
+<body>
+    {% if messages %}
+    <ul class="text-Success">
+        {% for message in messages %}
+           <p>{{ message }}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
+<div class="heading">
+    <h1>Internship_career_office List</h1>
+
+</div>
+<table class="table table-striped">
+    <tr>
+            <th>user name</th>
+            <th>ICU director</th>
+            <th>Email Address</th>
+
+        </tr>
+        {% for icu_lists in icu_list %}
+        <tr>
+            <td>{{ icu_lists.user.username }}</td>
+            <td>{{ icu_lists.ICU_director }}</td>
+            <td>{{ icu_lists.user.email }}</td>
+
+
+                {% comment %} <a href="{% url 'delete_student' student.id %}">Delete</a> {% endcomment %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    

@@ -1,0 +1,25 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<div class="heading">
+    <h2>Register a Department</h2>
+</div>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<link rel="stylesheet" href="{% static 'css/applications.css' %}">
+<div class="container">
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <a href="admin_dashboard" class="btn">Back to dashboard</a>
+  <a type="submit" class="btn">Register Department</a>
+</form>
+</div>
+
+{% endblock nav_and_footer %}

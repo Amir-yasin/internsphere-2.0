@@ -1,0 +1,88 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<link rel="stylesheet" href="{% static 'css/applications.css' %}">
+{% if messages %}
+<div id="message-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="heading">
+    <h2>View Bi-Weekly Report</h2>
+    <h3>Report {{ report.report_number }} by {{ report.student.user.first_name }} {{ report.student.user.last_name }}</h3>
+
+</div>
+<div class="container">
+    
+    <h2 class="text-center fw-bolder">Bi-Weekly Report Details</h2>
+    <table class="table table-striped">
+        <tr>
+            <th>Report Number:</th>
+            <td>{{ report.report_number }}</td>
+        </tr>
+        <tr>
+            <th>Assignment Responsibilities:</th>
+            <td>{{ report.assignment_responsibilities }}</td>
+        </tr>
+        <tr>
+            <th>Critical Analysis:</th>
+            <td>{{ report.critical_analysis }}</td>
+        </tr>
+        <tr>
+            <th>Observing Hours:</th>
+            <td>{{ report.observing_hours }}</td>
+        </tr>
+        <tr>
+            <th>Administrative Hours:</th>
+            <td>{{ report.administrative_hours }}</td>
+        </tr>
+        <tr>
+            <th>Researching Hours:</th>
+            <td>{{ report.researching_hours }}</td>
+        </tr>
+        <tr>
+            <th>Assisting Hours:</th>
+            <td>{{ report.assisting_hours }}</td>
+        </tr>
+        <tr>
+            <th>Miscellaneous Hours:</th>
+            <td>{{ report.misc_hours }}</td>
+        </tr>
+        <tr>
+            <th>Meetings and Discussions:</th>
+            <td>{{ report.meetings_discussions }}</td>
+        </tr>
+        <tr>
+            <th>Course Relevance Suggestions:</th>
+            <td>{{ report.course_relevance_suggestions }}</td>
+        </tr>
+        <tr>
+            <th>Week Start:</th>
+            <td>{{ report.week_start }}</td>
+        </tr>
+        <tr>
+            <th>Week End:</th>
+            <td>{{ report.week_end }}</td>
+        </tr>
+        <tr>
+            <th>Total Hours Completed:</th>
+            <td>{{ report.total_hours_completed }}</td>
+        </tr>
+        <tr>
+            <th>Submission Date:</th>
+            <td>{{ report.date_submitted }}</td>
+        </tr>
+    </table>
+    <a href="{% url 'review_biweekly_reports' %}" class="btn btn-primary">Back to Reports</a>
+
+</div>
+</div>
+
+
+{% endblock nav_and_footer %}

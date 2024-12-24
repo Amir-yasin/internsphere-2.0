@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/company_dashboard.css' %}">
-
 </head>
 <body>
     {% if messages %}
@@ -21,7 +19,7 @@
             </div>
         {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
     <div class="heading">
         <h1>Company Dashboard</h1>
     </div>
@@ -31,41 +29,62 @@
     </header>
 
     <div class="dashboard">
-
         <div class="dashboard-item">
             <h2>My Profile</h2>
             <p>View your Company's profile.</p>
             <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn1">View Profile</a>
-
         </div>
+
         <div class="dashboard-item">
-            <h2>Applicants</h2>
-            <p>Total: 2</p>
-
-        {% for internship in internship_list %}
-       <ul>
-       <a class="btn1" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a></li> 
-
-       </ul>
-    {% endfor %}
-</div>
-
-        {% comment %} <div class="dashboard-item">
             <h2>Posted Internships</h2>
-            <p>Total: 3</p>
+            <p>Post Your Internships</p>
             <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
         </div>
-        <a class="dropdown-item" href="{% url 'view_applicants' internship_id=request.internship.id %}">Applicants</a> {% endcomment %}
+
+        <div class="dashboard-item">
+            <h2>Applicants</h2>
+            {% if internship_list %} 
+                {% for internship in internship_list %}
+                    <ul>
+                        <p>Total: {{ internship.applications.count }}</p>
+                        <a class="btn1" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a>
+                    </ul>
+                {% endfor %}
+            {% else %}
+                <p><strong>No Applicants Yet.</strong></p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Review Bi-weekly Reports</h2>
+            <p>Review and Approve</p>
+            <a href="{% url 'review_biweekly_reports' %}" class="btn1">View Bi-weekly Reports</a>
+        </div>
 
         <div class="dashboard-item">
             <h2>Manage Interns</h2>
             <p>Total: 8</p>
             <a href="{% url 'attendance' %}" class="btn1">Manage Attendance</a>
         </div>
+
+        <div class="dashboard-item">
+            <h2>Submit Evaluations</h2>
+            {% if students_with_internships %}
+                <ul>
+                    {% for item in students_with_internships %}
+                        
+                            {{ item.student.user.get_full_name }} <!-- Adjust field as per your model -->
+                            {% comment %} - Internship: {{ item.internship.title }} {% endcomment %}
+                            <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn1" style="background: purple; color: white">Evaluate</a>
+                        
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p><strong>No Interns Available for Evaluation.</strong></p>
+            {% endif %}
+        </div>
+        
     </div>
 </body>
 </html>
-
-
 {% endblock nav_and_footer %}
-    

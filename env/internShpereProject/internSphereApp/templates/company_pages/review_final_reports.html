@@ -1,0 +1,62 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<h2>Final Reports for Review</h2>
+
+<ul>
+    {% if reports %}
+        {% for report in reports %}
+            <li>
+                <!-- Report Information -->
+                Final Report by {{ report.student.user.first_name }} {{ report.student.user.last_name }}
+
+                <!-- View Report File Button -->
+                <a href="{{ report.report_file.url }}" class="btn btn-info" target="_blank">View Report File</a>
+
+                <!-- Approval and Rejection Buttons Based on User Type -->
+                {% if user.user_type == "Company" %}
+                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Approve as Company</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Reject as Company</button>
+                    </form>
+                {% elif user.user_type == "InternshipCareerOffice" %}
+                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Approve as Internship Office</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Reject as Internship Office</button>
+                    </form>
+                {% elif user.user_type == "Department" %}
+                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Approve as Department</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Reject as Department</button>
+                    </form>
+                {% elif user.user_type == "Supervisor" %}
+                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Approve as Supervisor</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Reject as Supervisor</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        <p><strong>There Are No Final Reports Submitted Yet.</strong></p>
+    {% endif %}
+</ul>
+
+{% endblock nav_and_footer %}

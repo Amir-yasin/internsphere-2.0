@@ -31,42 +31,35 @@
         <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
     </section >
   
-      <div class="opportunities-list">
-          <div class="opportunity">
+     
 
             {% if internships %}
             <ul>
                 {% for internship in internships %}
+                <div class="opportunities-list">
+                    <div class="opportunity">
                         <h2> {{ internship.title }} </h2>
-                        <h6><strong>company:</strong> Abc comp{{ company.company_name }}</h6>
-                        {% comment %} <p>{{ internship.description }}</p> {% endcomment %}
+                        <h6><strong>company:</strong> {{ internship.company.company_name }}</h6>
+                        <h6><strong>Description:</strong> {{ internship.description }}</h6> 
                         <h6><strong>Location:</strong> {{ internship.location }}</h6>
-                        {% comment %} <p><strong>Requirements:</strong> {{ internship.requirement }}</p> {% endcomment %}
+                        <h6><strong>Requirements:</strong> {{ internship.requirement }}</h6> 
                         <h6><strong>Deadline:</strong> {{ internship.deadline }}</h6>
                     {% comment %} <input type="submit" class="btn1" value="Apply Now"> {% endcomment %}
-                    <a href="{% url 'apply_to_internship' internship.id %}">Apply</a>
+                     <a class="btn1" href="{% url 'apply_to_internship' internship.id %}">Apply Now</a>
+                </div>
+            </div>
                     {% endfor %}
             </ul>
         {% else %}
-            <p>No internships available for your department at the moment.</p>
+        <div class="opportunities-list">
+            <div class="opportunity">
+            <p>No internships available for your department at the moment🤷.</p>
+        </div>
+    </div>
         {% endif %}
 
 
-          </div>
-  
-          <div class="opportunity">
-              <h2>Marketing Intern</h2>
-              <p>Company: Marketing Solutions</p>
-              <p>Location: Remote</p>
-              <input type="submit" class="btn1" value="Apply Now">
-          </div>
-          <div class="opportunity">
-            <h2>web Developer Intern</h2>
-            <p>Company: abc Corp</p>
-            <p>Location: Addis Ababa</p>
-            <input type="submit" class="btn1" value="Apply Now">
-        </div>
-      </div>
+       
   </body>
   </html>
   

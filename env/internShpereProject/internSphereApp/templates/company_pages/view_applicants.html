@@ -2,42 +2,105 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Applicants</title>
-    <link rel="stylesheet" href="{% static 'css/view_applicants.css' %}">
+    <title>Applicants</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        .card {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .card-body p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .btn-small {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .text-truncate {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 <div class="heading">
     <h1>View Applicants</h1>
 </div>
-    <div class="applicants-list">
+    <div class="container my-4">
+        <h2 class="text-center mb-4">Applicants for {{ internship.title }}</h2>
 
-       <!-- view_applicants.html -->
-       <h2>Applicants for {{ internship.title }}</h2>
-       <ul>
-           {% if pending_applicants.exists %}
-               {% for application in pending_applicants %}
-                   <li>{{ application.student.username }} - {{ application.student.email }}
-                       - Status: {{ application.status }}
-                       <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post">
-                           {% csrf_token %}
-                           <button type="submit" style="background-color: green;">Accept</button>
-                       </form>
-                       <form action="{% url 'update_application_status' application.id 'Rejected' %}" method="post">
-                           {% csrf_token %}
-                           <button type="submit" style="background-color: red;">Reject</button>
-                       </form>
-                   </li>
-               {% endfor %}
-           {% else %}
-               <li>No pending applicants yet.</li>
-           {% endif %}
-       </ul>
+        {% if pending_applicants.exists %}
+            <div class="row">
+                {% for application in pending_applicants %}
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-header text-truncate" title="{{ application.student.user.first_name }} {{ application.student.user.last_name }}">
+                                {{ application.student.user.first_name }} {{ application.student.user.last_name }}
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Email:</strong> {{ application.student.email }}</p>
+                                <p><strong>Department:</strong> {{ application.student.department }}</p>
+                                <p><strong>Phone:</strong> {{ application.student.phone_number }}</p>
+                                <p><strong>Year:</strong> {{ application.student.year_of_study }}</p>
+                                <p><strong>skills:</strong> {{ application.student.skills }}</p>
+
+                                {% if application.student.resume %}
+                                    <p><strong>Resume:</strong> 
+                                        <a href="{{ application.student.resume.url }}" target="_blank">Download</a>
+                                    </p>
+                                {% endif %}
+                                {% if application.student.linkedin_profile %}
+                                    <p><strong>LinkedIn:</strong> 
+                                        <a href="{{ application.student.linkedin_profile }}" target="_blank">Profile</a>
+                                    </p>
+                                {% endif %}
+                                {% comment %} <p><strong>Status:</strong> {{ application.status }}</p> {% endcomment %}
+                            </div>
+                            <div class="text-center">
+                                <form action="{% url 'update_application_status' application.id 'Accepted' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-small">Accept</button>
+                                </form>
+                                <form action="{% url 'update_application_status' application.id 'Rejected' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-small">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">No pending applicants yet.</p>
+        {% endif %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
        
        
 

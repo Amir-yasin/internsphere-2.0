@@ -1,0 +1,17 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<h2>Reports Pending Approval</h2>
+<ul>
+    {% for report in reports %}
+        <li>
+            Report {{ report.report_number }} by {{ report.student.user.username }} - 
+            <a href="{% url 'approve_report' approver_type report.id %}">Review</a>
+        </li>
+    {% endfor %}
+</ul>
+
+
+{% endblock nav_and_footer %}

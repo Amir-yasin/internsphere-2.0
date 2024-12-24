@@ -1,0 +1,23 @@
+
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<div class="heading">
+<h2>Submit Final Report</h2>
+</div>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Submit Report</button>
+</form>
+
+{% endblock nav_and_footer %}

@@ -1,0 +1,94 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+    
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+</head>
+<body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="heading">
+        <h1>Department Dashboard</h1>
+    </div>
+    <header>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p>You are logged in as a {{ user.user_type }}</p>
+    </header>
+    
+    
+    <div class="dashboard">
+        <div class="dashboard-item">
+            <h2>Manage Students</h2>
+            <p>View and manage student profiles and information.</p>
+            <a href="{% url 'intern_opportunities' %}" class="btn">View Student information</a>
+        </div>
+
+        <div class="dashboard-item">
+            <h2>Bi-Weekly Reports</h2>
+            <p>Access and review bi-weekly reports submitted by students.</p>
+            <a href="{% url 'review_biweekly_reports' %}" class="btn">Review report</a>
+            {% comment %} <a href="{% url 'report_list' %}" class="btn">View report</a> {% endcomment %}
+
+        </div>
+        
+
+        <div class="dashboard-item">
+            <h2>Submit Evaluations</h2>
+            {% if students_with_internships %}
+                <ul>
+                    {% for item in students_with_internships %}
+                        
+                            {{ item.student.user.get_full_name }} <!-- Adjust field as per your model -->
+                            {% comment %} - Internship: {{ item.internship.title }} {% endcomment %}
+                            <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn1" style="background: purple; color: white">Evaluate</a>
+                        
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p><strong>No Interns Available for Evaluation.</strong></p>
+            {% endif %}
+        </div>
+
+        {% comment %} <div class="dashboard-item">
+            <h2>Review Final Reports</h2>
+            <p>Monitor and access student Final Reports</p>
+            <a href="{% url 'review_final_reports' %}" class="btn">Review Final Reports</a>
+        </div> {% endcomment %}
+    </div>
+    <br>
+    <br>
+    <br>
+
+
+
+    <script>
+        // Automatically hide the message after 5 seconds (5000 milliseconds)
+        setTimeout(function() {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000);  // 5000 milliseconds = 5 seconds
+    </script>
+
+</body>
+</html>
+
+
+
+{% endblock nav_and_footer %}
+    

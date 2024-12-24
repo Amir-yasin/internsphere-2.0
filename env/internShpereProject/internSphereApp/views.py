@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
+from django.utils import timezone
+from django.utils.timezone import now
 
 
 # main pages views
@@ -50,8 +52,12 @@ def login_user(request):
                 return redirect('admin_dashboard')
             elif user.user_type == 'InternshipCareerOffice':
                 return redirect('icu_dashboard')
+            elif user.user_type == 'Supervisor':
+                return redirect('supervisor_dashboard')
+            elif user.user_type == 'Department':
+                return redirect('department_dashboard')
             else:
-                return redirect('homes')
+                return redirect('home')
         else:
             messages.error(request, 'Invalid credentials')
             return render(request, 'main_pages/login.html')
@@ -73,47 +79,271 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
+    # Ensure the user has a student profile
+    if not hasattr(request.user, 'stud_profile'):
+        return redirect('error_page')  # Redirect if no profile exists
+
     student = request.user.stud_profile
-    
+
     if request.method == 'POST':
-        # Update student fields with the submitted form data
-        student.email = request.POST['email']
-        student.phone_number = request.POST['phone_number']
-        student.gender = request.POST['gender']
-        student.year_of_study = request.POST['year_of_study']
-        student.skills = request.POST['skills']
-        student.linkedin_profile = request.POST['linkedin_profile']
-        student.resume = request.FILES.get('resume')
-        student.department = request.POST['department']  # New field
-        student.profile_completed = True
+        # Safeguard: Handle missing fields gracefully
+        student.email = request.POST.get('email', student.email)
+        student.phone_number = request.POST.get('phone_number', student.phone_number)
+        student.gender = request.POST.get('gender', student.gender)
+        student.year_of_study = request.POST.get('year_of_study', student.year_of_study)
+        student.skills = request.POST.get('skills', student.skills)
+        student.resume = request.FILES.get('resume', student.resume)
+        student.linkedin_profile = request.POST.get('linkedin_profile', student.linkedin_profile)
+        student.department = request.POST.get('department', student.department)
+        student.profile_completed = True  # Mark profile as completed
         student.save()
         
-        messages.success(request, 'Profile created successfully!')
+        messages.success(request, 'Profile updated successfully!')
         return redirect('student_dashboard')
-    
+
+    # Render the profile completion form
     return render(request, 'student_pages/student_profile.html', {
         'student': student,
-        'department_choices': stud_profile.DEPARTMENT_CHOICES  # Passing choices to template
+        'department_choices': stud_profile.DEPARTMENT_CHOICES,
     })
+    
 @login_required
 def bi_weekly_report(request):
+    try:
+        # Ensure student profile exists and is completed
+        student_profile = request.user.stud_profile
+        if not student_profile.profile_completed:
+            messages.error(request, 'Your profile is not completed yet!')
+            return redirect('student_dashboard')
+
+        # Check for the active company
+        active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+        if not active_application:
+            messages.error(request, 'You have not selected a company to work with. Please select one.')
+            return redirect('select_active_company')  
+
+    except AttributeError:
+        messages.error(request, 'Student profile is missing.')
+        return redirect('student_profile')
+
     if request.method == 'POST':
         form = BiWeeklyReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
-            report.student = request.user.student_Profile
-            report.company = CompanyProfile.objects.get(user=request.user.student_Profile.company)
+            report.student = student_profile  # Associate the student profile
+            report.company = active_application.company  # Use the active company
+            report.application_status = active_application  # Associate the application
             report.save()
+            messages.success(request, 'Bi-weekly report submitted successfully!')
             return redirect('student_dashboard')
     else:
         form = BiWeeklyReportForm()
-    return render(request, 'student_pages/bi_weekly_report.html', {'current_page': 'bi_weekly_report'})
+
+    context = {
+        'form': form,
+        'id_number': student_profile.id,
+        'company': active_application.company.company_name if active_application else None,
+        'section': student_profile.section,
+        'current_page': 'bi_weekly_report',
+    }
+    return render(request, 'student_pages/bi_weekly_report.html', context)
+
+def view_biweekly_report(request, report_id):
+    # Retrieve the report for viewing
+    report = get_object_or_404(BiWeeklyReport, id=report_id)
+    return render(request, 'company_pages/view_biweekly_report.html', {'report': report})
+
+
+@login_required
+def review_biweekly_reports(request):
+    user = request.user
+
+    if user.user_type == "Company":
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            company=user.company, company_approval_status="Pending"
+        )
+        final_reports = FinalReport.objects.filter(
+            company_approval_status="Pending"
+        )
+    elif user.user_type == "InternshipCareerOffice":
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            company_approval_status="Approved",
+            internship_office_approval_status="Pending"
+        )
+        final_reports = FinalReport.objects.filter(
+            company_approval_status="Approved",
+            internship_office_approval_status="Pending"
+        )
+    elif user.user_type == "Department":
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            internship_office_approval_status="Approved",
+            department_approval_status="Pending",
+            student__department=user.department_profile.department_name,
+        )
+        final_reports = FinalReport.objects.filter(
+            internship_office_approval_status="Approved",
+            department_approval_status="Pending"
+        )
+    elif user.user_type == "Supervisor":
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            department_approval_status="Approved",
+            supervisor_approval_status="Pending",
+            student__department=user.supervisor_profile.department.department_name,
+        )
+        final_reports = FinalReport.objects.filter(
+            department_approval_status="Approved",
+            supervisor_approval_status="Pending"
+        )
+    else:
+        biweekly_reports = None
+        final_reports = None
+
+    # Group reports by student
+    reports_by_student = {}
+    for report in biweekly_reports:
+        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["biweekly"].append(report)
+    for report in final_reports:
+        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["final"].append(report)
+
+    return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
+
+
+@login_required
+def approve_biweekly_report(request, report_id, action):
+    report = get_object_or_404(BiWeeklyReport, id=report_id)
+    user = request.user
+
+    if request.method == "POST":
+        if action == "approve":
+            if user.user_type == "Company":
+                report.company_approval_status = "Approved"
+                report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                report.internship_office_approval_status = "Approved"
+                report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                report.department_approval_status = "Approved"
+                report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                report.supervisor_approval_status = "Approved"
+                report.supervisor_approval_date = now()
+        elif action == "reject":
+            if user.user_type == "Company":
+                report.company_approval_status = "Rejected"
+                report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                report.internship_office_approval_status = "Rejected"
+                report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                report.department_approval_status = "Rejected"
+                report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                report.supervisor_approval_status = "Rejected"
+                report.supervisor_approval_date = now()
+
+        report.save()
+        return redirect("review_biweekly_reports")
+
+    return render(request, "company_pages/approve_biweekly_report.html", {"report": report})
+
+@login_required
+def final_report(request):
+    # Ensure only students can submit reports
+    if request.user.user_type != 'Student':
+        messages.error(request, "You do not have permission to submit a report.")
+        return redirect('home')  # Replace 'home' with the appropriate URL
+    try:
+        # Ensure student profile exists and is completed
+        student_profile = request.user.stud_profile
+        if not student_profile.profile_completed:
+            messages.error(request, 'Your profile is not completed yet!')
+            return redirect('student_dashboard')
+
+        # Check for the active company
+        active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+        if not active_application:
+            messages.error(request, 'You have not selected a company to work with. Please select one.')
+            return redirect('select_active_company')  
+
+    except AttributeError:
+        messages.error(request, 'Student profile is missing.')
+        return redirect('student_profile')
+
+    try:
+        # Access the student's profile (assuming stud_profile is related to User)
+        stud_profile_instance = request.user.stud_profile  # Access the related stud_profile instance
+
+        # Check if the student has already submitted a report
+        report_instance = FinalReport.objects.get(student=stud_profile_instance)
+        form = FinalReportForm(request.POST or None, request.FILES or None, instance=report_instance)
+    except FinalReport.DoesNotExist:
+        form = FinalReportForm(request.POST or None, request.FILES or None)
+    except stud_profile.DoesNotExist:
+        # Handle the case where stud_profile doesn't exist for the user
+        messages.error(request, "No profile found for the current user.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        if form.is_valid():
+            final_report = form.save(commit=False)
+            final_report.student = stud_profile_instance  # Set the related stud_profile instance
+            final_report.save()
+            messages.success(request, "Your final report has been submitted successfully!")
+            return redirect('student_dashboard')  # Replace with the URL name for viewing the report
+        else:
+            messages.error(request, "Please correct the errors below.")
+
+    return render(request, 'student_pages/final_report.html', {'form': form})
+
+
+
+@login_required
+def approve_final_report(request, report_id, action):
+    final_report = get_object_or_404(FinalReport, id=report_id)
+    user = request.user
+
+    if request.method == "POST":
+        if action == "approve":
+            if user.user_type == "Company":
+                final_report.company_approval_status = "Approved"
+                final_report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                final_report.internship_office_approval_status = "Approved"
+                final_report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                final_report.department_approval_status = "Approved"
+                final_report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                final_report.supervisor_approval_status = "Approved"
+                final_report.supervisor_approval_date = now()
+        elif action == "reject":
+            if user.user_type == "Company":
+                final_report.company_approval_status = "Rejected"
+                final_report.company_approval_date = now()
+            elif user.user_type == "InternshipCareerOffice":
+                final_report.internship_office_approval_status = "Rejected"
+                final_report.internship_office_approval_date = now()
+            elif user.user_type == "Department":
+                final_report.department_approval_status = "Rejected"
+                final_report.department_approval_date = now()
+            elif user.user_type == "Supervisor":
+                final_report.supervisor_approval_status = "Rejected"
+                final_report.supervisor_approval_date = now()
+
+        final_report.save()
+        messages.success(request, f"Final report has been {action}d successfully!")
+        return redirect("review_biweekly_reports")
+
+    return render(request, "approve_final_report.html", {"final_report": final_report})
 
 @login_required
 def student_dashboard(request):
     if request.user.user_type != 'Student':
         return redirect('home')
     return render(request, 'student_pages/student_dashboard.html', {'current_page': 'student_dashboard'})
+
 
 
 
@@ -135,7 +365,7 @@ def apply_to_internship(request, internship_id):
         status='Pending'
     )
     messages.success(request, 'Your application was submitted successfully!')
-    return redirect('intern_opportunities')
+    return redirect('student_dashboard')
 
 @login_required
 def applications(request):
@@ -146,6 +376,29 @@ def applications(request):
         'current_page': 'applications'
     }
     return render(request, 'student_pages/applications.html', context)
+
+
+@login_required
+def select_active_company(request):
+    student_profile = request.user.stud_profile
+    accepted_applications = Application.objects.filter(student=student_profile, status='Accepted')
+
+    if request.method == 'POST':
+        selected_application_id = request.POST.get('application_id')
+        if selected_application_id:
+            # Reset all other applications to inactive
+            Application.objects.filter(student=student_profile).update(is_active=False)
+            # Set the selected application as active
+            selected_application = get_object_or_404(Application, id=selected_application_id)
+            selected_application.is_active = True
+            selected_application.save()
+            messages.success(request, f"You've successfully selected {selected_application.company.company_name} as your active company.")
+            return redirect('student_dashboard')
+
+    context = {
+        'accepted_applications': accepted_applications,
+    }
+    return render(request, 'student_pages/select_active_company.html', context)
 
 @login_required
 def stud_notification(request):
@@ -168,11 +421,16 @@ def view_profile(request, user_id):
 @login_required
 def intern_opportunities(request):
     try:
-        student_profile = stud_profile.objects.get(user=request.user)
-        if not student_profile.profile_completed:
+        try:
+            student_profile = stud_profile.objects.get(user=request.user)
+        except stud_profile.DoesNotExist:
+            messages.error(request, "Student profile does not exist.")
+            student_profile = None        
             return redirect('student_profile')
         internships = Internship.objects.filter(sector=student_profile.department, status='Open')
+        company = Internship.objects.select_related('Company').all()
         context = {
+            'company' : company,
             'internships': internships,
             'current_page': 'intern_opportunities'
         }
@@ -239,13 +497,29 @@ def view_company_profile(request, user_id):
     }
     return render(request, 'company_pages/view_company_profile.html', context)
 
-
-
 @login_required
 def company_dashboard(request):
-    internships = Internship.objects.filter(company=request.user.company)
-    internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
-    return render(request, 'company_pages/company_dashboard.html', {'internship_list': internship_list})
+    # Ensure the user is a company
+    if not hasattr(request.user, 'company'):
+        return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
+
+    # Fetch all active applications for the company's internships
+    active_applications = Application.objects.filter(company=request.user.company, is_active=True)
+
+    # Fetch the students and their associated internships
+    students_with_internships = [
+        {
+            'student': application.student,  # Student linked to the application
+            'internship': application.internship,  # Internship for the application
+        }
+        for application in active_applications
+    ]
+
+    # Pass the student-internship pairs to the template
+    context = {
+        'students_with_internships': students_with_internships,
+    }
+    return render(request, 'company_pages/company_dashboard.html', context)
 
 
 @login_required
@@ -280,14 +554,16 @@ def post_internship(request):
 @login_required
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
-    applicants = internship.applications.all()  # Fetch all applications for this internship
-    
+    # applicants = internship.applications.all()  # Fetch all applications for this internship
+    applications = internship.applications.select_related('student__user')  # Optimized query
+
     # Filter pending applicants
-    pending_applicants = applicants.filter(status="Pending")
+    pending_applicants = applications.filter(status="Pending")
     
     return render(request, 'company_pages/view_applicants.html', {
         'internship': internship,
-        'applicants': applicants,
+        # 'applicants': applicants,
+        'applications': applications,
         'pending_applicants': pending_applicants,
     })
 @login_required
@@ -313,12 +589,119 @@ def attendance(request):
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
+def submit_evaluation(request, student_id, internship_id):
+    # Check if the company user has permission
+    try:
+        company = request.user.company
+    except AttributeError:
+        messages.error(request, "You do not have permission to evaluate.")
+        return redirect('dashboard')
+
+    # Fetch student and internship objects
+    student = get_object_or_404(stud_profile, id=student_id)
+    internship = get_object_or_404(Internship, id=internship_id)
+
+    # Check if an evaluation already exists for this student and company
+    if Evaluation.objects.filter(student=student, company=company, internship=internship).exists():
+        messages.error(request, "You have already submitted an evaluation for this student.")
+        return redirect('evaluation_list')
+
+    # Handle form submission
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST)
+        if form.is_valid():
+            # Create evaluation object
+            evaluation = Evaluation.objects.create(
+                student=student,
+                company=company,
+                internship=internship,
+                total_score=0  # Will calculate below
+            )
+            total_score = 0
+
+            # Save answers and calculate total score
+            for question, answer in form.cleaned_data.items():
+                question_obj = EvaluationQuestion.objects.get(id=question.split("_")[1])  # Extract question ID
+                EvaluationAnswer.objects.create(
+                    evaluation=evaluation,
+                    question=question_obj,
+                    answer=int(answer)
+                )
+                total_score += int(answer)
+
+            # Update evaluation with total score
+            evaluation.total_score = total_score
+            evaluation.save()
+
+            messages.success(request, "Evaluation submitted successfully!")
+            return redirect('evaluation_list')
+        else:
+            messages.error(request, "There was an error with your submission. Please try again.")
+    else:
+        form = EvaluationForm()
+
+    return render(request, 'company_pages/submit_evaluation.html', {'form': form})
+
+
+
 @login_required
-def evaluate_intern(request):
-    return render(request, 'company_pages/evaluate_intern.html', {'current_page': 'evaluate_intern'})
+def evaluation_list(request):
+    evaluations = Evaluation.objects.filter(company=request.user.company)
+    user = request.user
+    if hasattr(user, 'company'):
+        evaluations = Evaluation.objects.filter(company=user.company)
+    elif user.user_type == 'InternshipCareerOffice':
+        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
+    elif user.user_type == 'Department':
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
+    else:
+        evaluations = None
 
+    return render(request, 'company_pages/evaluation_list.html', {'evaluations': evaluations})
 
+@login_required
+def view_evaluation(request, evaluation_id):
+    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
+    answers = EvaluationAnswer.objects.filter(evaluation=evaluation)
 
+    context = {
+        'evaluation': evaluation,
+        'answers': answers,
+    }
+    return render(request, 'company_pages/view_evaluation.html', context)
+
+@login_required
+def approve_evaluation(request, evaluation_id, action):
+    evaluation = get_object_or_404(Evaluation, id=evaluation_id)
+    user = request.user
+
+    if request.method == 'POST':
+        if action == 'approve':
+            if user.user_type == 'Company':
+                evaluation.company_approval_status = 'Approved'
+                evaluation.company_approval_date = now()
+            elif user.user_type == 'InternshipCareerOffice':
+                evaluation.internship_office_approval_status = 'Approved'
+                evaluation.internship_office_approval_date = now()
+            elif user.user_type == 'Department':
+                evaluation.department_approval_status = 'Approved'
+                evaluation.department_approval_date = now()
+        elif action == 'reject':
+            if user.user_type == 'Company':
+                evaluation.company_approval_status = 'Rejected'
+                evaluation.company_approval_date = now()
+            elif user.user_type == 'InternshipCareerOffice':
+                evaluation.internship_office_approval_status = 'Rejected'
+                evaluation.internship_office_approval_date = now()
+            elif user.user_type == 'Department':
+                evaluation.department_approval_status = 'Rejected'
+                evaluation.department_approval_date = now()
+
+        evaluation.save()
+        messages.success(request, f"Evaluation has been {action}d.")
+        return redirect('evaluation_list')
+
+    return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
 # Admin Views
 @login_required
 def admin_dashboard(request):
@@ -331,167 +714,26 @@ def admin_dashboard(request):
 
 
     # internship and carrer office views
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from .models import (
-    CustomUser, stud_profile, Company, Department, Supervisor,
-    InternshipCareerOffice, Internship, Application, BiWeeklyReport,
-    FinalReport, Attendance, Evaluation
-)
-from django.contrib import messages
-
 # Dashboard view for Internship Career Office
 @login_required
 def icu_dashboard(request):
-    # if request.user.customuser.user_type != 'InternshipCareerOffice':
-    #     messages.error(request, "You do not have access to this page.")
-    #     return redirect('home')
+    if request.user.user_type != 'InternshipCareerOffice':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
 
     students = stud_profile.objects.all()
     reports = BiWeeklyReport.objects.all()
     evaluations = Evaluation.objects.all()
     attendance_records = Attendance.objects.all()
 
-    return render(request, 'icu_dashboard.html', {
+    return render(request, 'internship_office_pages/icu_dashboard.html', {
         'students': students,
         'reports': reports,
         'evaluations': evaluations,
         'attendance_records': attendance_records,
     })
-
-
-# Student dashboard view
-@login_required
-def student_dashboard(request):
-    if request.user.customuser.user_type != 'Student':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    student_profile = get_object_or_404(stud_profile, user=request.user)
-    applications = Application.objects.filter(student=student_profile)
-    reports = BiWeeklyReport.objects.filter(student=student_profile)
-    final_report = FinalReport.objects.filter(student=student_profile).first()
-    attendance_records = Attendance.objects.filter(student=student_profile)
-
-    return render(request, 'student_dashboard.html', {
-        'student_profile': student_profile,
-        'applications': applications,
-        'reports': reports,
-        'final_report': final_report,
-        'attendance_records': attendance_records,
-    })
-
-
-# Company dashboard view
-@login_required
-def company_dashboard(request):
-    if request.user.customuser.user_type != 'Company':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    company = get_object_or_404(Company, user=request.user)
-    internships = Internship.objects.filter(company=company)
-    applications = Application.objects.filter(company=company)
-    evaluations = Evaluation.objects.filter(company=company)
-
-    return render(request, 'company_dashboard.html', {
-        'company': company,
-        'internships': internships,
-        'applications': applications,
-        'evaluations': evaluations,
-    })
-
-
-# Department dashboard view
-@login_required
-def department_dashboard(request):
-    if request.user.customuser.user_type != 'Department':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    department = get_object_or_404(Department, user=request.user)
-    students = stud_profile.objects.filter(department=department.department_name)
-
-    return render(request, 'department_dashboard.html', {
-        'department': department,
-        'students': students,
-    })
-
-
-# Supervisor dashboard view
-@login_required
-def supervisor_dashboard(request):
-    if request.user.customuser.user_type != 'Supervisor':
-        messages.error(request, "You do not have access to this page.")
-        return redirect('home')
-
-    supervisor = get_object_or_404(Supervisor, user=request.user)
-    supervised_students = stud_profile.objects.filter(department=supervisor.department)
-
-    return render(request, 'supervisor_dashboard.html', {
-        'supervisor': supervisor,
-        'supervised_students': supervised_students,
-    })
-
-
-# Internship listing view
-@login_required
-def internship_list(request):
-    internships = Internship.objects.filter(status='Open').order_by('-posted_on')
-
-    return render(request, 'internship_list.html', {
-        'internships': internships,
-    })
-
-
-# Apply to internship view
-@login_required
-def apply_to_internship(request, internship_id):
-    internship = get_object_or_404(Internship, id=internship_id)
     
-    if request.user.customuser.user_type != 'Student':
-        messages.error(request, "Only students can apply to internships.")
-        return redirect('home')
 
-    student_profile = get_object_or_404(stud_profile, user=request.user)
-    existing_application = Application.objects.filter(student=student_profile, internship=internship).first()
-
-    if existing_application:
-        messages.info(request, "You have already applied for this internship.")
-    else:
-        Application.objects.create(
-            student=student_profile,
-            internship=internship,
-            company=internship.company,
-            status='Pending'
-        )
-        messages.success(request, "Your application has been submitted.")
-
-    return redirect('internship_list')
-
-
-# View for ICU to send reports to the department
-@login_required
-def send_reports_to_department(request):
-    if request.user.customuser.user_type != 'InternshipCareerOffice':
-        messages.error(request, "You do not have permission to send reports.")
-        return redirect('home')
-
-    reports = BiWeeklyReport.objects.all()
-    # Additional logic to send reports can be added here, such as sending an email to department
-
-    messages.success(request, "Reports sent to the department.")
-    return redirect('icu_dashboard')
-
-
-# Function to close internships if expired
-def close_expired_internships():
-    internships = Internship.objects.filter(status='Open')
-    for internship in internships:
-        if internship.is_expired():
-            internship.close_if_expired()
 
 def register_students(request):
     if request.method == 'POST':
@@ -551,14 +793,23 @@ def view_company_info(request, company_id):
     return render(request, 'admin_pages/view_company_info.html', {'company': company})
 
 @login_required
+def dis_approve_company(request, company_id):
+    # company = get_object_or_404(company, id=company_id)
+    # company.user.delete()  
+    if request.user.is_superuser: 
+        company = get_object_or_404(Company, id=company_id)
+        company.approved = False
+        company.save()
+        messages.success(request, f"{company.company_name} has been dis-approved.")
+    return redirect('approve_companies')
+
+@login_required
 def delete_company(request, company_id):
     company = get_object_or_404(company, id=company_id)
     company.user.delete()  
-    return redirect('approve_companies')
-
 
 def is_admin(user):
-    return user.is_authenticated and user.user_type == 'Admin'
+    return user.is_authenticated and user.is_superuser
 
 @user_passes_test(is_admin)
 def register_internship_career_office(request):
@@ -566,7 +817,111 @@ def register_internship_career_office(request):
         form = InternshipCareerOfficeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('career_office_list')  # Redirect to a page listing all career offices or a success page
+            return redirect('icu_list')  # Redirect to a page listing all career offices or a success page
     else:
         form = InternshipCareerOfficeForm()
     return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})
+
+
+@login_required
+def icu_list(request):
+    icu_list = InternshipCareerOffice.objects.all()
+    return render(request, 'admin_pages/icu_list.html', {'icu_list': icu_list})
+
+@login_required
+def register_department(request):
+    if not request.user.is_superuser:  # Only allow superusers to register departments
+        messages.error(request, "You do not have permission to register a department.")
+        return redirect('home')  # Replace 'home' with the appropriate URL name
+
+    if request.method == "POST":
+        form = DepartmentRegistrationForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Department registered successfully!")
+                return redirect('department_list')  # Replace with the URL name for department list
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = DepartmentRegistrationForm()
+
+    return render(request, 'admin_pages/register_department.html', {'form': form})
+
+@login_required
+def department_list(request):
+    departments = Department.objects.all()
+    return render(request, 'admin_pages/department_list.html', {'departments': departments})
+
+
+@login_required
+def register_supervisor(request):
+    if not request.user.is_superuser:  # Only allow superusers to register supervisors
+        messages.error(request, "You do not have permission to register a supervisor.")
+        return redirect('home')  # Replace 'home' with the appropriate URL name
+
+    if request.method == "POST":
+        form = SupervisorRegistrationForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Supervisor registered successfully!")
+                return redirect('supervisor_list')  # Replace with the URL name for supervisor list
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = SupervisorRegistrationForm()
+
+    return render(request, 'admin_pages/register_supervisor.html', {'form': form})
+
+@login_required
+def supervisor_list(request):
+    supervisors = Supervisor.objects.all()
+    return render(request, 'admin_pages/supervisor_list.html', {'supervisors': supervisors})
+
+
+# Dashboard view for Internship Career Office
+@login_required
+def department_dashboard(request):
+    if request.user.user_type != 'Department':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    students = stud_profile.objects.all()
+    reports = BiWeeklyReport.objects.all()
+    final_reports = FinalReport.objects.all()
+    evaluations = Evaluation.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    return render(request, 'department_pages/department_dashboard.html', {
+        'students': students,
+        'reports': reports,
+        'final_reports': final_reports,
+        'evaluations': evaluations,
+        'attendance_records': attendance_records,
+    })
+    
+    
+@login_required
+def supervisor_dashboard(request):
+    if request.user.user_type != 'Supervisor':
+        messages.error(request, "You do not have access to this page.")
+        return redirect('home')
+
+    students = stud_profile.objects.all()
+    reports = BiWeeklyReport.objects.all()
+    final_reports = FinalReport.objects.all()
+    evaluations = Evaluation.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    return render(request, 'supervisor_pages/supervisor_dashboard.html', {
+        'students': students,
+        'reports': reports,
+        'final_reports': final_reports,
+        'evaluations': evaluations,
+        'attendance_records': attendance_records,
+    })

@@ -1,0 +1,107 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<div class="heading">
+    <h2>Review Reports</h2>
+</div>
+<div class="container">
+    {% if reports_by_student %}
+        {% for student, reports in reports_by_student.items %}
+            <div class="card mb-4 col-4">
+                <div class="card-header">
+                    <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
+                </div>
+                <div class="card-body">
+                    <!-- Biweekly Reports -->
+                    {% if reports.biweekly %}
+                        <h5>Biweekly Reports</h5>
+                        <ul>
+                            {% for report in reports.biweekly %}
+                                <li>
+                                    <a href="{% url 'view_biweekly_report' report.id %}" class="btn btn-info">View Biweekly Report</a>
+                                    <form method="post" action="{% url 'approve_biweekly_report' report.id 'approve' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form method="post" action="{% url 'approve_biweekly_report' report.id 'reject' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No pending biweekly reports.</p>
+                    {% endif %}
+
+                    <!-- Final Reports -->
+                    {% if reports.final %}
+                        <h5>Final Reports</h5>
+                        <ul>
+                            {% for report in reports.final %}
+                                <li>
+                                    <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-info">View Final Report</a>
+                                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No pending final reports.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No pending reports to review.</p>
+    {% endif %}
+</div>
+
+{% endblock nav_and_footer %}
+
+
+
+
+
+
+{% comment %} {% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+
+<h2>Bi-Weekly Reports for Review </h2>
+<ul>
+    
+    {% if reports %}
+        
+    {% for report in reports %}
+        <li>
+            Bi-Weekly Report {{ report.report_number }} by {{ report.student.user.first_name }} {{ report.student.user.last_name }} 
+            
+            <!-- View Report Button -->
+            <a href="{% url 'view_biweekly_report' report.id %}" class="btn btn-info">View Report</a>
+
+            <!-- Approve and Reject Buttons -->
+            <form method="post" action="{% url 'approve_biweekly_report' report.id 'approve' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+            <form method="post" action="{% url 'approve_biweekly_report' report.id 'reject' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        </li>
+    {% endfor %}
+{% else %}
+<p><strong>There Are No Bi-Weekly Reports Submitted Yet.</strong> </p>
+{% endif %}
+</ul>
+
+{% endblock nav_and_footer %} {% endcomment %}

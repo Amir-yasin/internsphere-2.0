@@ -2,16 +2,9 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    <style>
-        table, th ,td{
-            border:2px solid black;
-            padding:0px 7px;
-        
-        }
-    </style>
 
 
-    <!-- admin_pages/student_list.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,8 +18,14 @@
         {% endfor %}
     </ul>
 {% endif %}
+<link rel="stylesheet" href="{% static 'css/applications.css' %}">
+<div class="heading">
     <h1>Student List</h1>
-    <table border="1">
+
+</div>
+<a href="admin_dashboard" class="btn mb-3">Back to dashboard</a>
+
+<table class="table table-striped">
         <tr>
             <th>Student ID</th>
             <th>First Name</th>
@@ -53,27 +52,11 @@
         </tr>
         {% endfor %}
     </table>
+
 </body>
 </html>
 
 
-
-{% comment %} <table>
-    <tr>
-        <th>Id Number</th> 
-        <th>first_name</th>
-        <th>last_name </th>
-        <th>Profile Completed</th>
-    </tr>
-    {% for student in students %}
-    <tr>
-        <td>{{ student.user.username }}</td> 
-        <td>{{ student.user.first_name }}</td>
-        <td>{{ student.user.last_name }}</td>
-        <td>{{ student.profile_completed }}</td>
-    </tr>
-    {% endfor %}
-</table> {% endcomment %}
 
 
 
