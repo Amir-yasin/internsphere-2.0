@@ -589,8 +589,9 @@ def attendance(request):
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
+@login_required
 def submit_evaluation(request, student_id, internship_id):
-    # Check if the company user has permission
+    # Check if the logged-in user is a company user
     try:
         company = request.user.company
     except AttributeError:
@@ -615,7 +616,8 @@ def submit_evaluation(request, student_id, internship_id):
                 student=student,
                 company=company,
                 internship=internship,
-                total_score=0  # Will calculate below
+                internship_office_approval_status='Pending',  # Directly passes to the Internship Office
+                total_score=0
             )
             total_score = 0
 
@@ -633,7 +635,7 @@ def submit_evaluation(request, student_id, internship_id):
             evaluation.total_score = total_score
             evaluation.save()
 
-            messages.success(request, "Evaluation submitted successfully!")
+            messages.success(request, "Evaluation submitted successfully and passed to the Internship Office.")
             return redirect('evaluation_list')
         else:
             messages.error(request, "There was an error with your submission. Please try again.")
@@ -643,32 +645,35 @@ def submit_evaluation(request, student_id, internship_id):
     return render(request, 'company_pages/submit_evaluation.html', {'form': form})
 
 
-
 @login_required
 def evaluation_list(request):
-    evaluations = Evaluation.objects.filter(company=request.user.company)
     user = request.user
+
     if hasattr(user, 'company'):
         evaluations = Evaluation.objects.filter(company=user.company)
     elif user.user_type == 'InternshipCareerOffice':
-        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
     elif user.user_type == 'Department':
-        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved', department_approval_status='Pending')
+    elif user.user_type == 'Supervisor':
+        evaluations = Evaluation.objects.filter(department_approval_status='Approved', supervisor_approval_status='Pending')
     else:
         evaluations = None
 
     return render(request, 'company_pages/evaluation_list.html', {'evaluations': evaluations})
+
 
 @login_required
 def view_evaluation(request, evaluation_id):
     evaluation = get_object_or_404(Evaluation, id=evaluation_id)
     answers = EvaluationAnswer.objects.filter(evaluation=evaluation)
 
-    context = {
+    return render(request, 'company_pages/view_evaluation.html', {
         'evaluation': evaluation,
         'answers': answers,
-    }
-    return render(request, 'company_pages/view_evaluation.html', context)
+    })
+
+
 
 @login_required
 def approve_evaluation(request, evaluation_id, action):
@@ -677,31 +682,51 @@ def approve_evaluation(request, evaluation_id, action):
 
     if request.method == 'POST':
         if action == 'approve':
-            if user.user_type == 'Company':
-                evaluation.company_approval_status = 'Approved'
-                evaluation.company_approval_date = now()
-            elif user.user_type == 'InternshipCareerOffice':
+            if user.user_type == 'InternshipCareerOffice':
                 evaluation.internship_office_approval_status = 'Approved'
                 evaluation.internship_office_approval_date = now()
             elif user.user_type == 'Department':
                 evaluation.department_approval_status = 'Approved'
                 evaluation.department_approval_date = now()
+            elif user.user_type == 'Supervisor':
+                evaluation.supervisor_approval_status = 'Approved'
+                evaluation.supervisor_approval_date = now()
         elif action == 'reject':
-            if user.user_type == 'Company':
-                evaluation.company_approval_status = 'Rejected'
-                evaluation.company_approval_date = now()
-            elif user.user_type == 'InternshipCareerOffice':
+            if user.user_type == 'InternshipCareerOffice':
                 evaluation.internship_office_approval_status = 'Rejected'
                 evaluation.internship_office_approval_date = now()
             elif user.user_type == 'Department':
                 evaluation.department_approval_status = 'Rejected'
                 evaluation.department_approval_date = now()
+            elif user.user_type == 'Supervisor':
+                evaluation.supervisor_approval_status = 'Rejected'
+                evaluation.supervisor_approval_date = now()
 
         evaluation.save()
         messages.success(request, f"Evaluation has been {action}d.")
         return redirect('evaluation_list')
 
     return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
+
+@login_required
+def bulk_approve_evaluations(request):
+    if request.user.user_type != 'InternshipCareerOffice':
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        evaluation_ids = request.POST.getlist('evaluation_ids')  # IDs of evaluations to approve
+        evaluations = Evaluation.objects.filter(id__in=evaluation_ids, internship_office_approval_status='Pending')
+        evaluations.update(
+            internship_office_approval_status='Approved',
+            internship_office_approval_date=now()
+        )
+        messages.success(request, f"{evaluations.count()} evaluations approved successfully.")
+        return redirect('evaluation_list')
+
+    evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
+    return render(request, 'evaluations/bulk_approve.html', {'evaluations': evaluations})
+
 # Admin Views
 @login_required
 def admin_dashboard(request):

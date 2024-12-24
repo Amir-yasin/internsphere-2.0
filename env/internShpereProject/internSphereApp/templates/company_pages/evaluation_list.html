@@ -36,40 +36,85 @@
     </div>
     {% endif %}
 </div>
-<div class="heading">
-    <h1>Evaluation List</h1>
 
-</div>
-{% if evaluations %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Student</th>
-                <th>Company</th>
-                <th>Internship</th>
-                <th>Total Score</th>
-                <th>Submitted At</th>
-                <th>Actions</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            {% for evaluation in evaluations %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluations</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="heading">
+        <h1>Evaluation List</h1>
+    
+    </div>
+    <!-- Bulk Approval Form -->
+    <form method="POST" id="bulk-approval-form">
+        {% csrf_token %}
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ evaluation.student.user.first_name }} {{ evaluation.student.user.last_name }}</td>
-                    <td>{{ evaluation.company.company_name }}</td>
-                    <td>{{ evaluation.internship.title }}</td>
-                    <td>{{ evaluation.total_score }}</td>
-                    <td>{{ evaluation.submitted_at }}</td>
-                    <td>
-                        <a href="{% url 'view_evaluation' evaluation.id %}" class="btn">View Evaluation</a>
-                    </td>
+                    <th>Select</th>
+                    <th>Student</th>
+                    <th>Internship</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No evaluations submitted yet.</p>
-{% endif %}
+            </thead>
+            <tbody>
+                {% for evaluation in evaluations %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="evaluation_ids" value="{{ evaluation.id }}">
+                        </td>
+                        <td>{{ evaluation.student.user.get_full_name }}</td>
+                        <td>{{ evaluation.internship.name }}</td>
+                        <td>{{ evaluation.get_internship_office_approval_status_display }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary view-evaluation" 
+                                    data-id="{{ evaluation.id }}">View Details</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success">Approve Selected</button>
+    </form>
+
+    <hr>
+
+    <!-- Individual Evaluation Details Section -->
+    <div id="evaluation-details" style="display: none;">
+        <h2>Evaluation Details</h2>
+        <div id="details-container">
+            <!-- Evaluation details will load here dynamically -->
+        </div>
+        <button id="close-details" class="btn btn-secondary">Close</button>
+    </div>
+
+    <script>
+        // Handle dynamic loading of evaluation details
+        document.querySelectorAll('.view-evaluation').forEach(button => {
+            button.addEventListener('click', function() {
+                const evaluationId = this.getAttribute('data-id');
+                fetch(`/evaluations/${evaluationId}/details/`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('details-container').innerHTML = html;
+                        document.getElementById('evaluation-details').style.display = 'block';
+                    });
+            });
+        });
+
+        // Close details section
+        document.getElementById('close-details').addEventListener('click', function() {
+            document.getElementById('evaluation-details').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+
 
 {% endblock nav_and_footer %}

@@ -259,8 +259,8 @@ class Evaluation(models.Model):
     submitted = models.BooleanField(default=False)
 
     # Approval fields
-    company_approval_status = models.CharField(max_length=20, default='Pending')
-    company_approval_date = models.DateTimeField(null=True, blank=True)
+    # company_approval_status = models.CharField(max_length=20, default='Pending')
+    # company_approval_date = models.DateTimeField(null=True, blank=True)
 
     internship_office_approval_status = models.CharField(max_length=20, default='Pending')
     internship_office_approval_date = models.DateTimeField(null=True, blank=True)
