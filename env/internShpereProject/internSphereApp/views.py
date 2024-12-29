@@ -159,22 +159,25 @@ def view_biweekly_report(request, report_id):
 def review_biweekly_reports(request):
     user = request.user
 
+    # Initialize variables
+    biweekly_reports = None
+    final_reports = None
+    evaluations = None
+
+    # Filter reports and evaluations based on user type
     if user.user_type == "Company":
-        biweekly_reports = BiWeeklyReport.objects.filter(
-            company=user.company, company_approval_status="Pending"
-        )
-        final_reports = FinalReport.objects.filter(
-            company_approval_status="Pending"
-        )
+        biweekly_reports = BiWeeklyReport.objects.filter(company=user.company, company_approval_status="Pending")
+        final_reports = FinalReport.objects.filter(company_approval_status="Pending")
+        # evaluations = Evaluation.objects.filter(company=user.company)
+
     elif user.user_type == "InternshipCareerOffice":
         biweekly_reports = BiWeeklyReport.objects.filter(
             company_approval_status="Approved",
             internship_office_approval_status="Pending"
         )
-        final_reports = FinalReport.objects.filter(
-            company_approval_status="Approved",
-            internship_office_approval_status="Pending"
-        )
+        final_reports = FinalReport.objects.filter(company_approval_status="Approved",internship_office_approval_status="Pending")
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
+
     elif user.user_type == "Department":
         biweekly_reports = BiWeeklyReport.objects.filter(
             internship_office_approval_status="Approved",
@@ -185,6 +188,12 @@ def review_biweekly_reports(request):
             internship_office_approval_status="Approved",
             department_approval_status="Pending"
         )
+        evaluations = Evaluation.objects.filter(
+            internship_office_approval_status='Approved',
+            department_approval_status='Pending',
+            student__department=user.department_profile.department_name
+        )
+
     elif user.user_type == "Supervisor":
         biweekly_reports = BiWeeklyReport.objects.filter(
             department_approval_status="Approved",
@@ -195,17 +204,35 @@ def review_biweekly_reports(request):
             department_approval_status="Approved",
             supervisor_approval_status="Pending"
         )
-    else:
-        biweekly_reports = None
-        final_reports = None
+        evaluations = Evaluation.objects.filter(
+            department_approval_status='Approved',
+            student__department=user.supervisor_profile.department.department_name
+        )
 
-    # Group reports by student
+    # Group reports and evaluations by student
     reports_by_student = {}
-    for report in biweekly_reports:
-        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["biweekly"].append(report)
-    for report in final_reports:
-        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["final"].append(report)
+    if biweekly_reports:
+        for report in biweekly_reports:
+            student = report.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["biweekly"].append(report)
 
+    if final_reports:
+        for report in final_reports:
+            student = report.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["final"].append(report)
+
+    if evaluations:
+        for evaluation in evaluations:
+            student = evaluation.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["evaluations"].append(evaluation)
+
+    # Render the template with the grouped data
     return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
 
 
@@ -502,23 +529,12 @@ def company_dashboard(request):
     # Ensure the user is a company
     if not hasattr(request.user, 'company'):
         return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
-
-    # Get the company object
     company = request.user.company  # Assuming the user is linked to a company model
-
-    # Fetch all internships posted by the company
     internships = company.internships.all()
-
-    # Create a list of internship IDs and titles
     internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
-
-    # Fetch all active applications for the company's internships
     active_applications = Application.objects.filter(company=company, is_active=True)
-
-    # Fetch the students linked to active applications (distinct to avoid duplicates)
     students = stud_profile.objects.filter(applications__in=active_applications).distinct()
 
-    # Create a list of students and their associated internships
     students_with_internships = [
         {
             'student': application.student,  # Student linked to the application
@@ -527,7 +543,6 @@ def company_dashboard(request):
         for application in active_applications
     ]
 
-    # Combine all data into a single context
     context = {
         'internship_list': internship_list,  # List of internships for the company
         'students': students,  # Distinct list of students for evaluation
@@ -597,8 +612,26 @@ def update_application_status(request, application_id, status):
 
 
 @login_required
-def attendance(request):
-    return render(request, 'company_pages/attendance.html', {'current_page': 'attendance'})
+def attendance(request, internship_id):
+    internship = Internship.objects.get(id=internship_id, company=request.user)
+    interns = User.objects.filter(student_attendance__internship=internship).distinct()
+
+    if request.method == "POST":
+        # Process attendance
+        for student_id, status in request.POST.items():
+            if student_id.startswith("student_"):
+                student_id = int(student_id.split("_")[1])
+                student = User.objects.get(id=student_id)
+                Attendance.objects.update_or_create(
+                    student=student,
+                    internship=internship,
+                    date=now().date(),
+                    defaults={"status": status},
+                )
+        return JsonResponse({"success": True})
+
+    return render(request, "company_pages/mark_attendance.html", {"internship": internship, "interns": interns})
+
 
 @login_required
 def accepted_interns(request):
@@ -690,24 +723,27 @@ def view_evaluation(request, evaluation_id):
 
 
 
-@login_required
 def approve_evaluation(request, evaluation_id, action):
     evaluation = get_object_or_404(Evaluation, id=evaluation_id)
     user = request.user
 
     if request.method == 'POST':
-        if action == 'approve':
-            if user.user_type == 'InternshipCareerOffice':
+        if action not in ('approve', 'reject'):
+            messages.error(request, "Invalid action.")
+            return redirect('evaluation_list')
+
+        if user.user_type == 'InternshipCareerOffice':
+            if action == 'approve':
                 evaluation.internship_office_approval_status = 'Approved'
                 evaluation.internship_office_approval_date = now()
-            elif user.user_type == 'Department':
-                evaluation.department_approval_status = 'Approved'
-                evaluation.department_approval_date = now()
-        elif action == 'reject':
-            if user.user_type == 'InternshipCareerOffice':
+            else:
                 evaluation.internship_office_approval_status = 'Rejected'
                 evaluation.internship_office_approval_date = now()
-            elif user.user_type == 'Department':
+        elif user.user_type == 'Department':
+            if action == 'approve':
+                evaluation.department_approval_status = 'Approved'
+                evaluation.department_approval_date = now()
+            else:
                 evaluation.department_approval_status = 'Rejected'
                 evaluation.department_approval_date = now()
 
@@ -717,6 +753,7 @@ def approve_evaluation(request, evaluation_id, action):
         return redirect('evaluation_list')
 
     return render(request, 'company_pages/approve_evaluation.html', {'evaluation': evaluation})
+
 
 @login_required
 def bulk_approve_evaluations(request):
@@ -960,3 +997,49 @@ def supervisor_dashboard(request):
         'evaluations': evaluations,
         'attendance_records': attendance_records,
     })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+@login_required
+def view_applicants_list(request):
+    user = request.user
+
+    # Get all internships for the company
+    internships = Internship.objects.filter(company=user.company)
+
+    # Create a dictionary where each internship is mapped to its applications
+    internship_applications = {
+        internship: Application.objects.filter(internship=internship)
+        for internship in internships
+    }
+
+    context = {
+        'internship_applications': internship_applications,
+    }
+    return render(request, 'company_pages/view_applicants_list.html', context)
+
+
+@login_required
+def submit_evaluation_list(request):
+    user = request.user
+    students_with_internships = Application.objects.filter(company=user.company, is_active=True).select_related('student', 'internship')
+
+    context = {
+        'students_with_internships': students_with_internships, 
+    }
+    return render(request, 'company_pages/submit_evaluation_list.html', context)

@@ -22,7 +22,7 @@
     <p><strong>Company Phone:</strong> {{ company.company_phone }}</p>
     <p><strong>Company Description:</strong> {{ company.company_description }}</p>
     <p><strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}</p>
-    <a class="btn" href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
+    <a class="btn btn-purple" href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
     </div>
 </div>
     {% comment %} <a href="{% url 'edit_company_profile' company.user.id %}">Edit Profile</a> <!-- If you want an edit link --> {% endcomment %}

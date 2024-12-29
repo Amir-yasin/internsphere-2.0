@@ -2,43 +2,66 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Intern Attendance</title>
-    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
-</head>
-<body>
-<div class="heading">
-    <h1>Manage Intern Attendance</h1>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>Mark Attendance for {{ internship.title }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="attendanceForm">
+                {% csrf_token %}
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for intern in interns %}
+                        <tr>
+                            <td>{{ intern.get_full_name }}</td>
+                            <td>
+                                <select name="student_{{ intern.id }}" class="form-control">
+                                    <option value="Present">Present</option>
+                                    <option value="Absent">Absent</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center">No interns found for this internship.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-success">Submit Attendance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <a href="{% url 'company_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
 </div>
-    <table class="attendance-table">
-        <thead>
-            <tr>
-                <th>Intern Name</th>
-                <th>Attendance (hours)</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>John Doe</td>
-                <td>40 hours</td>
-                <td>Completed</td>
-            </tr>
-            <tr>
-                <td>Jane Smith</td>
-                <td>35 hours</td>
-                <td>Pending</td>
-            </tr>
-        </tbody>
-    </table>
-</body>
-</html>
 
-
+<script>
+    document.getElementById('attendanceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        fetch("", {
+            method: "POST",
+            body: new FormData(this),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Attendance marked successfully!");
+                window.location.reload();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
 {% endblock nav_and_footer %}
-    

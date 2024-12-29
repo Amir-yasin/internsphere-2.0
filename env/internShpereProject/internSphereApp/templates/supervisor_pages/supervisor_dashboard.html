@@ -46,19 +46,25 @@
         </div>
         
 
-        <div class="dashboard-item">
+        {% comment %} <div class="dashboard-item">
             <h2>Evaluation</h2>
             <p>Review evaluations provided by companies for students.</p>
         <!-- <a href="{% url 'student_profile' %}" class="btn"></a> -->
             <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn">View Evaluation</a>
 
-        </div>
+        </div> {% endcomment %}
 
         {% comment %} <div class="dashboard-item">
             <h2>Review Final Reports</h2>
             <p>Monitor and access student Final Reports</p>
             <a href="{% url 'review_final_reports' %}" class="btn">Review Final Reports</a>
-        </div> {% endcomment %}
+        </div>  {% endcomment %}
+
+        <div class="dashboard-item">
+            <h2>View Evaluations</h2>
+            <p>View evaluations provided by companies for students.</p>
+            <a href="{% url 'evaluation_list' %}" class="btn" style="background: purple; color: white">Evaluation List</a>
+        </div>
     </div>
     <br>
     <br>

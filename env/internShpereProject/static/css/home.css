@@ -278,7 +278,14 @@ background-color: #ffffff;
     } 
 }
 
-
+.btn-purple{
+  background-color: #c923a5;
+  color: white;
+}
+.btn-purple:hover{
+  background-color: purple;
+  color: white;
+}
 
 .para{
   margin: 10px 20px;

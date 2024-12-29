@@ -53,6 +53,8 @@
     <!-- Bulk Approval Form -->
    
     
+        
+        
     {% if evaluations.exists %}
     <form method="POST" id="bulk-approval-form">
         {% csrf_token %}
@@ -79,7 +81,17 @@
                         {% endif %}
                         <td>{{ evaluation.student.user.get_full_name }}</td>
                         <td>{{ evaluation.internship }}</td>
+                        {% if user.user_type == 'Company' %}
                         <td>{{ evaluation.internship_office_approval_status }}</td>
+                        {% elif user.user_type == 'InternshipCareerOffice' %}
+                        <td>{{ evaluation.internship_office_approval_status }}</td>
+                        {% elif user.user_type == 'Department' %}
+                        <td>{{ evaluation.department_approval_status }}</td>
+                        {% elif user.user_type == 'Supervisor' %}
+                        <td>{{ evaluation.department_approval_status }} by the department</td>
+
+                        {% endif %}
+                            
                         <td>
                             {% comment %} <button type="button" class="btn btn-primary view-evaluation" 
                                     data-id="{{ evaluation.id }}">View Details</button> {% endcomment %}
@@ -104,36 +116,9 @@
     {% endif %}
         
 
-    <hr>
+   
 
-    <!-- Individual Evaluation Details Section -->
-    <div id="evaluation-details" style="display: none;">
-        <h2>Evaluation Details</h2>
-        <div id="details-container">
-            <!-- Evaluation details will load here dynamically -->
-        </div>
-        <button id="close-details" class="btn btn-secondary">Close</button>
-    </div>
-
-    <script>
-        // Handle dynamic loading of evaluation details
-        document.querySelectorAll('.view-evaluation').forEach(button => {
-            button.addEventListener('click', function() {
-                const evaluationId = this.getAttribute('data-id');
-                fetch(`/evaluations/${evaluationId}/details/`)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('details-container').innerHTML = html;
-                        document.getElementById('evaluation-details').style.display = 'block';
-                    });
-            });
-        });
-
-        // Close details section
-        document.getElementById('close-details').addEventListener('click', function() {
-            document.getElementById('evaluation-details').style.display = 'none';
-        });
-    </script>
+   
 </body>
 </html>
 

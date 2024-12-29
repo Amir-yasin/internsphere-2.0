@@ -1,0 +1,56 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<style>
+    .btn-purple {
+        background-color: #c923a5;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+    .btn-purple:hover {
+        background-color: purple;
+        color: white;
+    }
+</style>
+<div class="heading">
+    <h1>Internship Applicants</h1>
+</div>
+<div class="container">
+
+  {% for internship, applications in internship_applications.items %}
+    <h2>{{ internship.title }}</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Student Name</th>
+          <th scope="col">Application Date</th>
+          <th scope="col">Status</th>
+          <th scope="col">Active</th>
+          <th scope="col">View Application</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in applications %}
+          <tr>
+            <td>{{ application.student.user.get_full_name }}</td>
+            <td>{{ application.applied_on }}</td>
+            <td>{{ application.get_status_display }}</td>
+            <td>{{ application.is_active }}</td>
+            <td><a href="{% url 'view_applicants' application.id %}" class="btn btn-purple">View</a></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">No applications found for this internship.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% empty %}
+    <p>No internships found.</p>
+  {% endfor %}
+  <div class="text-center mt-4">
+  <a href="{% url 'company_dashboard' %}" class="btn btn-purple">Back to Dashboard</a>
+  </div>
+</div>
+{% endblock nav_and_footer %}

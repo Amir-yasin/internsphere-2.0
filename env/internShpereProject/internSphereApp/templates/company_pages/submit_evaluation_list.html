@@ -1,0 +1,60 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<style>
+    .btn-purple {
+        background-color: #c923a5;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+    .btn-purple:hover {
+        background-color: purple;
+        color: white;
+    }
+    .heading-card {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+</style>
+<div class="heading"><h1>Students for Evaluation</h1>
+    {% comment %} <p >Evaluate the performance of students based on their internships</p> {% endcomment %}
+
+</div>
+
+<div class="container mt-5">
+    <!-- Header Card -->
+   
+    <!-- Students List -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in students_with_internships %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">{{ item.student.user.get_full_name }}</h5>
+                            <small class="text-muted">Internship: {{ item.internship.title }}</small>
+                        </div>
+                        <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn btn-purple btn-md">
+                            Evaluate
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-center">
+                        <p class="text-muted mb-0">No students found for evaluation.</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'company_dashboard' %}" class="btn btn-purple btn-md">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock nav_and_footer %}

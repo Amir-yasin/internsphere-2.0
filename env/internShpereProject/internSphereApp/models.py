@@ -251,21 +251,25 @@ class Attendance(models.Model):
 # User = get_user_model()
 
 class Evaluation(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
     student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='evaluations')
     internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='evaluations')
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
     submitted_at = models.DateTimeField(default=now)
     total_score = models.IntegerField(default=0)
-    submitted = models.BooleanField(default=False)
+    # submitted = models.BooleanField(default=False)
 
-    # Approval fields
-    # company_approval_status = models.CharField(max_length=20, default='Pending')
-    # company_approval_date = models.DateTimeField(null=True, blank=True)
-
-    internship_office_approval_status = models.CharField(max_length=20, default='Pending')
+    internship_office_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
     internship_office_approval_date = models.DateTimeField(null=True, blank=True)
-
-    department_approval_status = models.CharField(max_length=20, default='Pending')
+    department_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
     department_approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -286,3 +290,6 @@ class EvaluationAnswer(models.Model):
 
     def __str__(self):
         return f"{self.question.text}: {self.answer}"
+    
+    
+    
