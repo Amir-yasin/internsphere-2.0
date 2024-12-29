@@ -90,7 +90,7 @@ path('biweekly-report/<int:report_id>/view/', views.view_biweekly_report, name='
 
 
 path('submit_evaluation/<int:student_id>/<int:internship_id>/', views.submit_evaluation, name='submit_evaluation'),
-path('evaluation/approve/<int:evaluation_id>/<str:action>/', views.approve_evaluation, name='approve_evaluation'),
+path('approve_evaluation/<int:evaluation_id>/<str:action>/', views.approve_evaluation, name='approve_evaluation'),
 path('evaluation/list/', views.evaluation_list, name='evaluation_list'),
 path('view_evaluation/<int:evaluation_id>/', views.view_evaluation, name='view_evaluation'),
 

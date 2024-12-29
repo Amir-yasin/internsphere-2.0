@@ -113,7 +113,7 @@ class Internship(models.Model):
         ('THM', 'THM'),
     ]
     
-    company = models.ForeignKey('Company', on_delete=models.CASCADE)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='internships')
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
@@ -269,7 +269,7 @@ class Evaluation(models.Model):
     department_approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Evaluation for {self.student.user.get_full_name()} by {self.company.name}"
+        return f"Evaluation for {self.student.user.get_full_name()} by {self.company.company_name}"
 
 
 class EvaluationQuestion(models.Model):

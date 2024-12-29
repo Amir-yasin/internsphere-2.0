@@ -46,7 +46,7 @@
             {% if internship_list %} 
                 {% for internship in internship_list %}
                     <ul>
-                        <p>Total: {{ internship.applications.count }}</p>
+                        {% comment %} <p>Total: {{ internship.applications.count }}</p> {% endcomment %}
                         <a class="btn1" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a>
                     </ul>
                 {% endfor %}

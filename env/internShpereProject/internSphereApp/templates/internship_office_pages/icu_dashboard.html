@@ -47,20 +47,8 @@
         
 
         <div class="dashboard-item">
-            <h2>Submit Evaluations</h2>
-            {% if students_with_internships %}
-                <ul>
-                    {% for item in students_with_internships %}
-                        
-                            {{ item.student.user.get_full_name }} <!-- Adjust field as per your model -->
-                            {% comment %} - Internship: {{ item.internship.title }} {% endcomment %}
-                            <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn1" style="background: purple; color: white">Evaluate</a>
-                        
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p><strong>No Interns Available for Evaluation.</strong></p>
-            {% endif %}
+            <h2>View Evaluations</h2>
+            <a href="{% url 'evaluation_list' %}" class="btn" style="background: purple; color: white">Evaluation List</a>
         </div>
 
         {% comment %} <div class="dashboard-item">

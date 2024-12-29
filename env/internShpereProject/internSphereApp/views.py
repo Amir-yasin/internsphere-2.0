@@ -503,10 +503,22 @@ def company_dashboard(request):
     if not hasattr(request.user, 'company'):
         return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
 
-    # Fetch all active applications for the company's internships
-    active_applications = Application.objects.filter(company=request.user.company, is_active=True)
+    # Get the company object
+    company = request.user.company  # Assuming the user is linked to a company model
 
-    # Fetch the students and their associated internships
+    # Fetch all internships posted by the company
+    internships = company.internships.all()
+
+    # Create a list of internship IDs and titles
+    internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
+
+    # Fetch all active applications for the company's internships
+    active_applications = Application.objects.filter(company=company, is_active=True)
+
+    # Fetch the students linked to active applications (distinct to avoid duplicates)
+    students = stud_profile.objects.filter(applications__in=active_applications).distinct()
+
+    # Create a list of students and their associated internships
     students_with_internships = [
         {
             'student': application.student,  # Student linked to the application
@@ -515,10 +527,13 @@ def company_dashboard(request):
         for application in active_applications
     ]
 
-    # Pass the student-internship pairs to the template
+    # Combine all data into a single context
     context = {
-        'students_with_internships': students_with_internships,
+        'internship_list': internship_list,  # List of internships for the company
+        'students': students,  # Distinct list of students for evaluation
+        'students_with_internships': students_with_internships,  # Students with their internships
     }
+
     return render(request, 'company_pages/company_dashboard.html', context)
 
 
@@ -656,7 +671,7 @@ def evaluation_list(request):
     elif user.user_type == 'Department':
         evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved', department_approval_status='Pending')
     elif user.user_type == 'Supervisor':
-        evaluations = Evaluation.objects.filter(department_approval_status='Approved', supervisor_approval_status='Pending')
+        evaluations = Evaluation.objects.filter(department_approval_status='Approved')
     else:
         evaluations = None
 
@@ -688,9 +703,6 @@ def approve_evaluation(request, evaluation_id, action):
             elif user.user_type == 'Department':
                 evaluation.department_approval_status = 'Approved'
                 evaluation.department_approval_date = now()
-            elif user.user_type == 'Supervisor':
-                evaluation.supervisor_approval_status = 'Approved'
-                evaluation.supervisor_approval_date = now()
         elif action == 'reject':
             if user.user_type == 'InternshipCareerOffice':
                 evaluation.internship_office_approval_status = 'Rejected'
@@ -698,15 +710,13 @@ def approve_evaluation(request, evaluation_id, action):
             elif user.user_type == 'Department':
                 evaluation.department_approval_status = 'Rejected'
                 evaluation.department_approval_date = now()
-            elif user.user_type == 'Supervisor':
-                evaluation.supervisor_approval_status = 'Rejected'
-                evaluation.supervisor_approval_date = now()
 
+        # Save the evaluation status and redirect
         evaluation.save()
         messages.success(request, f"Evaluation has been {action}d.")
         return redirect('evaluation_list')
 
-    return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
+    return render(request, 'company_pages/approve_evaluation.html', {'evaluation': evaluation})
 
 @login_required
 def bulk_approve_evaluations(request):
