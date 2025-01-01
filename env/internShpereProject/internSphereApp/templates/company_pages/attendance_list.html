@@ -1,0 +1,24 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<style>
+    .bg-purple{
+        background-color: #c923a5;
+    }
+    .bg-purple:hover{
+        background-color: purple;
+    }
+</style>
+<div class="heading"><h2>Attendance List</h2>
+</div>
+<ul>
+    {% for student in students %}
+    <li>
+        {{ student.user.username }} ({{ student.department }})
+        <a href="{% url 'attendance' week=1 %}">Mark Attendance</a> <!-- Pass week dynamically -->
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock nav_and_footer %}

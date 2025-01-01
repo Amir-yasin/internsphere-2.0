@@ -2,66 +2,57 @@
 {% load static %}
 
 {% block nav_and_footer %}
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3>Mark Attendance for {{ internship.title }}</h3>
-        </div>
-        <div class="card-body">
-            <form method="post" id="attendanceForm">
-                {% csrf_token %}
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for intern in interns %}
-                        <tr>
-                            <td>{{ intern.get_full_name }}</td>
-                            <td>
-                                <select name="student_{{ intern.id }}" class="form-control">
-                                    <option value="Present">Present</option>
-                                    <option value="Absent">Absent</option>
-                                </select>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="text-center">No interns found for this internship.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="text-right">
-                    <button type="submit" class="btn btn-success">Submit Attendance</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <a href="{% url 'company_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+<style>
+    /* Same styles as before */
+</style>
+
+<div class="heading">
+    <h2>Mark Attendance for Week {{ week }}</h2>
 </div>
 
-<script>
-    document.getElementById('attendanceForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        fetch("", {
-            method: "POST",
-            body: new FormData(this),
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Attendance marked successfully!");
-                window.location.reload();
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
-</script>
+<form method="POST">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                {% for day in weekdays %}
+                    <th>{{ day }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in applications %}  {# Iterate through applications #}
+            <tr>
+                <td>{{ student.student.user.username }}</td>  {# Access username from Student profile #}
+                {% for day in weekdays %}
+                    {% for week_num in weeks %}
+                        <td>
+                            <label>
+                                <input type="radio" name="{{ student.id }}_{{ day }}_{{ week_num }}" value="Present"
+                                     {% if attendance_data.get(student.student.id) and attendance_data[student.student.id][str(week_num)] == 'Present' %}
+                                        checked
+                                     {% endif %}
+                                >
+                                Present
+                            </label>
+                            <label>
+                                <input type="radio" name="{{ student.id }}_{{ day }}_{{ week_num }}" value="Absent"
+                                     {% if attendance_data.get(student.student.id) and attendance_data[student.student.id][str(week_num)] == 'Absent' %}
+                                        checked
+                                     {% endif %}
+                                >
+                                Absent
+                            </label>
+                        </td>
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        
+        </tbody>
+    </table>
+    <button type="submit">Save Attendance</button>
+</form>
+
 {% endblock nav_and_footer %}

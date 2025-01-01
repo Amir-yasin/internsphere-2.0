@@ -14,6 +14,8 @@ from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from django.utils.timezone import now
+from datetime import timedelta
+
 
 
 # main pages views
@@ -530,6 +532,7 @@ def company_dashboard(request):
     if not hasattr(request.user, 'company'):
         return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
     company = request.user.company  # Assuming the user is linked to a company model
+    interns = Internship.objects.filter(company=company)
     internships = company.internships.all()
     internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
     active_applications = Application.objects.filter(company=company, is_active=True)
@@ -547,6 +550,7 @@ def company_dashboard(request):
         'internship_list': internship_list,  # List of internships for the company
         'students': students,  # Distinct list of students for evaluation
         'students_with_internships': students_with_internships,  # Students with their internships
+        'interns': interns,
     }
 
     return render(request, 'company_pages/company_dashboard.html', context)
@@ -610,27 +614,73 @@ def update_application_status(request, application_id, status):
 
     return redirect('view_applicants', internship_id=application.internship.id)
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Application, Attendance
 
 @login_required
-def attendance(request, internship_id):
-    internship = Internship.objects.get(id=internship_id, company=request.user)
-    interns = User.objects.filter(student_attendance__internship=internship).distinct()
+def attendance(request, week):
+    company = request.user.company
+    # Fetch active applications and prefetch related students and attendance records
+    active_applications = Application.objects.filter(company=company, is_active=True).select_related('student', 'internship')
 
+    # Extract students from active applications
+    students = [app.student for app in active_applications]
+    
+    # Fetch attendance records for all students and organize them by week, day, and student
+    attendance_data = {}
+    for student in students:
+        attendance_data[student.id] = {}
+        for week_num in range(1, 9):
+            for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']:
+                # Get the attendance record for the given student, week, and day
+                attendance = Attendance.objects.filter(
+                    student=student, week=week_num, day=day
+                ).first()
+                if attendance:
+                    attendance_data[student.id][(week_num, day)] = attendance.status
+                else:
+                    attendance_data[student.id][(week_num, day)] = None
+
+    # List of days
+    weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+    # Handle the POST request to save attendance
     if request.method == "POST":
-        # Process attendance
-        for student_id, status in request.POST.items():
-            if student_id.startswith("student_"):
-                student_id = int(student_id.split("_")[1])
-                student = User.objects.get(id=student_id)
-                Attendance.objects.update_or_create(
-                    student=student,
-                    internship=internship,
-                    date=now().date(),
-                    defaults={"status": status},
-                )
-        return JsonResponse({"success": True})
+        # Iterate through each student and save attendance for each weekday and week
+        for student in students:
+            for day in weekdays:
+                for week_num in range(1, 9):  # Weeks 1 to 8
+                    # Get the attendance status from the form (if any)
+                    status = request.POST.get(f"{student.id}_{day}_{week_num}")
+                    if status:
+                        # Update or create attendance record
+                        Attendance.objects.update_or_create(
+                            student=student,
+                            internship=active_applications.get(student=student).internship,
+                            week=week_num,
+                            day=day,
+                            defaults={"status": status},
+                        )
+        # Redirect to the attendance list page after processing
+        return redirect("attendance_list")
 
-    return render(request, "company_pages/mark_attendance.html", {"internship": internship, "interns": interns})
+    # Pass all necessary data to the template
+    return render(request, "company_pages/attendance.html", {
+        "students": students,
+        "week": week,
+        "weekdays": weekdays,
+        "weeks": range(1, 9),  # Weeks 1 to 8
+        "attendance_data": attendance_data,  # Pass the attendance data
+    })
+
+
+
+def attendance_list(request):
+    company = request.user.company  # Ensure logged-in user is a company
+    active_applications = Application.objects.filter(company=company, is_active=True)
+    students = [app.student for app in active_applications]
+    return render(request, "company_pages/attendance_list.html", {"students": students})
 
 
 @login_required

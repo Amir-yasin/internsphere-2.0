@@ -237,16 +237,18 @@ class FinalReport(models.Model):
         return f"Final Report by {self.student.user.username}"
 
 
-
 # Attendance model
 class Attendance(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.CharField(max_length=10, choices=[('present', 'Present'), ('absent', 'Absent')])
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="attendance_records")
+    internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name="attendance_records")
+    week = models.PositiveIntegerField(max_length=10)  # Week number (1 to 8)
+    day = models.CharField(max_length=10, choices=[('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), 
+                                                   ('Thursday', 'Thursday'), ('Friday', 'Friday')])
+    status = models.CharField(max_length=10, choices=[('Present', 'Present'), ('Absent', 'Absent')])
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.date} - {self.status}"
+        return f"{self.student.user.username} - Week {self.week} - {self.day} - {self.status}"
+
 
 # User = get_user_model()
 
@@ -261,8 +263,6 @@ class Evaluation(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
     submitted_at = models.DateTimeField(default=now)
     total_score = models.IntegerField(default=0)
-    # submitted = models.BooleanField(default=False)
-
     internship_office_approval_status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default='Pending'
     )

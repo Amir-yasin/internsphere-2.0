@@ -37,9 +37,11 @@ path('company/<int:user_id>/', views.view_company_profile, name='view_company_pr
 path('view_applicants_list/', views.view_applicants_list, name='view_applicants_list'),
 path('view_applicants/<int:internship_id>/', views.view_applicants, name='view_applicants'),
 path('update_application_status/<int:application_id>/status/<str:status>/', views.update_application_status, name='update_application_status'),
-path("attendance/<int:internship_id>/", views.attendance, name="attendance"),
+# path("attendance/<int:internship_id>/", views.attendance, name="attendance"),
+path('attendance_list/', views.attendance_list, name='attendance_list'), 
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
 # path('reports/<str:approver_type>/<int:report_id>/approve/', views.approve_report, name='approve_report'),
+path('attendance/<int:week>/', views.attendance, name='attendance'),
 
 
 

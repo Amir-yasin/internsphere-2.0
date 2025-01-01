@@ -57,12 +57,12 @@
     </div>
 
     <div class="dashboard-item">
-      <h2>Manage Interns</h2>
-      <p>Total: 8</p> 
-      <a href="{% url 'mark_attendance' internship.id %}" class="btn btn-primary btn-sm">Mark Attendance</a>
-      {% comment %} <a href="{% url 'attendance' %}" class="btn1">Manage Attendance</a> {% endcomment %}
+        <h2>Manage Interns</h2>
+        <p>Mark Attendance for Internships</p>
+        <a href="{% url 'attendance_list' %}" class="btn1">Mark Attendance</a> 
     </div>
 
+     
     <div class="dashboard-item">
       <h2>Submit Evaluations</h2>
       <p>Evaluate Interns</p>
