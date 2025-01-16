@@ -81,14 +81,13 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
-    # Ensure the user has a student profile
+    
     if not hasattr(request.user, 'stud_profile'):
-        return redirect('error_page')  # Redirect if no profile exists
+        return redirect('error_page')  
 
     student = request.user.stud_profile
 
     if request.method == 'POST':
-        # Safeguard: Handle missing fields gracefully
         student.email = request.POST.get('email', student.email)
         student.phone_number = request.POST.get('phone_number', student.phone_number)
         student.gender = request.POST.get('gender', student.gender)
@@ -97,13 +96,12 @@ def student_profile(request):
         student.resume = request.FILES.get('resume', student.resume)
         student.linkedin_profile = request.POST.get('linkedin_profile', student.linkedin_profile)
         student.department = request.POST.get('department', student.department)
-        student.profile_completed = True  # Mark profile as completed
+        student.profile_completed = True  
         student.save()
         
         messages.success(request, 'Profile updated successfully!')
         return redirect('student_dashboard')
 
-    # Render the profile completion form
     return render(request, 'student_pages/student_profile.html', {
         'student': student,
         'department_choices': stud_profile.DEPARTMENT_CHOICES,

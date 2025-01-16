@@ -35,7 +35,8 @@ class stud_profile(models.Model):
         ('THM', 'THM'),
     ]
         
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='stud_profile' , limit_choices_to={'user_type': 'Student'})
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, 
+                                related_name='stud_profile' , limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
     temporary_password = models.CharField(max_length=100)
@@ -45,7 +46,7 @@ class stud_profile(models.Model):
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
     year_of_study = models.CharField(max_length=2)
     skills = models.CharField(max_length=1000)
-    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  # Ensures matching with sector choices
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  
     resume = models.FileField(upload_to='resumes/')
     linkedin_profile = models.URLField(blank=True, null=True)
     list_of_students = models.FileField(upload_to='list_of_students/', blank=True, null=True)
