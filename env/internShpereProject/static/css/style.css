@@ -1,0 +1,94 @@
+/* Style for custom elements */
+special-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+/* Style for specific elements inside the header */
+.special-header .navbar-brand {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Footer styles */
+special-footer {
+    background-color: #343a40;
+    color: white;
+}
+
+special-footer a {
+    color: #17a2b8;
+}
+
+special-footer a:hover {
+    text-decoration: underline;
+}
+/* General Footer Styles */
+special-footer {
+    background-color: #2c2f33; /* Dark background */
+    color: #ffffff; /* White text color */
+    padding: 2rem 0; /* Space around content */
+    font-family: Arial, sans-serif; /* Clean font style */
+}
+
+special-footer h4 {
+    color: #f39c12; /* Accent color for headings */
+    font-size: 1.2rem; /* Adjust heading size */
+    margin-bottom: 1rem;
+    text-transform: uppercase; /* Capitalize headings */
+}
+
+special-footer ul {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+}
+
+special-footer ul li {
+    margin-bottom: 0.5rem; /* Space between items */
+}
+
+special-footer ul li a {
+    color: #bdc3c7; /* Light gray for links */
+    text-decoration: none; /* Remove underline */
+    font-size: 0.95rem; /* Slightly smaller text */
+}
+
+special-footer ul li a:hover {
+    color: #f39c12; /* Hover effect to match heading */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Footer Layout Adjustments */
+special-footer .footer-container {
+    display: flex;
+    flex-wrap: wrap; /* Responsive layout */
+    justify-content: space-between; /* Spread columns */
+    gap: 1.5rem; /* Space between columns */
+}
+
+special-footer .footer-col {
+    flex: 1 1 calc(25% - 1.5rem); /* Responsive columns */
+    min-width: 200px; /* Ensure minimum column size */
+}
+
+/* Social Media Links */
+special-footer .footer-col ul li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+special-footer .footer-col ul li a::before {
+    content: '.'; 
+    font-size: 1rem;
+    color:#ffffff;
+}
+
+/* Mobile-Friendly Adjustments */
+@media (max-width: 768px) {
+    special-footer .footer-container {
+        flex-direction: column; /* Stack columns */
+        align-items: center;
+    }
+}
+

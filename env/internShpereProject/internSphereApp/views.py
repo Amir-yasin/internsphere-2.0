@@ -14,7 +14,7 @@ from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import date, timedelta
 
 
 
@@ -508,10 +508,18 @@ def company_register(request):
                 approved=False
             )
             return redirect('login')
+        else:
+            # Include error messages in the context if the form is invalid
+            return render(request, 'company_pages/company_register.html', {
+                'form': form,
+                'current_page': 'company_register',
+                'errors': form.errors
+            })
     else:
         form = CompanyRegistrationForm()
 
     return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
+
 
 @login_required
 def view_company_profile(request, user_id):
@@ -612,73 +620,47 @@ def update_application_status(request, application_id, status):
 
     return redirect('view_applicants', internship_id=application.internship.id)
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Application, Attendance
+def attendance(request, student_id):
+    student = get_object_or_404(stud_profile, id=student_id)
+    today = date.today()
+    start_date = today - timedelta(days=today.weekday())  # Start of the current week (Monday)
+    dates = [(start_date - timedelta(weeks=w)) for w in range(8)]  # Generate start dates of past 8 weeks
+    weeks = {w + 1: [(start_date - timedelta(weeks=w) + timedelta(d), None) for d in range(5)] for w in range(8)}
 
-@login_required
-def attendance(request, week):
-    company = request.user.company
-    # Fetch active applications and prefetch related students and attendance records
-    active_applications = Application.objects.filter(company=company, is_active=True).select_related('student', 'internship')
+    # Populate attendance data
+    for week, days in weeks.items():
+        for i, (day, _) in enumerate(days):
+            try:
+                attendance = Attendance.objects.get(student=student, date=day)
+                weeks[week][i] = (day, attendance.present)
+            except Attendance.DoesNotExist:
+                weeks[week][i] = (day, False)
 
-    # Extract students from active applications
-    students = [app.student for app in active_applications]
-    
-    # Fetch attendance records for all students and organize them by week, day, and student
-    attendance_data = {}
-    for student in students:
-        attendance_data[student.id] = {}
-        for week_num in range(1, 9):
-            for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']:
-                # Get the attendance record for the given student, week, and day
-                attendance = Attendance.objects.filter(
-                    student=student, week=week_num, day=day
-                ).first()
-                if attendance:
-                    attendance_data[student.id][(week_num, day)] = attendance.status
-                else:
-                    attendance_data[student.id][(week_num, day)] = None
+    if request.method == 'POST':
+        for week, days in weeks.items():
+            for day, _ in days:
+                date_str = day.strftime('%Y-%m-%d')
+                present = request.POST.get(date_str) == 'on'  # Checked means 'on'
+                attendance, created = Attendance.objects.get_or_create(student=student, date=day, defaults={'present': present})
+                if not created:
+                    attendance.present = present
+                    attendance.save()
+        messages.success(request, "Attendance marked successfully!")
+        return redirect('attendance', student_id=student.id)
 
-    # List of days
-    weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-    # Handle the POST request to save attendance
-    if request.method == "POST":
-        # Iterate through each student and save attendance for each weekday and week
-        for student in students:
-            for day in weekdays:
-                for week_num in range(1, 9):  # Weeks 1 to 8
-                    # Get the attendance status from the form (if any)
-                    status = request.POST.get(f"{student.id}_{day}_{week_num}")
-                    if status:
-                        # Update or create attendance record
-                        Attendance.objects.update_or_create(
-                            student=student,
-                            internship=active_applications.get(student=student).internship,
-                            week=week_num,
-                            day=day,
-                            defaults={"status": status},
-                        )
-        # Redirect to the attendance list page after processing
-        return redirect("attendance_list")
-
-    # Pass all necessary data to the template
-    return render(request, "company_pages/attendance.html", {
-        "students": students,
-        "week": week,
-        "weekdays": weekdays,
-        "weeks": range(1, 9),  # Weeks 1 to 8
-        "attendance_data": attendance_data,  # Pass the attendance data
-    })
-
+    context = {
+        'student': student,
+        'weeks': weeks,
+    }
+    return render(request, 'company_pages/attendance.html', context)
 
 
 def attendance_list(request):
     company = request.user.company  # Ensure logged-in user is a company
+    internships = Internship.objects.all
     active_applications = Application.objects.filter(company=company, is_active=True)
     students = [app.student for app in active_applications]
-    return render(request, "company_pages/attendance_list.html", {"students": students})
+    return render(request, "company_pages/attendance_list.html", {"students": students , "internships": internships})
 
 
 @login_required
@@ -1091,3 +1073,55 @@ def submit_evaluation_list(request):
         'students_with_internships': students_with_internships, 
     }
     return render(request, 'company_pages/submit_evaluation_list.html', context)
+
+
+
+@login_required
+def assign_supervisor_view(request):
+    if request.method == "POST":
+        section_batch = request.POST.get("section_batch")
+        supervisor_id = request.POST.get("supervisor_id")
+
+        if not section_batch or not supervisor_id:
+            messages.error(request, "Please select a valid section and supervisor.")
+            return redirect("assign_supervisor")
+
+        section, batch = section_batch.split("|")  # Extract section and batch from combined value
+
+        students = stud_profile.objects.filter(section=section, batch=batch)
+        supervisor = get_object_or_404(Supervisor, id=supervisor_id)
+
+        if not students.exists():
+            messages.error(request, "No students found in the selected section and batch.")
+            return redirect("assign_supervisor")
+
+        # Check if the section and batch already have an assigned supervisor
+        existing_assignment = SupervisorAssignment.objects.filter(student__section=section, student__batch=batch).first()
+
+        if existing_assignment:
+            # Update the supervisor for all students in the section and batch
+            SupervisorAssignment.objects.filter(student__section=section, student__batch=batch).update(supervisor=supervisor)
+            messages.success(request, f"Supervisor updated for section {section}, batch {batch}.")
+        else:
+            # Assign the supervisor if not already assigned
+            for student in students:
+                SupervisorAssignment.objects.create(student=student, supervisor=supervisor)
+            messages.success(request, f"Supervisor assigned successfully for section {section}, batch {batch}.")
+
+        return redirect("assign_supervisor")
+
+    # Get supervisors based on department
+    department_name = request.user.department_profile.department_name
+    supervisors = Supervisor.objects.filter(department__department_name=department_name)
+
+    # Fetch unique section-batch combinations that have registered students
+    section_batches = (
+        stud_profile.objects.values_list('section', 'batch')
+        .distinct()
+        .order_by('section', 'batch')
+    )
+
+    return render(request, 'department_pages/assign_supervisor.html', {
+        'supervisors': supervisors,
+        'section_batches': section_batches,
+    })

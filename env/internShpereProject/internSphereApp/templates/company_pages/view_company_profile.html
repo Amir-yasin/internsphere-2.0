@@ -1,34 +1,94 @@
 {% extends "main_pages/base.html" %}
 {% load static %}
 
-
 {% block nav_and_footer %}
-    
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Company Profile</title>
-    <link rel="stylesheet" href="{% static 'css/applications.css' %}"></head>
-<body>
-    <div class="heading">
-        <h1>Company Profile</h1>
+<style>
+    .btn-purple {
+        background-color: #c923a5;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        transition: all 0.3s ease-in-out;
+    }
 
-    </div>
-    <div class="applications-list">
-        <div class="application">
-    <p><strong>Company Name:</strong> {{ company.company_name }}</p>
-    <p><strong>Company Address:</strong> {{ company.company_address }}</p>
-    <p><strong>Company Phone:</strong> {{ company.company_phone }}</p>
-    <p><strong>Company Description:</strong> {{ company.company_description }}</p>
-    <p><strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}</p>
-    <a class="btn btn-purple" href="{% url 'company_dashboard' %}">Back to Dashboard</a> 
+    .btn-purple:hover {
+        background-color: purple;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 700px;
+    }
+
+    .profile-card h2 {
+        color: #c923a5;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-info {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .profile-info strong {
+        color: #c923a5;
+    }
+
+    .profile-icon {
+        font-size: 30px;
+        color: #c923a5;
+        margin-right: 10px;
+    }
+
+    .btn-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+</style>
+<div class="heading">
+    <h2>Company Profile</h2>
+
+</div>
+<div class="container my-5">
+    <div class="profile-card">
+        <div class="profile-info">
+            <p>
+                <span class="profile-icon"><i class="bi bi-building"></i></span>
+                <strong>Company Name:</strong> {{ company.company_name }}
+            </p>
+            <p>
+                <span class="profile-icon"><i class="bi bi-geo-alt"></i></span>
+                <strong>Company Address:</strong> {{ company.company_address }}
+            </p>
+            <p>
+                <span class="profile-icon"><i class="bi bi-telephone"></i></span>
+                <strong>Company Phone:</strong> {{ company.company_phone }}
+            </p>
+            <p>
+                <span class="profile-icon"><i class="bi bi-info-circle"></i></span>
+                <strong>Company Description:</strong> {{ company.company_description }}
+            </p>
+            <p>
+                <span class="profile-icon"><i class="bi bi-check-circle"></i></span>
+                <strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}
+            </p>
+        </div>
+        <div class="btn-container">
+            <a class="btn btn-purple" href="{% url 'company_dashboard' %}">Back to Dashboard</a>
+        </div>
     </div>
 </div>
-    {% comment %} <a href="{% url 'edit_company_profile' company.user.id %}">Edit Profile</a> <!-- If you want an edit link --> {% endcomment %}
-</body>
-</html>
-
 
 {% endblock nav_and_footer %}
-    

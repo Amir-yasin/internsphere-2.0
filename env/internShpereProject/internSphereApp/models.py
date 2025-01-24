@@ -239,17 +239,25 @@ class FinalReport(models.Model):
 
 
 # Attendance model
+# class Attendance(models.Model):
+#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="attendance_records")
+#     internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name="attendance_records")
+#     date = models.DateField()  # Specific date for attendance
+#     status = models.CharField(max_length=10, choices=[('Present', 'Present'), ('Absent', 'Absent')])
+
+#     def __str__(self):
+#         return f"{self.student.user.username} - {self.date} - {self.status}"
+
 class Attendance(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="attendance_records")
-    internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name="attendance_records")
-    week = models.PositiveIntegerField(max_length=10)  # Week number (1 to 8)
-    day = models.CharField(max_length=10, choices=[('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), 
-                                                   ('Thursday', 'Thursday'), ('Friday', 'Friday')])
-    status = models.CharField(max_length=10, choices=[('Present', 'Present'), ('Absent', 'Absent')])
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name='attendances')
+    date = models.DateField()
+    present = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('student', 'date')  # Prevent duplicate entries for the same student on the same date
 
     def __str__(self):
-        return f"{self.student.user.username} - Week {self.week} - {self.day} - {self.status}"
-
+        return f"{self.student.user.username} - {self.date} - {'Present' if self.present else 'Absent'}"
 
 # User = get_user_model()
 
@@ -293,4 +301,12 @@ class EvaluationAnswer(models.Model):
         return f"{self.question.text}: {self.answer}"
     
     
-    
+class SupervisorAssignment(models.Model):
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='supervisor_assignment')
+    supervisor = models.ForeignKey('Supervisor', on_delete=models.CASCADE, related_name='supervised_students')
+    assigned_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} assigned to {self.supervisor.supervisor_name}"
+
+ 

@@ -41,7 +41,7 @@ path('update_application_status/<int:application_id>/status/<str:status>/', view
 path('attendance_list/', views.attendance_list, name='attendance_list'), 
 path('accepted_interns', views.accepted_interns , name = 'accepted_interns'),
 # path('reports/<str:approver_type>/<int:report_id>/approve/', views.approve_report, name='approve_report'),
-path('attendance/<int:week>/', views.attendance, name='attendance'),
+path('attendance/<int:student_id>/', views.attendance, name='attendance'),
 
 
 
@@ -77,6 +77,7 @@ path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
 path('supervisor_dashboard', views.supervisor_dashboard , name = 'supervisor_dashboard'),
 
 path('department_dashboard', views.department_dashboard , name = 'department_dashboard'),
+path("assign_supervisor", views.assign_supervisor_view, name="assign_supervisor"),
 
 
 # path('attendance', views.attendance , name = 'attendance'),
@@ -100,3 +101,5 @@ path('view_evaluation/<int:evaluation_id>/', views.view_evaluation, name='view_e
 
     
 ]
+
+
