@@ -10,6 +10,34 @@
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
 </head>
+<style>
+    body{
+        background-color:white;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        text-align: center;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+    }
+
+    .card img {
+        max-width: 50%;
+        height: auto;
+        border-bottom: 1px solid #ddd;
+      }
+      
+      .card h3 {
+        margin: 15px 0;
+      }
+      
+      .card p {
+        color: #666;
+      }
+</style>
 <body>
     {% if messages %}
     <div id="message-container">
