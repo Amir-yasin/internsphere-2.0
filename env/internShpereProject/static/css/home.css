@@ -15,6 +15,10 @@ from {margin-left: 0%;}
 to {margin-left: 30%;}
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4 ;
+}
 
 @import url('https://fonts.googleapis.com/css2?family=poppins:wght@200;400;500;600;700&display=swap');
 

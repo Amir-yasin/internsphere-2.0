@@ -40,7 +40,11 @@
     </div>
 </div>
 {% endfor %}
-<button class="btn ms-5" type="submit">Submit</button>
+<div class="applications-list">
+    <a href="{% url 'student_dashboard' %}" class="btn btn-purple ">Back to Dashboard</a>
+    <button class="btn btn-purple " type="submit">Submit</button>
+</div>
+
     {% else %}
     <div class="applications-list">
         <div class="application">

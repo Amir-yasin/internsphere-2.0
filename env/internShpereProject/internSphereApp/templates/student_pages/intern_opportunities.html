@@ -14,9 +14,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>interns</title>
-   
+
 </head>
 
+<style>
+    .btn-purple{
+        background-color: purple;
+        color: white;
+      }
+      .btn-purple:hover{
+        background-color: #c923a5;
+        color: white;
+      }
+</style>
 <body>
     <h2 class="heading" >Internship Opportunities</h2>
     
@@ -29,7 +39,6 @@
 {% endif %}
     <section class="content-container">
         <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
-    </section >
   
      
 
@@ -45,7 +54,7 @@
                         <h6><strong>Requirements:</strong> {{ internship.requirement }}</h6> 
                         <h6><strong>Deadline:</strong> {{ internship.deadline }}</h6>
                     {% comment %} <input type="submit" class="btn1" value="Apply Now"> {% endcomment %}
-                     <a class="btn1" href="{% url 'apply_to_internship' internship.id %}">Apply Now</a>
+                     <a class="btn btn-purple" href="{% url 'apply_to_internship' internship.id %}">Apply Now</a>
                 </div>
             </div>
                     {% endfor %}
@@ -55,10 +64,12 @@
             <div class="opportunity">
             <p>No internships available for your department at the moment🤷.</p>
         </div>
+        
     </div>
         {% endif %}
-        <a href="{% url 'student_dashboard' %}" class="btn btn-purple mb-3">Back</a>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-purple ms-4 mb-3">Back to Dashboard</a>
 
+    </section >
 
        
   </body>

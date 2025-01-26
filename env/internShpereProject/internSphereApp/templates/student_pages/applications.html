@@ -39,6 +39,7 @@
                 </ul>
 
             {% endfor %}
+        
     {% else %}
     <ul class="application">
 
@@ -47,14 +48,10 @@
     </ul>
 
     {% endif %}
-        
+    <a href="{% url 'student_dashboard' %}" class="btn btn-purple ms-1 mb-1">Back to Dashboard</a>
 
-        {% comment %} <div class="application">
-            <h2>Marketing Intern</h2>
-            <p>Company: Marketing Solutions</p>
-            <p>Status: Approved</p>
-            <button class="btn">View Application</button>
-        </div> {% endcomment %}
+
+        
     </div>
 </body>
 </html>
