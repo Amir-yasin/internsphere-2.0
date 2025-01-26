@@ -1,6 +1,3 @@
-
-
-
 {% extends "main_pages/base.html" %}
 {% load static %}
 
@@ -8,70 +5,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/company_dashboard.css' %}"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/company_dashboard.css' %}">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: purple; /* Updated purple color */
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .section-title {
+            color: #c923a5;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .btn-purple {
+            background-color: #c923a5;
+            color: #fff;
+        }
+        .btn-purple:hover {
+            background-color: #c923a9;
+        }
+    </style>
 </head>
 <body>
-  {% if messages %}
-  <div id="message-container">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-  <div class="heading">
-    <h1>Company Dashboard</h1>
-  </div>
-  <header>
-    <h1>Welcome, {{ user.username }}</h1>
-    <p class="text-center">You are logged in as a {{ user.user_type }}</p>
-  </header>
-
-  <div class="dashboard">
-    <div class="dashboard-item">
-      <h2>My Profile</h2>
-      <p>View your Company's profile.</p>
-      <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn1">View Profile</a>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+<div class="heading">
+  <h1>Welcome, {{ user.username }}</h1>
+</div>
+    <div>
+        <p class="text-center">You are logged in as a {{ user.user_type }}</p>
     </div>
 
-    <div class="dashboard-item">
-      <h2>Posted Internships</h2>
-      <p>Post Your Internships</p>
-      <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
-    </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/myProfile.png' %}" alt="My Profile">
+                    <div class="card-body">
+                        <h5 class="card-title">My Profile</h5>
+                        <p class="card-text">View and edit your company profile details.</p>
+                        <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn btn-purple">My Profile</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/postInternship.png' %}" alt="Post Internship">
+                    <div class="card-body">
+                        <h5 class="card-title">Post Internship</h5>
+                        <p class="card-text">Create and publish new internship opportunities.</p>
+                        <a href="{% url 'post_internship' %}" class="btn btn-purple">Post Internship</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/ViewApplicant.png' %}" alt="View Applicants">
+                    <div class="card-body">
+                        <h5 class="card-title">View Applicants</h5>
+                        <p class="card-text">View, accept, or reject student applications.</p>
+                        <a href="{% url 'view_applicants_list' %}" class="btn btn-purple">View Applicants</a>
+                    </div>
+                </div>
+            </div>
 
-    <div class="dashboard-item">
-      <h2>Applicants</h2>
-      <p>View Internship Applicants</p>
-      <a href="{% url 'view_applicants_list' %}" class="btn1">View Applicants</a>
-    </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/ApproveReport.png' %}" alt="Approve Reports">
+                    <div class="card-body">
+                        <h5 class="card-title">Approve Reports</h5>
+                        <p class="card-text">Review and approve submitted internship reports.</p>
+                        <a href="{% url 'review_biweekly_reports' %}" class="btn btn-purple">Approve Reports</a>
+                    </div>
+                </div>
+            </div>
 
-    <div class="dashboard-item">
-      <h2>Review Reports</h2>
-      <p>Review and Approve Reports</p>
-      <a href="{% url 'review_biweekly_reports' %}" class="btn1">View Reports</a>
-    </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/Attendance.png' %}" alt="Attendance">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage Attendance</h5>
+                        <p class="card-text">Record and manage student attendance efficiently.</p>
+                        <a href="{% url 'attendance_list' %}" class="btn btn-purple">Manage Attendance</a>
+                    </div>
+                </div>
+            </div>
 
-    <div class="dashboard-item">
-        <h2>Manage Interns</h2>
-        <p>Mark Attendance for Internships</p>
-        <a href="{% url 'attendance_list' %}" class="btn1">Mark Attendance</a> 
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/Evaluationn.png' %}" alt="Evaluate Students">
+                    <div class="card-body">
+                        <h5 class="card-title">Evaluate Students</h5>
+                        <p class="card-text">Evaluate student performance and provide feedback.</p>
+                        <a href="{% url 'submit_evaluation_list' %}" class="btn btn-purple">Evaluate Students</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-     
-    <div class="dashboard-item">
-      <h2>Submit Evaluations</h2>
-      <p>Evaluate Interns</p>
-      <a href="{% url 'submit_evaluation_list' %}" class="btn1">Submit Evaluations</a>
-    </div>
-  </div>
 </body>
 </html>
 {% endblock nav_and_footer %}
-
-
-{% comment %} {% endblock nav_and_footer %} {% endcomment %}

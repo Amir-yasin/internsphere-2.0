@@ -279,11 +279,11 @@ background-color: #ffffff;
 }
 
 .btn-purple{
-  background-color: #c923a5;
+  background-color: purple;
   color: white;
 }
 .btn-purple:hover{
-  background-color: purple;
+  background-color: #c923a5;
   color: white;
 }
 

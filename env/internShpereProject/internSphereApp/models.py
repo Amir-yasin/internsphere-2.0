@@ -238,15 +238,6 @@ class FinalReport(models.Model):
         return f"Final Report by {self.student.user.username}"
 
 
-# Attendance model
-# class Attendance(models.Model):
-#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="attendance_records")
-#     internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name="attendance_records")
-#     date = models.DateField()  # Specific date for attendance
-#     status = models.CharField(max_length=10, choices=[('Present', 'Present'), ('Absent', 'Absent')])
-
-#     def __str__(self):
-#         return f"{self.student.user.username} - {self.date} - {self.status}"
 
 class Attendance(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name='attendances')

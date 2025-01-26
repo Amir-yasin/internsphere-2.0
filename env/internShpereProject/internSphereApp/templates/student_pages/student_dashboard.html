@@ -2,14 +2,13 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
-
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
 </head>
 <body>
     {% if messages %}
@@ -20,68 +19,89 @@
             </div>
         {% endfor %}
     </div>
-{% endif %}
-    <div class="heading">
-        <h1>Student Dashboard</h1>
-    </div>
-    <header>
-        <h1>Welcome, {{ user.first_name }}</h1>
-        <p>You are logged in as a {{ user.user_type }}</p>
-    </header>
+    {% endif %}
     
-    
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h2>Internship Opportunities</h2>
-            <p>Explore internships available for you.</p>
-            <a href="{% url 'intern_opportunities' %}" class="btn">View Opportunities</a>
-        </div>
+        <section class="heading">
+            <h1 class="section-title">Welcome, {{ user.first_name|capfirst }}</h1>
+            <p class="lead">Empowering students to track and manage their internships with ease.</p>
 
-        <div class="dashboard-item">
-            <h2>My Applications</h2>
-            <p>Track your internship applications.</p>
-            <a href="{% url 'applications' %}" class="btn">View Applications</a>
-            <a href="{% url 'select_active_company' %}" class="btn">Select a Company</a>
+        </section>
+        <div class="container">
 
-        </div>
-        
-
-        <div class="dashboard-item">
-            <h2>Profile</h2>
-            <p>Update your personal and academic profile.</p>
-            <a href="{% url 'student_profile' %}" class="btn">Edit Profile</a>
-            <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn">View Profile</a>
-
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Submit Your Reports</h2>
-            <p>Keep your internship progress up to date.</p>
-            <a href="{% url 'bi_weekly_report' %}" class="btn">Bi-weekly Report</a>
-            <a href="{% url 'final_report' %}" class="btn">Final Report</a>
-
-        </div>
+            {% comment %} <section class="py-5 text-center bg-light">
+            </section> {% endcomment %}
+        <section id="features" class="py-5">
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/profile.svg' %}" alt="Profile" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Profile</h5>
+                            <p class="card-text">Edit and View your Profile</p>
+                            <a href="{% url 'student_profile' %}" class="btn btn-purple">Edit</a>
+                            <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn btn-purple">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/opportunties.svg' %}" alt="View Placement Details" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Internship Opportunities</h5>
+                            <p class="card-text">Explore internships available for you.</p>
+                            <a href="{% url 'intern_opportunities' %}" class="btn btn-purple">View Opportunities</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/bi-weeklyreport.svg' %}" alt="Generate Reports" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Bi-Weekly Report</h5>
+                            <p class="card-text">Submit your Bi-weekly report.</p>
+                            <a href="{% url 'bi_weekly_report' %}" class="btn btn-purple">Submit Bi-weekly Reports</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/finallbi.svg' %}" alt="View Attendance Records" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Final Report</h5>
+                            <p class="card-text">Submit your final report.</p>
+                            <a href="{% url 'final_report' %}" class="btn btn-purple">Submit Final Report</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/select.svg' %}" alt="Send Confirmation Letters" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Select Active Company</h5>
+                            <p class="card-text">Select a company to intern with.</p>
+                            <a href="{% url 'select_active_company' %}" class="btn btn-purple">View Active Companies</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/track.svg' %}" alt="Send Student Reports" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Track Applications</h5>
+                            <p class="card-text">Track pending and approved applications.</p>
+                            <a href="{% url 'applications' %}" class="btn btn-purple">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <br>
-    <br>
-    <br>
 
-
-
-    <script>
-        // Automatically hide the message after 5 seconds (5000 milliseconds)
-        setTimeout(function() {
-            const messageContainer = document.getElementById('message-container');
-            if (messageContainer) {
-                messageContainer.style.display = 'none';
-            }
-        }, 5000);  // 5000 milliseconds = 5 seconds
-    </script>
-
+    <script src="{% static 'js/FooterHeader.js' %}"></script>
 </body>
-</html>
-
-
-
-{% endblock nav_and_footer %}
-    
+{% endblock %}
