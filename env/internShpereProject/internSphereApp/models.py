@@ -51,6 +51,17 @@ class stud_profile(models.Model):
     linkedin_profile = models.URLField(blank=True, null=True)
     list_of_students = models.FileField(upload_to='list_of_students/', blank=True, null=True)
 
+
+    def get_active_company(self):
+        try:
+            active_application = self.applications.filter(is_active=True).first()
+            if active_application:
+                return active_application.company
+            return None  # Return None if no active company is found
+        except Application.DoesNotExist:
+            return None
+
+
     def __str__(self):
         return self.user.username
 
@@ -258,11 +269,11 @@ class Evaluation(models.Model):
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
     ]
-    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='evaluations')
-    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='evaluations')
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='company_evaluations')
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='company_evaluations')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_evaluations')
     submitted_at = models.DateTimeField(default=now)
-    total_score = models.IntegerField(default=0)
+    total_score = models.FloatField(default=0)  # Changed to FloatField for precision
     internship_office_approval_status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default='Pending'
     )
@@ -274,6 +285,18 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation for {self.student.user.get_full_name()} by {self.company.company_name}"
+
+    def calculate_total_score(self):
+        total_raw_score = sum(answer.answer for answer in self.answers.all())
+        num_questions = 23  # Fixed number of questions
+
+        if num_questions > 0:  # Avoid division by zero
+            calculated_score = (total_raw_score / num_questions) * 10
+        else:
+            calculated_score = 0
+
+        self.total_score = round(calculated_score, 2)  # Round for clarity
+        self.save()
 
 
 class EvaluationQuestion(models.Model):
@@ -290,6 +313,10 @@ class EvaluationAnswer(models.Model):
 
     def __str__(self):
         return f"{self.question.text}: {self.answer}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.evaluation.calculate_total_score()
     
     
 class SupervisorAssignment(models.Model):
@@ -300,4 +327,59 @@ class SupervisorAssignment(models.Model):
     def __str__(self):
         return f"{self.student.user.username} assigned to {self.supervisor.supervisor_name}"
 
- 
+# class SupervisorEvaluation(models.Model):
+#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="evaluations")
+#     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, related_name="evaluations")
+
+#     bi_weekly_report_score = models.IntegerField(default=0)
+#     final_report_score = models.IntegerField(default=0)
+#     presentation_score = models.IntegerField(default=0)
+#     total_score = models.IntegerField(default=0, editable=False)  # Auto-calculated
+
+#     def save(self, *args, **kwargs):
+#         # Fetch the student's company evaluation score
+#         company_evaluation = Evaluation.objects.filter(student=self.student).first()
+#         company_score = company_evaluation.total_score if company_evaluation else 0
+
+#         # **Reset total_score before calculating new values**
+#         self.total_score = 0  # Ensures no accumulation of old values
+
+#         # Recalculate the total score properly
+#         self.total_score = (
+#             self.bi_weekly_report_score +
+#             self.final_report_score +
+#             self.presentation_score +
+#             company_score
+#         )
+
+#         super().save(*args, **kwargs)
+
+#     def __str__(self):
+#         return f"Evaluation for {self.student.user.username} by {self.supervisor.supervisor_name}"
+
+class SupervisorEvaluation(models.Model):
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="evaluations")
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, related_name="evaluations")
+
+    bi_weekly_report_score = models.IntegerField(default=0)
+    final_report_score = models.IntegerField(default=0)
+    presentation_score = models.IntegerField(default=0)
+    total_score = models.IntegerField(default=0, editable=False)  # Auto-calculated
+
+    def save(self, *args, **kwargs):
+        # Ensure we fetch the latest company evaluation score
+        company_evaluation = Evaluation.objects.filter(student=self.student).order_by('-submitted_at').first()
+        company_score = company_evaluation.total_score if company_evaluation else 0
+
+        # Reset total_score before calculating new values
+        self.total_score = (
+            self.bi_weekly_report_score +
+            self.final_report_score +
+            self.presentation_score +
+            company_score
+        )
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Evaluation for {self.student.user.username} by {self.supervisor.supervisor_name}"

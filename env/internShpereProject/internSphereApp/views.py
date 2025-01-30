@@ -289,7 +289,7 @@ def final_report(request):
 
         # Check for the active company
         active_application = Application.objects.filter(student=student_profile, is_active=True).first()
-
+        # print(active_application)
         if not active_application:
             messages.error(request, 'You have not selected a company to work with. Please select one.')
             return redirect('select_active_company')  
@@ -536,7 +536,7 @@ def view_company_profile(request, user_id):
 def company_dashboard(request):
     # Ensure the user is a company
     if not hasattr(request.user, 'company'):
-        return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
+        return render(request, 'home')
     company = request.user.company  # Assuming the user is linked to a company model
     interns = Internship.objects.filter(company=company)
     internships = company.internships.all()
@@ -1028,22 +1028,7 @@ def supervisor_dashboard(request):
         'attendance_records': attendance_records,
     })
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
     
 @login_required
 def view_applicants_list(request):
@@ -1124,4 +1109,79 @@ def assign_supervisor_view(request):
     return render(request, 'department_pages/assign_supervisor.html', {
         'supervisors': supervisors,
         'section_batches': section_batches,
+    })
+
+
+
+
+
+from django.db.models import Subquery, OuterRef, Value, IntegerField
+
+@login_required
+def evaluation_view(request):
+    supervisor = get_object_or_404(Supervisor, user=request.user)
+
+    # Get all students assigned to this supervisor
+    assigned_students = stud_profile.objects.filter(
+        supervisor_assignment__supervisor=supervisor
+    )
+
+    if request.method == "POST":
+        student_id = request.POST.get("student_id")
+        student = get_object_or_404(stud_profile, id=student_id)
+
+        bi_weekly_score = request.POST.get(f"bi_weekly_report_score_{student.id}")
+        final_report_score = request.POST.get(f"final_report_score_{student.id}")
+        presentation_score = request.POST.get(f"presentation_score_{student.id}")
+
+        if bi_weekly_score and final_report_score and presentation_score:
+            try:
+                bi_weekly_score = int(bi_weekly_score)
+                final_report_score = int(final_report_score)
+                presentation_score = int(presentation_score)
+
+                if 0 <= bi_weekly_score <= 100 and 0 <= final_report_score <= 100 and 0 <= presentation_score <= 100:
+                    evaluation, created = SupervisorEvaluation.objects.get_or_create(
+                        student=student,
+                        supervisor=supervisor
+                    )
+
+                    # Fetch the latest company evaluation manually
+                    latest_company_evaluation = (
+                        Evaluation.objects.filter(student=student)
+                        .order_by('-submitted_at')
+                        .first()
+                    )
+
+                    company_score = latest_company_evaluation.total_score if latest_company_evaluation else 0
+
+                    evaluation.bi_weekly_report_score = bi_weekly_score
+                    evaluation.final_report_score = final_report_score
+                    evaluation.presentation_score = presentation_score
+
+                    evaluation.total_score = (
+                        bi_weekly_score + final_report_score + presentation_score + company_score
+                    )
+
+                    evaluation.save()
+
+            except ValueError:
+                print(f"Invalid score values for student {student.id}")
+
+        return redirect('evaluation_view')
+
+    # Fetch company evaluation scores manually for template rendering
+    student_evaluations = {
+        student.id: (
+            Evaluation.objects.filter(student=student)
+            .order_by('-submitted_at')
+            .values('total_score')
+            .first() or {'total_score': 0}
+        )['total_score']
+        for student in assigned_students
+    }
+
+    return render(request, "supervisor_pages/evaluation_page.html", {
+        "students": assigned_students,
+        "student_evaluations": student_evaluations,  # Pass evaluations to the template
     })

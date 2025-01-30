@@ -5,76 +5,116 @@
     
 
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-    <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+    <title>Department Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+   
+    <!-- Custom CSS -->
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" href="css/home.css">
+    <style>
+        body {
+            background-color:white;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .section-title {
+            color: #6a1b9a;
+            font-weight: bold;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+        .btn-purple {
+            background-color: purple;
+            color: #fff;
+        }
+        .btn-purple:hover {
+            background-color: magenta;
+        }
+        .smooth-animation {
+            transition: all 0.3s ease-in-out;
+        }
+        .feature-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
+   
+    <!-- main Section -->
+    <section class="py-2 text-center bg-light">
+        <div class="container">
+            <h1 class="section-title">Welcome to the Department Portal</h1>
+            <p class="lead">Efficiently manage and oversee student internships and reports.</p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-2">
+        <div class="container">
+            <h2 class="section-title text-center">Features</h2>
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 smooth-animation">
+                        <img src="img/man-looking-report.jpeg" alt="View Student Reports" class="feature-image">
+
+                        <div class="card-body">
+                            <h5 class="card-title">View and send Student Reports</h5>
+                            <p class="card-text">View students's internship reports and send to their respective supervisor.</p>
+                            <a href="{% url 'review_biweekly_reports' %}">
+                                <button class="btn btn-purple">View Reports</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 smooth-animation">
+                        <img src="images/assign-supervisors.jpg" alt="Assign Supervisors" class="feature-image">
+                        <div class="card-body">
+                            <h5 class="card-title">Assign Advisors</h5>
+                            <p class="card-text">Easily assign supervisors to student interns.</p>
+                            <a href="{% url 'assign_supervisor' %}">
+                                <button class="btn btn-purple">Assign Supervisors</button>
+                            </a>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 smooth-animation">
+                        <img src="images/send-reports-supervisors.jpg" alt="Send Reports to Supervisors" class="feature-image">
+                        <div class="card-body">
+                            <h5 class="card-title">View Evaluation</h5>
+                            <p class="card-text">view and send Evauation to supervisors directly.</p>
+                            <a href="{% url 'evaluation_list' %}">
+                                <button class="btn btn-purple">View Evaluation</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </div>
-{% endif %}
-    <div class="heading">
-        <h1>Department Dashboard</h1>
-    </div>
-    <header>
-        <h1>Welcome, {{ user.username }}</h1>
-        <p>You are logged in as a {{ user.user_type }}</p>
-    </header>
-    
-    
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h2>Assign Supervisor</h2>
-            <p>View and assign supervisors to students.</p>
-            <a href="{% url 'assign_supervisor' %}" class="btn">Assign supervisors</a>
         </div>
-
-        <div class="dashboard-item">
-            <h2>Bi-Weekly Reports</h2>
-            <p>Access and review bi-weekly reports submitted by students.</p>
-            <a href="{% url 'review_biweekly_reports' %}" class="btn">Review report</a>
-            {% comment %} <a href="{% url 'report_list' %}" class="btn">View report</a> {% endcomment %}
-
-        </div>
-        
-
-
-        <div class="dashboard-item">
-            <h2>View Evaluations</h2>
-            <a href="{% url 'evaluation_list' %}" class="btn" style="background: purple; color: white">Evaluation List</a>
-        </div>
-        {% comment %} <div class="dashboard-item">
-            <h2>Review Final Reports</h2>
-            <p>Monitor and access student Final Reports</p>
-            <a href="{% url 'review_final_reports' %}" class="btn">Review Final Reports</a>
-        </div> {% endcomment %}
-    </div>
-    <br>
-    <br>
-    <br>
-
-
-
-    <script>
-        // Automatically hide the message after 5 seconds (5000 milliseconds)
-        setTimeout(function() {
-            const messageContainer = document.getElementById('message-container');
-            if (messageContainer) {
-                messageContainer.style.display = 'none';
-            }
-        }, 5000);  // 5000 milliseconds = 5 seconds
-    </script>
-
+    </section>
+   
+    <!-- script JS -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 
 
 

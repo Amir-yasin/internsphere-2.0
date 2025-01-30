@@ -56,6 +56,13 @@
                 {% if student_profile.linkedin_profile %}
                 <tr><th>LinkedIn:</th><td><a href="{{ student_profile.linkedin_profile }}" target="_blank">{{ student_profile.linkedin_profile }}</a></td></tr>
                 {% endif %}
+
+                {% if student.get_active_company %}
+                <tr><th>{{ student.get_active_company.company_name|capfirst }}</td></tr>
+                {% else %}
+                <tr><th>Not Selected Yet</td></tr>
+                {% endif %}</td>
+
                 <tr><th>Profile Completed:</th><td>{{ student_profile.profile_completed }}</td></tr>
               </tbody>
             </table>

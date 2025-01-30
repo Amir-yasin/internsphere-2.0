@@ -1,0 +1,130 @@
+{% extends 'main_pages/base.html' %}
+{% load custom_filters %}
+
+{% block nav_and_footer %}
+<div class="heading">
+  <h2 class="fw-bold">Supervisor Evaluation</h2>
+</div>
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <p class="text-muted">Evaluate students based on their reports and presentations.</p>
+    </div>
+
+    <div class="card shadow-lg p-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-purple">
+                        <tr class="text-center">
+                            <th>Student</th>
+                            <th>Bi-Weekly Report(20%)</th>
+                            <th>Final Report(15%)</th>
+                            <th>Presentation(15%)</th>
+                            <th>Company Score(50%)</th>
+                            <th>Total Score(100%)</th>
+                            <th>Submit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            {% with evaluation=student.evaluations.first %}
+                            {% with company_evaluation=student.companyevaluation_set.first %}
+                            <tr class="text-center">
+                                <td class="fw-semibold">{{ student.user.username }}</td>
+                                <td>
+                                    <input type="number" class="form-control text-center score-input"
+                                           name="bi_weekly_report_score_{{ student.id }}"
+                                           value="{{ evaluation.bi_weekly_report_score|default:0 }}"
+                                           min="0" max="100">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control text-center score-input"
+                                           name="final_report_score_{{ student.id }}"
+                                           value="{{ evaluation.final_report_score|default:0 }}"
+                                           min="0" max="100">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control text-center score-input"
+                                           name="presentation_score_{{ student.id }}"
+                                           value="{{ evaluation.presentation_score|default:0 }}"
+                                           min="0" max="100">
+                                </td>
+                                <td>
+                                  <span class="fw-bold text-success" id="company_score_{{ student.id }}">
+                                      {{ student_evaluations|get_item:student.id|default:0 }}
+                                  </span>
+                              </td>
+                              
+                              
+                                <td>
+                                    <span class="fw-bold text-danger" id="total_score_{{ student.id }}">
+                                        {{ evaluation.total_score|default:0 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm fw-bold"
+                                            name="student_id" value="{{ student.id }}">
+                                        Save
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .score-input {
+        max-width: 80px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    thead{
+        background-color:purple;
+    }
+    .btn-outline-primary {
+        border-radius: 8px;
+        transition: 0.3s;
+        border: purple solid;
+        color: purple;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: purple;
+        color: white;
+        border: purple solid;
+
+    }
+
+    .card {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .fw-semibold {
+        font-weight: 600;
+    }
+</style>
+
+<script>
+document.querySelectorAll('.score-input').forEach(input => {
+    input.addEventListener('input', function () {
+        const row = this.closest('tr');
+        const biWeeklyScore = parseInt(row.querySelector('[name^="bi_weekly_report_score_"]').value) || 0;
+        const finalScore = parseInt(row.querySelector('[name^="final_report_score_"]').value) || 0;
+        const presentationScore = parseInt(row.querySelector('[name^="presentation_score_"]').value) || 0;
+        const companyScore = parseInt(row.querySelector('[id^="company_score_"]').textContent) || 0;
+
+        row.querySelector('[id^="total_score_"]').textContent = biWeeklyScore + finalScore + presentationScore + companyScore;
+    });
+});
+</script>
+{% endblock nav_and_footer %}

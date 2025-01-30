@@ -75,6 +75,9 @@ path('icu_dashboard', views.icu_dashboard , name = 'icu_dashboard'),
 
 
 path('supervisor_dashboard', views.supervisor_dashboard , name = 'supervisor_dashboard'),
+path("evaluation_view/", views.evaluation_view, name="evaluation_view"),
+
+
 
 path('department_dashboard', views.department_dashboard , name = 'department_dashboard'),
 path("assign_supervisor", views.assign_supervisor_view, name="assign_supervisor"),

@@ -264,7 +264,16 @@ class EvaluationForm(forms.Form):
                 ),
             )
             
-# class AttendanceForm(forms.ModelForm):
-#     class Meta:
-#         model = Attendance
-#         fields = ['student', 'internship', 'date', 'status']
+
+
+class StudentEvaluationForm(forms.ModelForm):
+    class Meta:
+        model = SupervisorEvaluation
+        fields = ['bi_weekly_report_score', 'final_report_score', 'presentation_score']
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in ['bi_weekly_report_score', 'final_report_score', 'presentation_score']:
+            if cleaned_data[field] < 0 or cleaned_data[field] > 100:
+                self.add_error(field, "Marks should be between 0 and 100")
+        return cleaned_data

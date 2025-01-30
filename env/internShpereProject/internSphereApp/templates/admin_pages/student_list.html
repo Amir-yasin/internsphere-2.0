@@ -10,6 +10,19 @@
 <head>
     <title>Student List</title>
 </head>
+<style>
+    body{
+        background-color:white;
+    }
+    .btn-purple {
+        background-color: purple;
+        color: #fff;
+    }
+    .btn-purple:hover {
+        background-color: #c923a9;
+    }
+</style>
+
 <body>
     {% if messages %}
     <ul class="text-Success">
@@ -23,7 +36,14 @@
     <h1>Student List</h1>
 
 </div>
-<a href="admin_dashboard" class="btn mb-3">Back to dashboard</a>
+
+{% if user.user_type == 'Admin' or user.is_superuser %}
+<a href="admin_dashboard" class="btn btn-purple mb-3">Back to dashboard</a>
+{% elif user.user_type == 'InternshipCareerOffice' %}
+<a href="icu_dashboard" class="btn btn-purple mb-3">Back to dashboard</a>
+
+{% endif %}
+    
 
 <table class="table table-striped">
         <tr>
@@ -33,6 +53,7 @@
             <th>Batch</th>
             <th>Section</th>
             <th>Profile Completed</th>
+            <th>Active Company</th>
             <th>Password</th>
             <th>Actions</th>
         </tr>
@@ -44,6 +65,11 @@
             <td>{{ student.batch }}</td>
             <td>{{ student.section }}</td>
             <td>{{ student.profile_completed }}</td>
+            <td>{% if student.get_active_company %}
+                <p>{{ student.get_active_company.company_name|capfirst }}</p>
+            {% else %}
+                <p>Not Selected Yet</p>
+            {% endif %}</td>
             <td>{{ student.temporary_password }}</td>
 
             <td>
