@@ -253,6 +253,7 @@ class EvaluationForm(forms.Form):
             self.fields[f'question_{question.id}'] = forms.ChoiceField(
                 label=question.text,
                 choices=[
+                    ('N/A', 'N/A'),  # New Option to exclude question
                     (1, '1'),
                     (2, '2'),
                     (3, '3'),

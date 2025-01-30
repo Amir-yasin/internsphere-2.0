@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import date, timedelta
+from django.db import transaction
+from django.db.models import Subquery, OuterRef, Value, IntegerField
 
 
 
@@ -465,28 +467,6 @@ def intern_opportunities(request):
     except stud_profile.DoesNotExist:
         return redirect('student_profile')
 
-# # views.py
-# import json
-# from django.http import JsonResponse
-# from .models import Internship
-
-# def internships_by_department(request):
-#     # Assume student's department is passed as a query parameter
-#     department = request.GET.get('department', None)
-#     if department:
-#         internships = Internship.objects.filter(sector=department)
-#         internships_data = [
-#             {
-#                 'title': internship.title,
-#                 'description': internship.description,
-#                 'location': internship.location,
-#                 'start_date': internship.start_date,
-#                 'end_date': internship.end_date,
-#             }
-#             for internship in internships
-#         ]
-#         return JsonResponse({'internships': internships_data})
-#     return JsonResponse({'error': 'Department not specified'}, status=400)
 
 
 
@@ -669,58 +649,65 @@ def accepted_interns(request):
 
 @login_required
 def submit_evaluation(request, student_id, internship_id):
-    # Check if the logged-in user is a company user
-    try:
-        company = request.user.company
-    except AttributeError:
-        messages.error(request, "You do not have permission to evaluate.")
-        return redirect('dashboard')
-
-    # Fetch student and internship objects
     student = get_object_or_404(stud_profile, id=student_id)
     internship = get_object_or_404(Internship, id=internship_id)
+    company = request.user.company  # Assuming logged-in user is a company
 
-    # Check if an evaluation already exists for this student and company
+    # Check if an evaluation already exists
     if Evaluation.objects.filter(student=student, company=company, internship=internship).exists():
         messages.error(request, "You have already submitted an evaluation for this student.")
         return redirect('evaluation_list')
 
-    # Handle form submission
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EvaluationForm(request.POST)
         if form.is_valid():
-            # Create evaluation object
-            evaluation = Evaluation.objects.create(
-                student=student,
-                company=company,
-                internship=internship,
-                internship_office_approval_status='Pending',  # Directly passes to the Internship Office
-                total_score=0
-            )
-            total_score = 0
+            total_raw_score = 0
+            answered_questions = 0  # Track only answered questions (1-5)
 
-            # Save answers and calculate total score
-            for question, answer in form.cleaned_data.items():
-                question_obj = EvaluationQuestion.objects.get(id=question.split("_")[1])  # Extract question ID
-                EvaluationAnswer.objects.create(
-                    evaluation=evaluation,
-                    question=question_obj,
-                    answer=int(answer)
+            with transaction.atomic():  # Ensure atomic save
+                evaluation = Evaluation.objects.create(
+                    student=student,
+                    internship=internship,
+                    company=company,
+                    total_score=0  # Temporary value, will update after calculation
                 )
-                total_score += int(answer)
 
-            # Update evaluation with total score
-            evaluation.total_score = total_score
-            evaluation.save()
+                for question in EvaluationQuestion.objects.all():
+                    field_name = f'question_{question.id}'
+                    answer_value = form.cleaned_data.get(field_name)
 
-            messages.success(request, "Evaluation submitted successfully and passed to the Internship Office.")
-            return redirect('evaluation_list')
-        else:
-            messages.error(request, "There was an error with your submission. Please try again.")
+                    if answer_value != 'N/A':  # Exclude N/A responses
+                        answered_questions += 1
+                        total_raw_score += int(answer_value)
+
+                        # Save individual answers
+                        EvaluationAnswer.objects.create(
+                            evaluation=evaluation,
+                            question=question,
+                            answer=int(answer_value)
+                        )
+
+                # Adjust calculation based on answered questions
+                if answered_questions > 0:
+                    evaluation.total_score = round((total_raw_score / answered_questions) * 10, 2)
+                else:
+                    evaluation.total_score = 0  # No valid answers, total score remains 0
+
+                evaluation.save()
+
+            messages.success(request, "Evaluation submitted successfully.")
+            return redirect('evaluation_list')  # Redirect after submission
+
     else:
         form = EvaluationForm()
 
-    return render(request, 'company_pages/submit_evaluation.html', {'form': form})
+    return render(request, 'company_pages/submit_evaluation.html', {
+        'form': form,
+        'student': student,
+        'internship': internship,
+    })
+
+
 
 
 @login_required
@@ -1061,6 +1048,10 @@ def submit_evaluation_list(request):
 
 
 
+
+
+
+
 @login_required
 def assign_supervisor_view(request):
     if request.method == "POST":
@@ -1115,7 +1106,6 @@ def assign_supervisor_view(request):
 
 
 
-from django.db.models import Subquery, OuterRef, Value, IntegerField
 
 @login_required
 def evaluation_view(request):

@@ -2,15 +2,43 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
-
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>Supervisor Dashboard</title>
     <link rel="stylesheet" href="{% static 'CSS/student_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
 </head>
+
+<style>
+    body {
+        background-color: white;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        text-align: center;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+    }
+    .card img {
+        display: block;      /* Make the image block-level */
+        margin: 0 auto;      /* Center the image horizontally */
+        max-width: 50%;
+        height: auto;
+        border-bottom: 1px solid #ddd;
+    }
+    .card h3 {
+        margin: 15px 0;
+    }
+    .card p {
+        color: #666;
+    }
+</style>
+
 <body>
     {% if messages %}
     <div id="message-container">
@@ -20,72 +48,52 @@
             </div>
         {% endfor %}
     </div>
-{% endif %}
-    <div class="heading">
-        <h1>Supervisor Dashboard</h1>
+    {% endif %}
+
+    <section class="heading">
+        <h1 class="section-title">Welcome, Supervisor {{ request.user.get_full_name }}</h1>
+        <p class="lead">Empowering supervisors to manage evaluations and reports efficiently.</p>
+    </section>
+
+    <div class="container">
+        <section id="features" class="py-5">
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/approve.svg' %}" alt="Evaluate Students" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Evaluate Students</h5>
+                            <p class="card-text">Assess and grade student performance.</p>
+                            <a href="{% url 'evaluation_view' %}" class="btn btn-purple">Give Evaluations</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/bi-weeklyreport.svg' %}" alt="Review Bi-Weekly Reports" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">Review Bi-Weekly Reports</h5>
+                            <p class="card-text">Check students' progress reports.</p>
+                            <a href="{% url 'review_biweekly_reports' %}" class="btn btn-purple">Review Reports</a>
+                        </div>
+                    </div>
+                </div>
+
+                {% comment %} <div class="col-md-6 mb-4">
+                    <div class="card p-3">
+                        <img src="{% static 'img/evaluation_list.svg' %}" alt="View Evaluations" class="feature-image" width="300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">View Evaluations</h5>
+                            <p class="card-text">Check evaluations submitted by companies.</p>
+                            <a href="{% url 'evaluation_list' %}" class="btn btn-purple">Evaluation List</a>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+        </section>
     </div>
-    <header>
-        <h1>Welcome, {{ user.username }}</h1>
-        <p>You are logged in as a {{ user.user_type }}</p>
-    </header>
-    
-    
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h2>Evaluate Students</h2>
-            <p>View and Evaluate students.</p>
-            <a href="{% url 'evaluation_view'  %}" class="btn">Give Evaluations</a>
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Bi-Weekly Reports</h2>
-            <p>Access and review bi-weekly reports submitted by students.</p>
-            <a href="{% url 'review_biweekly_reports' %}" class="btn">Review report</a>
-            {% comment %} <a href="{% url 'report_list' %}" class="btn">View report</a> {% endcomment %}
-
-        </div>
-        
-
-        {% comment %} <div class="dashboard-item">
-            <h2>Evaluation</h2>
-            <p>Review evaluations provided by companies for students.</p>
-        <!-- <a href="{% url 'student_profile' %}" class="btn"></a> -->
-            <a href="{% url 'view_profile' user_id=request.user.id %}" class="btn">View Evaluation</a>
-
-        </div> {% endcomment %}
-
-        {% comment %} <div class="dashboard-item">
-            <h2>Review Final Reports</h2>
-            <p>Monitor and access student Final Reports</p>
-            <a href="{% url 'review_final_reports' %}" class="btn">Review Final Reports</a>
-        </div>  {% endcomment %}
-
-        <div class="dashboard-item">
-            <h2>View Evaluations</h2>
-            <p>View evaluations provided by companies for students.</p>
-            <a href="{% url 'evaluation_list' %}" class="btn" style="background: purple; color: white">Evaluation List</a>
-        </div>
-    </div>
-    <br>
-    <br>
-    <br>
-
-
-
-    <script>
-        // Automatically hide the message after 5 seconds (5000 milliseconds)
-        setTimeout(function() {
-            const messageContainer = document.getElementById('message-container');
-            if (messageContainer) {
-                messageContainer.style.display = 'none';
-            }
-        }, 5000);  // 5000 milliseconds = 5 seconds
-    </script>
 
 </body>
-</html>
-
-
 
 {% endblock nav_and_footer %}
-    

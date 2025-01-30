@@ -256,12 +256,11 @@ class Attendance(models.Model):
     present = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('student', 'date')  # Prevent duplicate entries for the same student on the same date
+        unique_together = ('student', 'date')  
 
     def __str__(self):
         return f"{self.student.user.username} - {self.date} - {'Present' if self.present else 'Absent'}"
 
-# User = get_user_model()
 
 class Evaluation(models.Model):
     STATUS_CHOICES = [
@@ -273,7 +272,7 @@ class Evaluation(models.Model):
     internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='company_evaluations')
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_evaluations')
     submitted_at = models.DateTimeField(default=now)
-    total_score = models.FloatField(default=0)  # Changed to FloatField for precision
+    total_score = models.FloatField(default=0)  
     internship_office_approval_status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default='Pending'
     )
