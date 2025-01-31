@@ -5,18 +5,22 @@
     
 
 {% if messages %}
-<ul class="text-Success">
-    {% for message in messages %}
-       <p>{{ message }}</p>
-    {% endfor %}
-</ul>
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
 {% endif %}
 
 <div class="heading"><h2>Approve Companies</h2>
 </div>
+<div class="container">
+    <a class="btn btn-purple" href="admin_dashboard">Back to Dashboard</a>
+
 <h2 class="text-center">Pending Companies to be Approved</h2>
 {% if pending_companies %}
-<table class="table table-striped">
+<table class="table table-bordered table-striped">
     <thead>
             <tr>
                 <th>Company Name</th>
@@ -53,7 +57,7 @@
 <h2 class="text-center">Approved Companies</h2>
 
 {% if approved_companies %}
-<table class="table table-striped">
+<table class="table table-bordered table-striped">
     <thead>
             <tr>
                 <th>Company Name</th>
@@ -84,5 +88,5 @@
 {% else %}
     <p class="text-center">No approved companies yet.</p>
 {% endif %}
-
+</div>
 {% endblock nav_and_footer %}

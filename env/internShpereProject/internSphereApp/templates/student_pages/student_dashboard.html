@@ -50,14 +50,13 @@
 
 <body>
     {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
             {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+    {% endfor %}
+{% endif %}
 
     <section class="heading">
         <h1 class="section-title">Welcome, {{ user.first_name|capfirst }}</h1>
@@ -81,7 +80,7 @@
 
                 <div class="col-md-6 mb-4">
                     <div class="card p-3">
-                        <img src="{% static 'img/opportunties.svg' %}" alt="View Placement Details" class="feature-image" />
+                        <img src="{% static 'img/Internship Opportunities .png' %}" alt="View Placement Details" class="feature-image" />
                         <div class="card-body">
                             <h5 class="card-title">Internship Opportunities</h5>
                             <p class="card-text">Explore internships available for you.</p>

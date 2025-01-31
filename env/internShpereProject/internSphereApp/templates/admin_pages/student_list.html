@@ -3,88 +3,163 @@
 
 {% block nav_and_footer %}
 
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student List</title>
-</head>
-<style>
-    body{
-        background-color:white;
-    }
-    .btn-purple {
-        background-color: purple;
-        color: #fff;
-    }
-    .btn-purple:hover {
-        background-color: #c923a9;
-    }
-</style>
-
-<body>
     {% if messages %}
-    <ul class="text-Success">
         {% for message in messages %}
-           <p>{{ message }}</p>
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         {% endfor %}
-    </ul>
-{% endif %}
-<link rel="stylesheet" href="{% static 'css/applications.css' %}">
-<div class="heading">
-    <h1>Student List</h1>
+    {% endif %}
 
-</div>
-
-{% if user.user_type == 'Admin' or user.is_superuser %}
-<a href="admin_dashboard" class="btn btn-purple mb-3">Back to dashboard</a>
-{% elif user.user_type == 'InternshipCareerOffice' %}
-<a href="icu_dashboard" class="btn btn-purple mb-3">Back to dashboard</a>
-
-{% endif %}
     
+    <div class="heading mb-4">
+        <h2>Student List</h2>
+    </div>
 
-<table class="table table-striped">
-        <tr>
-            <th>Student ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Batch</th>
-            <th>Section</th>
-            <th>Profile Completed</th>
-            <th>Active Company</th>
-            <th>Password</th>
-            <th>Actions</th>
-        </tr>
-        {% for student in students %}
-        <tr>
-            <td>{{ student.user.username }}</td>
-            <td>{{ student.user.first_name }}</td>
-            <td>{{ student.user.last_name }}</td>
-            <td>{{ student.batch }}</td>
-            <td>{{ student.section }}</td>
-            <td>{{ student.profile_completed }}</td>
-            <td>{% if student.get_active_company %}
-                <p>{{ student.get_active_company.company_name|capfirst }}</p>
-            {% else %}
-                <p>Not Selected Yet</p>
-            {% endif %}</td>
-            <td>{{ student.temporary_password }}</td>
+    <div class="container">
+        <!-- Filters Section -->
+        <div class="filter-group mb-4">
+            <div class="row">
+                <div class="col-md-2">
+                    {% if user.user_type == 'Admin' or user.is_superuser %}
+                        <a class="btn btn-purple form-control" href="admin_dashboard">Back to Dashboard</a>
+                    {% elif user.user_type == 'InternshipCareerOffice' %}
+                        <a class="btn btn-purple form-control" href="icu_dashboard">Back to Dashboard</a>
+                    {% endif %}
+                </div>
 
-            <td>
-                <a href="{% url 'delete_student' student.id %}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Filter by Name" id="filter-name">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Filter by ID" id="filter-id">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Filter by Section" id="filter-section">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Filter by Batch" id="filter-batch">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="filter-profile-completed">
+                        <option value="">Filter by Profile Completion</option>
+                        <option value="True">Completed</option>
+                        <option value="False">Not Completed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-</body>
-</html>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="student-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Batch</th>
+                        <th>Section</th>
+                        <th>Profile Completed</th>
+                        <th>Active Company</th>
+                        <th>Password</th>
+                        {% if user.user_type == 'Admin' or user.is_superuser %}
+                            <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
+                            <td>{{ student.user.username }}</td>
+                            <td>{{ student.batch }}</td>
+                            <td>{{ student.section }}</td>
+                            <td>{{ student.profile_completed }}</td>
+                            <td>
+                                {% if student.get_active_company %}
+                                    <p>{{ student.get_active_company.company_name|capfirst }}</p>
+                                {% else %}
+                                    <p>Not Selected Yet</p>
+                                {% endif %}
+                            </td>
+                            <td>{{ student.temporary_password }}</td>
+                            {% if user.user_type == 'Admin' or user.is_superuser %}
+                                <td>
+                                    <a class="btn btn-purple" href="{% url 'delete_student' student.id %}">Delete</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
+    <!-- JavaScript for filtering -->
+    <script>
+        document.getElementById('filter-name').addEventListener('input', function () {
+            filterTable(0, this.value);
+        });
 
+        document.getElementById('filter-id').addEventListener('input', function () {
+            filterTable(1, this.value);
+        });
 
+        document.getElementById('filter-section').addEventListener('input', function () {
+            filterTable(3, this.value);
+        });
 
+        document.getElementById('filter-batch').addEventListener('input', function () {
+            filterTable(2, this.value);
+        });
+
+        document.getElementById('filter-profile-completed').addEventListener('change', function () {
+            filterTable(4, this.value);
+        });
+
+        function filterTable(columnIndex, query) {
+            const table = document.getElementById('student-table');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells[columnIndex] && cells[columnIndex].innerText.toLowerCase().includes(query.toLowerCase())) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: white;
+        }
+
+        .btn-purple {
+            background-color: purple;
+            color: #fff;
+        }
+
+        .btn-purple:hover {
+            background-color: #c923a9;
+        }
+
+        .table {
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
 
 {% endblock nav_and_footer %}
-    

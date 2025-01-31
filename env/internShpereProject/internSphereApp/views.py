@@ -109,6 +109,8 @@ def student_profile(request):
         'department_choices': stud_profile.DEPARTMENT_CHOICES,
     })
     
+from datetime import timedelta
+
 @login_required
 def bi_weekly_report(request):
     try:
@@ -124,6 +126,14 @@ def bi_weekly_report(request):
         if not active_application:
             messages.error(request, 'You have not selected a company to work with. Please select one.')
             return redirect('select_active_company')  
+
+        # Check if the student has submitted a report in the last two weeks
+        last_report = BiWeeklyReport.objects.filter(student=student_profile).order_by('-date_submitted').first()
+        if last_report:
+            time_since_last_report = timezone.now() - last_report.date_submitted
+            if time_since_last_report < timedelta(weeks=2):
+                messages.error(request, 'You can only submit a bi-weekly report every two weeks. Please wait for the next submission window.')
+                return redirect('student_dashboard')  # Redirect to another page, e.g., the student dashboard
 
     except AttributeError:
         messages.error(request, 'Student profile is missing.')
@@ -150,6 +160,7 @@ def bi_weekly_report(request):
         'current_page': 'bi_weekly_report',
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
+
 
 def view_biweekly_report(request, report_id):
     # Retrieve the report for viewing

@@ -27,9 +27,10 @@
         }
 
         .card img {
-            height: 200px;
-            object-fit: cover;
+            height: 300px;
+            width: 350px;
             border-radius: 8px;
+            margin: flex;
         }
 
         .btn-purple {
@@ -42,15 +43,14 @@
     </style>
 </head>
 <body>
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+  {% if messages %}
+  {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+  {% endfor %}
+{% endif %}
 <div class="heading">
   <h1>Welcome, {{ user.username }}</h1>
 </div>
@@ -62,7 +62,7 @@
         <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/view-profile.jpg' %}" alt="My Profile">
+                    <img src="{% static 'img/view_profile.png' %}" alt="My Profile">
                     <div class="card-body">
                         <h5 class="card-title">My Profile</h5>
                         <p class="card-text">View and edit your company profile details.</p>
@@ -73,7 +73,7 @@
             
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/postInternships.jpeg' %}" alt="Post Internship">
+                    <img src="{% static 'img/post internship.png' %}" alt="Post Internship">
                     <div class="card-body">
                         <h5 class="card-title">Post Internship</h5>
                         <p class="card-text">Create and publish new internship opportunities.</p>
@@ -84,7 +84,7 @@
             
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/heroImg.png' %}" alt="View Applicants">
+                    <img src="{% static 'img/View Applicant .png' %}" alt="View Applicants">
                     <div class="card-body">
                         <h5 class="card-title">View Applicants</h5>
                         <p class="card-text">View, accept, or reject student applications.</p>
@@ -95,7 +95,7 @@
 
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/ApproveReport.jpg' %}" alt="Approve Reports">
+                    <img src="{% static 'img/company_approve_report.png' %}" alt="Approve Reports">
                     <div class="card-body">
                         <h5 class="card-title">Approve Reports</h5>
                         <p class="card-text">Review and approve submitted internship reports.</p>
@@ -106,7 +106,7 @@
 
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/Attendance.jpg' %}" alt="Attendance">
+                    <img src="{% static 'img/Attendance .png' %}" alt="Attendance">
                     <div class="card-body">
                         <h5 class="card-title">Manage Attendance</h5>
                         <p class="card-text">Record and manage student attendance efficiently.</p>
@@ -117,7 +117,7 @@
 
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="{% static 'img/Evaluation.avif' %}" alt="Evaluate Students">
+                    <img src="{% static 'img/Evaluation.png' %}" alt="Evaluate Students">
                     <div class="card-body">
                         <h5 class="card-title">Evaluate Students</h5>
                         <p class="card-text">Evaluate student performance and provide feedback.</p>

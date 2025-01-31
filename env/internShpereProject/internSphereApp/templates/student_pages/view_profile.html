@@ -16,6 +16,14 @@
     <link rel="stylesheet" href="{% static 'css/hulu.css' %}" />
     <link rel="stylesheet" href="{% static 'css/student-profile.css' %}" />
   </head>
+  {% if messages %}
+  {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+  {% endfor %}
+{% endif %}
   <div class="heading"> 
     <h1 class="fw-bold">Student Profile</h1>
   </div>
@@ -57,11 +65,11 @@
                 <tr><th>LinkedIn:</th><td><a href="{{ student_profile.linkedin_profile }}" target="_blank">{{ student_profile.linkedin_profile }}</a></td></tr>
                 {% endif %}
 
-                {% if student.get_active_company %}
-                <tr><th>Active Company: </th><td>{{ student.get_active_company.company_name|capfirst }}</td></tr>
+                {% if student_profile.get_active_company %}
+                <tr><th>Active Company: </th><td>{{ student_profile.get_active_company.company_name|capfirst }}</td></tr>
                 {% else %}
                 <tr><th>Active Company: </th><td>Not Selected Yet</td></tr>
-                {% endif %}</td>
+                {% endif %}
 
                 <tr><th>Profile Completed:</th><td>{{ student_profile.profile_completed }}</td></tr>
               </tbody>

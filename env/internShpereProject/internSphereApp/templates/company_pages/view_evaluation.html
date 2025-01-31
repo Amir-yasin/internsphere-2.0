@@ -37,7 +37,14 @@
     background: orange;
   }
 </style>
-
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
 <div class="heading">
   <h2 class="">Evaluation Details</h2>
 </div>

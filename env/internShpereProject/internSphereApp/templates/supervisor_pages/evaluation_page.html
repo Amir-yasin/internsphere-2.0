@@ -2,6 +2,14 @@
 {% load custom_filters %}
 
 {% block nav_and_footer %}
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
 <div class="heading">
   <h2 class="fw-bold">Supervisor Evaluation</h2>
 </div>

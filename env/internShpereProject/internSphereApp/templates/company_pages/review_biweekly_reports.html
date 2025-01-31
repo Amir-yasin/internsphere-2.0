@@ -2,94 +2,173 @@
 {% load static %}
 
 {% block nav_and_footer %}
-<div class="heading">
-    <h2>Review Reports</h2>
-</div>
-<div class="container">
-    {% if reports_by_student %}
-        {% for student, reports in reports_by_student.items %}
-            <div class="card mb-4 col-md-6 col-lg-4">
-                <div class="card-header">
-                    <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
-                </div>
-                <div class="card-body">
-                    <!-- Biweekly Reports -->
-                    {% if reports.biweekly %}
-                        <h5>Biweekly Reports</h5>
-                        <ul>
-                            {% for report in reports.biweekly %}
-                                <li>
-                                    <a href="{% url 'view_biweekly_report' report.id %}" class="btn btn-info btn-sm mb-2">View Biweekly Report</a>
-                                    <form method="post" action="{% url 'approve_biweekly_report' report.id 'approve' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                    </form>
-                                    <form method="post" action="{% url 'approve_biweekly_report' report.id 'reject' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                    </form>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No pending biweekly reports.</p>
-                    {% endif %}
-
-                    <!-- Final Reports -->
-                    {% if reports.final %}
-                        <h5>Final Reports</h5>
-                        <ul>
-                            {% for report in reports.final %}
-                                <li>
-                                    <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-info btn-sm mb-2">View Final Report</a>
-                                    <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                    </form>
-                                    <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                    </form>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No pending final reports.</p>
-                    {% endif %}
-                    {% if user.user_type != 'Company' %}
-
-                    <!-- Evaluations -->
-                    {% if reports.evaluations %}
-                        <h5>Evaluations</h5>
-                        <ul>
-                            
-                                
-                                
-                            {% for evaluation in reports.evaluations %}
-                                <li>
-                                    <a href="{% url 'view_evaluation' evaluation.id %}" class="btn btn-info btn-sm mb-2">View Evaluation Details</a>
-                                    <form method="post" action="{% url 'approve_evaluation' evaluation.id 'approve' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                    </form>
-                                    <form method="post" action="{% url 'approve_evaluation' evaluation.id 'reject' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                    </form>
-                                </li>
-                            {% endfor %}
-
-                        </ul>
-                    {% else %}
-                        <p>No pending evaluations.</p>
-                    {% endif %}
-                    {% endif %}
-
-                </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
-    {% else %}
-        <p>No pending reports to review.</p>
     {% endif %}
-</div>
+    
+    <div class="heading mb-4">
+        <h2>Review Reports</h2>
+    </div>
+    
+    <div class="container">
+        {% if reports_by_student %}
+            <!-- Filters Section -->
+            <div class="filter-group mb-4">
+                <div class="row">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Filter by Name" id="filter-name">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Filter by ID" id="filter-id">
+                    </div>
+                    {% if user.user_type != 'Company' %}
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Filter by Section" id="filter-section">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Filter by Batch" id="filter-batch">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="student-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            {% if user.user_type != 'Company' %}
+                            <th>Section</th>
+                            <th>Batch</th>
+                            {% endif %}
+                            <th>Biweekly Reports</th>
+                            <th>Final Reports</th>
+                            {% if user.user_type != 'Company' %}
+                                <th>Evaluations</th>
+                            {% endif %}                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student, reports in reports_by_student.items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
+                                </td>
+
+                                <td>
+                                    <strong>{{ student.user.username }}</strong>
+                                </td>
+                                {% if user.user_type != 'Company' %}
+                                <td>
+                                    <strong>{{ student.section }}</strong>
+                                </td> 
+
+                                <td>
+                                    <strong>{{ student.batch }}</strong>
+                                </td>                                
+                                {% endif %}
+
+                                <td>
+                                    {% if reports.biweekly %}
+                                        {% for report in reports.biweekly %}
+                                            <a href="{% url 'view_biweekly_report' report.id %}" class="btn btn-info btn-sm ">View</a>
+                                            <form method="post" action="{% url 'approve_biweekly_report' report.id 'approve' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                            </form>
+                                            <form method="post" action="{% url 'approve_biweekly_report' report.id 'reject' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                            </form>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>No pending biweekly reports.</p>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if reports.final %}
+                                        {% for report in reports.final %}
+                                            <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-info btn-sm ">View</a>
+                                            <form method="post" action="{% url 'approve_final_report' report.id 'approve' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                            </form>
+                                            <form method="post" action="{% url 'approve_final_report' report.id 'reject' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                            </form>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>No pending final reports.</p>
+                                    {% endif %}
+                                </td>
+                                {% if user.user_type != 'Company' %}
+                                    <td>
+                                        {% if reports.evaluations %}
+                                            {% for evaluation in reports.evaluations %}
+                                                <a href="{% url 'view_evaluation' evaluation.id %}" class="btn btn-info btn-sm ">View</a>
+                                                <form method="post" action="{% url 'approve_evaluation' evaluation.id 'approve' %}" style="display:inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+                                                <form method="post" action="{% url 'approve_evaluation' evaluation.id 'reject' %}" style="display:inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                </form>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>No pending evaluations.</p>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No pending reports to review.</p>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript for filtering -->
+    <script>
+        document.getElementById('filter-name').addEventListener('input', function () {
+            filterTable(0, this.value);
+        });
+
+        document.getElementById('filter-id').addEventListener('input', function () {
+            filterTable(1, this.value);
+        });
+
+        {% if user.user_type != 'Company' %}
+        document.getElementById('filter-section').addEventListener('input', function () {
+            filterTable(2, this.value);
+        });
+
+        document.getElementById('filter-batch').addEventListener('input', function () {
+            filterTable(3, this.value);
+        });
+        {% endif %}
+
+        function filterTable(columnIndex, query) {
+            const table = document.getElementById('student-table');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells[columnIndex] && cells[columnIndex].innerText.toLowerCase().includes(query.toLowerCase())) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
 {% endblock nav_and_footer %}

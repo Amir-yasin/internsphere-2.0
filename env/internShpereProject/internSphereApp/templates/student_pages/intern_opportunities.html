@@ -31,12 +31,13 @@
     <h2 class="heading" >Internship Opportunities</h2>
     
     {% if messages %}
-    <ul class="text-Success">
         {% for message in messages %}
-           <p>{{ message }}</p>
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         {% endfor %}
-    </ul>
-{% endif %}
+    {% endif %}
     <section class="content-container">
         <img class="bounce" src="{% static 'img/Reviewapplicants.png' %}" alt="">
   

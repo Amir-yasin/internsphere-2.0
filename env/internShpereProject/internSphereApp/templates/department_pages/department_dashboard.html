@@ -55,7 +55,14 @@
     </style>
 </head>
 <body>
-   
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
     <!-- main Section -->
     <section class="py-2 text-center bg-light">
         <div class="container">
@@ -71,7 +78,7 @@
             <div class="row mt-4">
                 <div class="col-md-4 mb-4">
                     <div class="card p-3 smooth-animation">
-                        <img src="img/man-looking-report.jpeg" alt="View Student Reports" class="feature-image">
+                        <img src="{% static 'img/review_report.png' %}" alt="View Student Reports" class="feature-image" width="250px" />
 
                         <div class="card-body">
                             <h5 class="card-title">View and send Student Reports</h5>
@@ -84,7 +91,7 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="card p-3 smooth-animation">
-                        <img src="images/assign-supervisors.jpg" alt="Assign Supervisors" class="feature-image">
+                        <img src="{% static 'img/Assign_supervisor.png' %}" alt="Assign supervisor" class="feature-image" width="250px" />
                         <div class="card-body">
                             <h5 class="card-title">Assign Advisors</h5>
                             <p class="card-text">Easily assign supervisors to student interns.</p>

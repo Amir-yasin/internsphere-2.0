@@ -2,6 +2,14 @@
 {% load static %}
 
 {% block nav_and_footer %}
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
 <div class="heading">
     <h2>Company Profile</h2>
 </div>
@@ -12,7 +20,7 @@
     <p><strong>Description:</strong> {{ company.company_description }}</p>
     <p><strong>Approved:</strong> {{ company.approved|yesno:"Yes,No" }}</p>
 
-<a href="{% url 'approve_companies' %}" class="btn btn-primary">Back to Approvals</a>
+<a href="{% url 'approve_companies' %}" class="btn btn-purple">Back to Approvals</a>
 </div>
 
 {% endblock nav_and_footer %}
