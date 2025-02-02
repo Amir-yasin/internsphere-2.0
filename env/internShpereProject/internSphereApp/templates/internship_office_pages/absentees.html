@@ -1,0 +1,165 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<div class="heading">
+    <h2>View Absentees</h2>
+</div>
+<div class="container">
+    <h2 class="text-center">Students Absent for 3 Consecutive Days</h2>
+
+    <!-- Filters Section -->
+    <div class="filter-group mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Filter by Name" id="filter-name">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" placeholder="Filter by ID" id="filter-id">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" placeholder="Filter by Section" id="filter-section">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" placeholder="Filter by Batch" id="filter-batch">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Filter by Department" id="filter-department">
+            </div>
+        </div>
+    </div>
+
+    {% if absent_students_with_dates %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover" id="absentees-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Batch</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Absent Dates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student_data in absent_students_with_dates %}
+                        <tr>
+                            <td>
+                                {% if student_data.student.user %}
+                                    {{ student_data.student.user.first_name }} {{ student_data.student.user.last_name }}
+                                {% else %}
+                                    Student ID: {{ student_data.student.id }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if student_data.student.user %}
+                                    {{ student_data.student.user.username }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ student_data.student.section }}
+                            </td>
+                            <td>
+                                {{ student_data.student.batch }}
+                            </td>
+                            <td>
+                                {{ student_data.student.department }}
+                            </td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    {% for date in student_data.absent_dates %}
+                                        <li>{{ date }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>No students have been absent for 3 consecutive days.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for filtering -->
+<script>
+    document.getElementById('filter-name').addEventListener('input', function () {
+        filterTable(0, this.value);
+    });
+
+    document.getElementById('filter-id').addEventListener('input', function () {
+        filterTable(1, this.value);
+    });
+
+    document.getElementById('filter-section').addEventListener('input', function () {
+        filterTable(2, this.value);
+    });
+
+    document.getElementById('filter-batch').addEventListener('input', function () {
+        filterTable(3, this.value);
+    });
+
+    document.getElementById('filter-department').addEventListener('input', function () {
+        filterTable(4, this.value);
+    });
+
+    function filterTable(columnIndex, query) {
+        const table = document.getElementById('absentees-table');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            if (cells[columnIndex] && cells[columnIndex].innerText.toLowerCase().includes(query.toLowerCase())) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+</script>
+
+<!-- Custom CSS for styling -->
+<style>
+    body {
+        background-color: white;
+    }
+
+    .btn-purple {
+        background-color: purple;
+        color: #fff;
+    }
+
+    .btn-purple:hover {
+        background-color: #c923a9;
+    }
+
+    .table {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    .heading {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .filter-group {
+        margin-bottom: 20px;
+    }
+
+    .filter-group .form-control {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}

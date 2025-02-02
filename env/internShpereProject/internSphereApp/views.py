@@ -17,6 +17,7 @@ from django.utils.timezone import now
 from datetime import date, timedelta
 from django.db import transaction
 from django.db.models import Subquery, OuterRef, Value, IntegerField
+from django.db.models import Count
 
 
 
@@ -220,7 +221,9 @@ def review_biweekly_reports(request):
         )
         final_reports = FinalReport.objects.filter(
             internship_office_approval_status="Approved",
-            department_approval_status="Pending"
+            department_approval_status="Pending",
+            student__department=user.department_profile.department_name,
+
         )
         evaluations = Evaluation.objects.filter(
             internship_office_approval_status='Approved',
@@ -236,7 +239,9 @@ def review_biweekly_reports(request):
         )
         final_reports = FinalReport.objects.filter(
             department_approval_status="Approved",
-            supervisor_approval_status="Pending"
+            supervisor_approval_status="Pending",
+                        student__department=user.supervisor_profile.department.department_name,
+
         )
         evaluations = Evaluation.objects.filter(
             department_approval_status='Approved',
@@ -692,6 +697,71 @@ def attendance_list(request):
     return render(request, "company_pages/attendance_list.html", {"students": students , "internships": internships})
 
 
+
+from datetime import date, timedelta
+from django.db.models import Q
+
+
+def has_unmarked_absences(student, days=3):
+    today = date.today()
+
+    # Get the last 14 working days (to ensure we check for gaps)
+    working_days = [today - timedelta(days=i) for i in range(14) if (today - timedelta(days=i)).weekday() < 5]
+    
+    # Get attendance records for those working days (ensure the dates are in order)
+    attendance_records = Attendance.objects.filter(student=student, date__in=working_days).order_by('date')
+
+    # Create a dictionary to map dates to attendance status
+    attendance_dict = {record.date: record.present for record in attendance_records}
+
+    # Check for 3 consecutive absent or unmarked days
+    consecutive_absent_days = 0
+    absent_dates = []  # Store the dates of consecutive absences
+    result = {"has_absence": False, "absent_dates": []}  # Result to return
+
+    for day in working_days:
+        # If the day is not marked or marked as absent
+        if day not in attendance_dict or not attendance_dict[day]:
+            consecutive_absent_days += 1
+            absent_dates.append(day)  # Add the date to the absent_dates list
+            if consecutive_absent_days >= days:
+                result["has_absence"] = True
+                result["absent_dates"] = absent_dates[-days:]  # Store the last `days` absent dates
+                break  # Exit the loop once we find 3 consecutive absences
+        else:
+            consecutive_absent_days = 0  # Reset the counter if a present day is found
+            absent_dates = []  # Reset the absent_dates list
+
+    return result
+
+
+
+
+def absent_students(request):
+    internship_office = request.user.internshipcareeroffice  # Ensure correct user role
+    active_applications = Application.objects.filter(is_active=True)
+    students = [app.student for app in active_applications]
+
+    # Find students who have 3 consecutive missing or absent attendance days
+    absent_students_with_dates = []
+    for student in students:
+        absence_info = has_unmarked_absences(student, 3)
+        if absence_info["has_absence"]:
+            absent_students_with_dates.append({
+                "student": student,
+                "absent_dates": absence_info["absent_dates"]
+            })
+
+    # Debugging print
+    print("Absent Students with Dates:", absent_students_with_dates)
+
+    # Ensure the absent_students_with_dates context is being passed
+    return render(
+        request,
+        "internship_office_pages/absentees.html",
+        {"absent_students_with_dates": absent_students_with_dates}
+    )
+
 @login_required
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
@@ -863,14 +933,25 @@ def icu_dashboard(request):
     reports = BiWeeklyReport.objects.all()
     evaluations = Evaluation.objects.all()
     attendance_records = Attendance.objects.all()
+    
+    # Get students who have 3 consecutive unmarked weekdays
+    absent_students_list = [student for student in students if has_unmarked_absences(student, 3)]
+
+    # Debugging print
+    print("Absent Students:", absent_students_list)
+    print("Absent Students Details:")
+    for student in absent_students_list:
+        print(f"Student ID: {student.id}, User: {student.user}, First Name: {getattr(student.user, 'first_name', 'N/A')}")
 
     return render(request, 'internship_office_pages/icu_dashboard.html', {
         'students': students,
         'reports': reports,
         'evaluations': evaluations,
         'attendance_records': attendance_records,
+        'absent_students': absent_students_list,
     })
-    
+
+
 
 
 def register_students(request):

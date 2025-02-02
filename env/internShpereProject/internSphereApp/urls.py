@@ -102,7 +102,8 @@ path('evaluation/list/', views.evaluation_list, name='evaluation_list'),
 path('view_evaluation/<int:evaluation_id>/', views.view_evaluation, name='view_evaluation'),
 
 
-    
+path("absent_students/", views.absent_students, name="absent_students"),
+ 
 ]
 
 
