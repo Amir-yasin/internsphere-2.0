@@ -72,6 +72,10 @@
 <div class="container">
 
     <ul class="student-list">
+        
+        {% if students %}
+            
+            
         {% for student in students %}
         <li class="student-item">
             <span class="student-name">
@@ -82,6 +86,10 @@
             </a>
         </li>
         {% endfor %}
+        {% else %}
+        <h4>No Interns Found To Mark Attendance.</h4>
+        {% endif %}
+
     </ul>
 </div>
 {% endblock nav_and_footer %}

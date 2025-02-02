@@ -62,8 +62,8 @@ img{
 }
 
 label {
-    width: 20%;
-    text-align: right;
+    width: 30%;
+    text-align: left;
 }
 
 .form-control, .input-group {

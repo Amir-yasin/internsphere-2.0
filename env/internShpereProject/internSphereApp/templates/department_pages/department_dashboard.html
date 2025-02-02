@@ -11,12 +11,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Department Page</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
    
-    <!-- Custom CSS -->
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
+
     <link rel="stylesheet" href="css/home.css">
     <style>
         body {
@@ -32,6 +29,8 @@
             border: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            text-align: center;
+
         }
         .card:hover {
             transform: translateY(-10px);
@@ -48,8 +47,7 @@
         }
         .feature-image {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
+            height: 350px;
             border-radius: 8px;
         }
     </style>
@@ -76,9 +74,9 @@
         <div class="container">
             <h2 class="section-title text-center">Features</h2>
             <div class="row mt-4">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="card p-3 smooth-animation">
-                        <img src="{% static 'img/review_report.png' %}" alt="View Student Reports" class="feature-image" width="250px" />
+                        <img src="{% static 'img/review_report.png' %}" alt="View Student Reports" class="feature-image"/>
 
                         <div class="card-body">
                             <h5 class="card-title">View and send Student Reports</h5>
@@ -89,9 +87,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="card p-3 smooth-animation">
-                        <img src="{% static 'img/Assign_supervisor.png' %}" alt="Assign supervisor" class="feature-image" width="250px" />
+                        <img src="{% static 'img/Assign_supervisor.png' %}" alt="Assign supervisor" class="feature-image" />
                         <div class="card-body">
                             <h5 class="card-title">Assign Advisors</h5>
                             <p class="card-text">Easily assign supervisors to student interns.</p>
@@ -101,7 +99,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                {% comment %} <div class="col-md-4 mb-4">
                     <div class="card p-3 smooth-animation">
                         <img src="images/send-reports-supervisors.jpg" alt="Send Reports to Supervisors" class="feature-image">
                         <div class="card-body">
@@ -112,7 +110,7 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </section>

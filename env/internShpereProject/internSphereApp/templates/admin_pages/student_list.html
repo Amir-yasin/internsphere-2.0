@@ -42,12 +42,9 @@
                     <input type="text" class="form-control" placeholder="Filter by Batch" id="filter-batch">
                 </div>
                 <div class="col-md-2">
-                    <select class="form-control" id="filter-profile-completed">
-                        <option value="">Filter by Profile Completion</option>
-                        <option value="True">Completed</option>
-                        <option value="False">Not Completed</option>
-                    </select>
+                    <input type="text" class="form-control" placeholder="Filter by Company" id="filter-active_company">
                 </div>
+               
             </div>
         </div>
 
@@ -60,7 +57,7 @@
                         <th>Batch</th>
                         <th>Section</th>
                         <th>Profile Completed</th>
-                        <th>Active Company</th>
+                        <th>Company</th>
                         <th>Password</th>
                         {% if user.user_type == 'Admin' or user.is_superuser %}
                             <th>Actions</th>
@@ -96,41 +93,43 @@
     </div>
 
     <!-- JavaScript for filtering -->
-    <script>
-        document.getElementById('filter-name').addEventListener('input', function () {
-            filterTable(0, this.value);
-        });
+    <!-- JavaScript for filtering -->
+<script>
+    document.getElementById('filter-name').addEventListener('input', function () {
+        filterTable(0, this.value);
+    });
 
-        document.getElementById('filter-id').addEventListener('input', function () {
-            filterTable(1, this.value);
-        });
+    document.getElementById('filter-id').addEventListener('input', function () {
+        filterTable(1, this.value);
+    });
 
-        document.getElementById('filter-section').addEventListener('input', function () {
-            filterTable(3, this.value);
-        });
+    document.getElementById('filter-section').addEventListener('input', function () {
+        filterTable(3, this.value);
+    });
 
-        document.getElementById('filter-batch').addEventListener('input', function () {
-            filterTable(2, this.value);
-        });
+    document.getElementById('filter-batch').addEventListener('input', function () {
+        filterTable(2, this.value);
+    });
 
-        document.getElementById('filter-profile-completed').addEventListener('change', function () {
-            filterTable(4, this.value);
-        });
+    document.getElementById('filter-active_company').addEventListener('input', function () {
+        filterTable(5, this.value);
+    });
 
-        function filterTable(columnIndex, query) {
-            const table = document.getElementById('student-table');
-            const rows = table.getElementsByTagName('tr');
+    function filterTable(columnIndex, query) {
+        const table = document.getElementById('student-table');
+        const rows = table.getElementsByTagName('tr');
 
-            for (let i = 1; i < rows.length; i++) {
-                const cells = rows[i].getElementsByTagName('td');
-                if (cells[columnIndex] && cells[columnIndex].innerText.toLowerCase().includes(query.toLowerCase())) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            if (cells[columnIndex] && cells[columnIndex].innerText.toLowerCase().includes(query.toLowerCase())) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
             }
         }
-    </script>
+    }
+</script>
+
 
     <style>
         body {

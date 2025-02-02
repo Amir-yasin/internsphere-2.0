@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block nav_and_footer %}
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -16,24 +15,12 @@
     <link rel="stylesheet" href="{% static 'css/hulu.css' %}" />
     <link rel="stylesheet" href="{% static 'css/student-profile.css' %}" />
   </head>
-  {% if messages %}
-  {% for message in messages %}
-      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-  {% endfor %}
-{% endif %}
-  <div class="heading"> 
-    <h1 class="fw-bold">Student Profile</h1>
-  </div>
   <body class="bg-light">
     <div class="container mt-5">
       <div class="text-center mb-4">
       </div>
       <a href="{% url 'student_dashboard' %}" class="btn btn-purple mb-3">Back</a>
       <a href="{% url 'student_profile' %}" class="btn btn-purple mb-3">Edit Profile</a>
-
       <div class="row g-4">
         <div class="col-md-4">
           <div class="card shadow-sm p-3 text-center">
@@ -61,6 +48,7 @@
                 {% if student_profile.resume %}
                 <tr><th>Resume:</th><td><a href="{{ student_profile.resume.url }}" target="_blank">Download</a></td></tr>
                 {% endif %}
+                
                 {% if student_profile.linkedin_profile %}
                 <tr><th>LinkedIn:</th><td><a href="{{ student_profile.linkedin_profile }}" target="_blank">{{ student_profile.linkedin_profile }}</a></td></tr>
                 {% endif %}
@@ -76,10 +64,44 @@
             </table>
           </div>
           <div class="card shadow-sm p-3 mt-3">
-               <h4 class="fw-bold"><span>&#128193;</span> Other Information</h4>
-
-            <p>More about the student details.</p>
-          </div>
+            <h4 class="fw-bold"><span>&#128193;</span> Other Information</h4>
+        
+            {% if reports or final_reports %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Report Type</th>
+                        <th>Company Approval</th>
+                        <th>ICU Approval</th>
+                        <th>Department Approval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>Bi-weekly Report-{{ report.report_number }}</td>
+                        <td>{{ report.company_approval_status }}</td>
+                        <td>{{ report.internship_office_approval_status }}</td>
+                        <td>{{ report.department_approval_status }}</td>
+                    </tr>
+                    {% endfor %}
+        
+                    {% for final_report in final_reports %}
+                    <tr>
+                        <td>Final Report</td>
+                        <td>{{ final_report.company_approval_status }}</td>
+                        <td>{{ final_report.internship_office_approval_status }}</td>
+                        <td>{{ final_report.department_approval_status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">No reports yet.</p>
+        {% endif %}
+        
+        </div>
+        
         </div>
       </div>
     </div>

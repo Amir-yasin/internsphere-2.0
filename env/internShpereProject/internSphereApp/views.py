@@ -177,18 +177,39 @@ def review_biweekly_reports(request):
     final_reports = None
     evaluations = None
 
-    # Filter reports and evaluations based on user type
+    # Ensure the logged-in user is a company
     if user.user_type == "Company":
-        biweekly_reports = BiWeeklyReport.objects.filter(company=user.company, company_approval_status="Pending")
-        final_reports = FinalReport.objects.filter(company_approval_status="Pending")
-        # evaluations = Evaluation.objects.filter(company=user.company)
+        # Get the logged-in company
+        logged_in_company = user.company
+
+        # Fetch students who have selected this company as their active company
+        students_with_active_company = stud_profile.objects.filter(
+            applications__company=logged_in_company,
+            applications__is_active=True
+        ).distinct()
+
+        # Filter bi-weekly reports for these students
+        biweekly_reports = BiWeeklyReport.objects.filter(
+            student__in=students_with_active_company,
+            company=logged_in_company,
+            company_approval_status="Pending"
+        )
+
+        # Filter final reports for these students
+        final_reports = FinalReport.objects.filter(
+            student__in=students_with_active_company,
+            company_approval_status="Pending"
+        )
 
     elif user.user_type == "InternshipCareerOffice":
         biweekly_reports = BiWeeklyReport.objects.filter(
             company_approval_status="Approved",
             internship_office_approval_status="Pending"
         )
-        final_reports = FinalReport.objects.filter(company_approval_status="Approved",internship_office_approval_status="Pending")
+        final_reports = FinalReport.objects.filter(
+            company_approval_status="Approved",
+            internship_office_approval_status="Pending"
+        )
         evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
 
     elif user.user_type == "Department":
@@ -247,6 +268,7 @@ def review_biweekly_reports(request):
 
     # Render the template with the grouped data
     return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
+
 
 
 @login_required
@@ -422,6 +444,15 @@ def applications(request):
 def select_active_company(request):
     student_profile = request.user.stud_profile
     accepted_applications = Application.objects.filter(student=student_profile, status='Accepted')
+    active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+    # If an active application is already selected, prevent further changes
+    if active_application:
+        # Display the selected active company
+        context = {
+            'active_company': active_application.company.company_name,
+        }
+        return render(request, 'student_pages/select_active_company.html', context)
 
     if request.method == 'POST':
         selected_application_id = request.POST.get('application_id')
@@ -440,23 +471,30 @@ def select_active_company(request):
     }
     return render(request, 'student_pages/select_active_company.html', context)
 
+
 @login_required
 def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 
 @login_required
 def view_profile(request, user_id):
-    # Retrieve the student user and profile using the correct model names
     student_user = get_object_or_404(CustomUser, id=user_id, user_type='Student')
     student_profile = get_object_or_404(stud_profile, user=student_user)  # Use stud_profile with lowercase 's'
+    
+    # Filter reports to only include those submitted by the student
+    reports = BiWeeklyReport.objects.filter(student=student_profile)
+    final_reports = FinalReport.objects.filter(student=student_profile)
 
     context = {
         'student_user': student_user,
         'student_profile': student_profile,
+        'reports': reports,
+        'final_reports': final_reports,
         'current_page': 'view_profile'
     }
     
     return render(request, 'student_pages/view_profile.html', context)
+
 
 @login_required
 def intern_opportunities(request):
