@@ -249,7 +249,7 @@ class FinalReport(models.Model):
         return f"Final Report by {self.student.user.username}"
 
 
-
+# Take attendance
 class Attendance(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name='attendances')
     date = models.DateField()
@@ -261,7 +261,7 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.student.user.username} - {self.date} - {'Present' if self.present else 'Absent'}"
 
-
+#Evaluation
 class Evaluation(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -326,35 +326,7 @@ class SupervisorAssignment(models.Model):
     def __str__(self):
         return f"{self.student.user.username} assigned to {self.supervisor.supervisor_name}"
 
-# class SupervisorEvaluation(models.Model):
-#     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="evaluations")
-#     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, related_name="evaluations")
 
-#     bi_weekly_report_score = models.IntegerField(default=0)
-#     final_report_score = models.IntegerField(default=0)
-#     presentation_score = models.IntegerField(default=0)
-#     total_score = models.IntegerField(default=0, editable=False)  # Auto-calculated
-
-#     def save(self, *args, **kwargs):
-#         # Fetch the student's company evaluation score
-#         company_evaluation = Evaluation.objects.filter(student=self.student).first()
-#         company_score = company_evaluation.total_score if company_evaluation else 0
-
-#         # **Reset total_score before calculating new values**
-#         self.total_score = 0  # Ensures no accumulation of old values
-
-#         # Recalculate the total score properly
-#         self.total_score = (
-#             self.bi_weekly_report_score +
-#             self.final_report_score +
-#             self.presentation_score +
-#             company_score
-#         )
-
-#         super().save(*args, **kwargs)
-
-#     def __str__(self):
-#         return f"Evaluation for {self.student.user.username} by {self.supervisor.supervisor_name}"
 
 class SupervisorEvaluation(models.Model):
     student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="evaluations")

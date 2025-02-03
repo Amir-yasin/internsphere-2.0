@@ -16,9 +16,10 @@ admin.site.register(Internship)
 admin.site.register(BiWeeklyReport)
 admin.site.register(FinalReport)
 admin.site.register(Application)
-# admin.site.register(Evaluation)
-# admin.site.register(EvaluationQuestion)
-# admin.site.register(EvaluationAnswer)
+admin.site.register(Evaluation)
+
+admin.site.register(EvaluationQuestion)
+admin.site.register(EvaluationAnswer)
 
 
 @admin.register(InternshipCareerOffice)

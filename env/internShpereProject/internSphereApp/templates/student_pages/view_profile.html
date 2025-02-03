@@ -15,10 +15,14 @@
     <link rel="stylesheet" href="{% static 'css/hulu.css' %}" />
     <link rel="stylesheet" href="{% static 'css/student-profile.css' %}" />
   </head>
+  <div class="heading">
+    <h2>View Profile</h2>
+  </div>
   <body class="bg-light">
     <div class="container mt-5">
       <div class="text-center mb-4">
       </div>
+
       <a href="{% url 'student_dashboard' %}" class="btn btn-purple mb-3">Back</a>
       <a href="{% url 'student_profile' %}" class="btn btn-purple mb-3">Edit Profile</a>
       <div class="row g-4">
