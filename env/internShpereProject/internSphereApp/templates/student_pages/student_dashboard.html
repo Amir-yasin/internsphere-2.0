@@ -62,7 +62,10 @@
         <h1 class="section-title">Welcome, {{ user.first_name|capfirst }}</h1>
         <p class="lead">Empowering students to track and manage their internships with ease.</p>
     </section>
-
+  
+          <div>
+              <p class="text-center">You are logged in as a {{ user.user_type }}</p>
+          </div>
     <div class="container">
         <section id="features" class="py-5">
             <div class="row mt-4">

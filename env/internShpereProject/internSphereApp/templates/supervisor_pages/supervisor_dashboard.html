@@ -49,11 +49,14 @@
         {% endfor %}
     {% endif %}
 
-    <section class="heading">
-        <h1 class="section-title">Welcome, Supervisor {{ request.user.get_full_name }}</h1>
+   
+    <div class="heading">
+        <h1>Welcome, {{ user.username }}</h1>
         <p class="lead">Empowering supervisors to manage evaluations and reports efficiently.</p>
-    </section>
-
+      </div>
+          <div>
+              <p class="text-center">You are logged in as a {{ user.user_type }}</p>
+          </div>
     <div class="container">
         <section id="features" class="py-5">
             <div class="row mt-4">
