@@ -13,57 +13,60 @@
         color: white;
     }
 </style>
+
 {% if messages %}
-{% for message in messages %}
-    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-{% endfor %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 {% endif %}
+
 <div class="heading">
     <h1>Internship Applicants</h1>
 </div>
+
 <div class="container">
-  {% if pending_applicants.exists %}
-
-  {% for internship, applications in internship_applications.items %}
-    <h2>{{ internship.title }}</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Student Name</th>
-          <th scope="col">Application Date</th>
-          <th scope="col">Status</th>
-          <th scope="col">Active</th>
-          <th scope="col">View Application</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for application in applications %}
-          <tr>
-            <td>{{ application.student.user.get_full_name }}</td>
-            <td>{{ application.applied_on }}</td>
-            <td>{{ application.get_status_display }}</td>
-            <td>{{ application.is_active }}</td>
-            <td><a href="{% url 'view_applicants' application.id %}" class="btn btn-purple">View</a></td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="4">No applications found for this internship.</td>
-          </tr>
+    {% if internship_applications %}
+        {% for internship, applications in internship_applications.items %}
+            <h2 class="mt-4">{{ internship.title }}</h2>
+            {% if applications %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Student Name</th>
+                            <th scope="col">Application Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Active</th>
+                            <th scope="col">View Application</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                            <tr>
+                                <td>{{ application.student.user.get_full_name }}</td>
+                                <td>{{ application.applied_on }}</td>
+                                <td>{{ application.get_status_display }}</td>
+                                <td>{{ application.is_active|yesno:"Yes,No" }}</td>
+                                <td>
+                                    <a href="{% url 'view_applicants' application.id %}" class="btn btn-purple">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No applicants for this internship yet.</p>
+            {% endif %}
         {% endfor %}
-      </tbody>
-    </table>
-  {% empty %}
-    <p>No internships found.</p>
-  {% endfor %}
+    {% else %}
+        <h4>No internships found.</h4>
+    {% endif %}
 
-  {% else %}
-  <h4>No Pending Applicants.</h4>
-  {% endif %}
-  <div class="text-center mt-4">
-  <a href="{% url 'company_dashboard' %}" class="btn btn-purple">Back to Dashboard</a>
-  </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'company_dashboard' %}" class="btn btn-purple">Back to Dashboard</a>
+    </div>
 </div>
+
 {% endblock nav_and_footer %}

@@ -616,14 +616,16 @@ def post_internship(request):
 @login_required
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
-    applications = internship.applications.select_related('student__user')  
+    applicants = internship.applications.all()  # Fetch all applications for this internship
+    student = Internship.objects.select_related('stud_profile').all()
 
     # Filter pending applicants
-    pending_applicants = applications.filter(status="Pending")
+    pending_applicants = applicants.filter(status="Pending")
     
     return render(request, 'company_pages/view_applicants.html', {
         'internship': internship,
-        'applications': applications,
+        'applicants': applicants,
+        'student': student,
         'pending_applicants': pending_applicants,
     })
 @login_required
