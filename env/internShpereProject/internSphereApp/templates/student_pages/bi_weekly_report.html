@@ -1,126 +1,136 @@
 {% extends "main_pages/base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block nav_and_footer %}
-    
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internship Bi-Weekly Report</title>
-    <link rel="stylesheet" href="{% static 'css/bi_weekly_report.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-
-</head>
-<body>
-    <div class="heading">
-        <h1 >Internship Bi-Weekly Report</h1>
-    </div>
-
-    <form method="post"  class="bi-weekly-report-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit Report</button>
-    </form>
-
-    {% comment %} <form method="post" class="bi-weekly-report-form">
-        <div class="form-row">
-            <label for="student_name">Student's Name:</label>
-            <input type="text" id="student_name" name="student_name" required>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bi-Weekly Report</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/hulu.css">
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            .card {
+                border-radius: 12px;
+                background: #fff;
+                padding: 30px;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            }
+            .btn-purple {
+                background-color: purple;
+                color: white;
+            }
+            .btn-purple:hover {
+                background-color: magenta;
+            }
+            label {
+                font-weight: 600;
+            }
+            .form-control {
+                border-radius: 8px;
+            }
+            .form-section {
+                padding: 15px;
+                border-radius: 8px;
+                background: #f1f1f1;
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+        <div class="heading">
+            <h2>Bi-Weekly Report Form</h2>
         </div>
+        <div class="container mt-5">
+            
+            <div class="card shadow-lg">
+                <form id="report-form" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_report_number" class="form-label">Report Number</label>
+                        {{ form.report_number|add_class:"form-control" }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_week_start" class="form-label">Week Start</label>
+                            {{ form.week_start|add_class:"form-control" }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_week_end" class="form-label">Week End</label>
+                            {{ form.week_end|add_class:"form-control" }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_total_hours_completed" class="form-label">Total Hours Completed</label>
+                        {{ form.total_hours_completed|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_assignment_responsibilities" class="form-label">Assignment Responsibilities</label>
+                        {{ form.assignment_responsibilities|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_critical_analysis" class="form-label">Critical Analysis</label>
+                        {{ form.critical_analysis|add_class:"form-control" }}
+                    </div>
+                    <h4 class="mt-4">Work Hours Breakdown</h4>
+                    <div class="form-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_observing_hours" class="form-label">Observing Hours</label>
+                                {{ form.observing_hours|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_administrative_hours" class="form-label">Administrative Hours</label>
+                                {{ form.administrative_hours|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_researching_hours" class="form-label">Researching Hours</label>
+                                {{ form.researching_hours|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_assisting_hours" class="form-label">Assisting Hours</label>
+                                {{ form.assisting_hours|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_misc_hours" class="form-label">Misc Hours</label>
+                                {{ form.misc_hours|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_meetings_discussions" class="form-label">Meetings and Discussions</label>
+                        {{ form.meetings_discussions|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_course_relevance_suggestions" class="form-label">Course Relevance Suggestions</label>
+                        {{ form.course_relevance_suggestions|add_class:"form-control" }}
+                    </div>
+                    <div class="d-flex justify-content-start mb-3">
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'student_dashboard' %}" class="btn btn-purple px-5 py-2">Back</a>
 
-        <div class="form-row">
-            <label for="id_number">ID Number:</label>
-            <input type="text" id="id_number" name="id_number" required>
+                        <button type="submit" class="btn btn-purple px-4 py-2">Submit Report</button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div class="form-row">
-            <label for="section">Section:</label>
-            <input type="text" id="section" name="section" required>
-        </div>
-
-
-        <div class="form-row">
-            <label for="report_number">Report Number:</label>
-            <input type="number" id="report_number" name="report_number" required>
-        </div>
-
-        <div class="form-row">
-            <label for="week_dates">For the week of (Beginning and ending date):</label>
-            <input type="text" id="week_dates" name="week_dates" required>
-        </div>
-
-        <div class="form-row">
-            <label for="hours_completed">Total Hours Completed to Date:</label>
-            <input type="number" id="hours_completed" name="hours_completed" required>
-        </div>
-
-        <div class="form-row">
-            <label for="department">Department:</label>
-            <select id="department" name="department" required>
-                <option value="Accounting">Accounting</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Management">Management</option>
-                <option value="Computer_Science">Computer Science</option>
-                <option value="THM">THM</option>
-            </select>
-        </div>
-
-        <h4>1. Assignment and Responsibilities</h4>
-        <div class="form-row">
-            <label for="assignment">Please give detailed information about your last week's actual assignment and responsibilities:</label>
-            <textarea id="assignment" name="assignment" rows="5" required></textarea>
-        </div>
-
-        <h4>2. Critical Analysis/Reflection</h4>
-        <div class="form-row">
-            <label for="reflection">Make a critical analysis/reflection of your experiences over the past week in terms of learning values and experiences you achieved. What did you learn? (Be specific):</label>
-            <textarea id="reflection" name="reflection" rows="5" required></textarea>
-        </div>
-
-        <h4>3. Hours Spent</h4>
-        <div class="form-row">
-            <label for="observing_hours">Observing (hours):</label>
-            <input type="number" id="observing_hours" name="observing_hours" required>
-        </div>
-
-        <div class="form-row">
-            <label for="administrative_hours">Administrative (hours):</label>
-            <input type="number" id="administrative_hours" name="administrative_hours" required>
-        </div>
-
-        <div class="form-row">
-            <label for="researching_hours">Researching (hours):</label>
-            <input type="number" id="researching_hours" name="researching_hours" required>
-        </div>
-
-        <div class="form-row">
-            <label for="assisting_hours">Assisting (hours):</label>
-            <input type="number" id="assisting_hours" name="assisting_hours" required>
-        </div>
-
-        <div class="form-row">
-            <label for="miscellaneous_hours">Miscellaneous (hours):</label>
-            <input type="number" id="miscellaneous_hours" name="miscellaneous_hours" required>
-        </div>
-
-        <h4>4. Meetings and Discussions</h4>
-        <div class="form-row">
-            <label for="meetings_discussions">Discuss briefly the nature of meetings and discussion topics, field trips, and assigned readings (if applicable) you had with the agency supervisor in which you are assigned for the internship:</label>
-            <textarea id="meetings_discussions" name="meetings_discussions" rows="5" required></textarea>
-        </div>
-
-        <h4>5. Course Relevance and Suggestions</h4>
-        <div class="form-row">
-            <label for="course_relevance">To what extent the courses you studied supported you in the internship? Were they relevant to the actual work you practiced? What content/topics do you suggest to be added for the future?</label>
-            <textarea id="course_relevance" name="course_relevance" rows="5" required></textarea>
-        </div>
-
-        <button type="submit">Submit Report</button>
-    </form> {% endcomment %}
-
-
-
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
 {% endblock nav_and_footer %}
-    

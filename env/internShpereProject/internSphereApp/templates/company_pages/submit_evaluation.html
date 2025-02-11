@@ -2,8 +2,6 @@
 {% load static %}
 
 {% block nav_and_footer %}
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,66 +10,123 @@
     <title>Evaluation Form</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 20px 0;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #ddd;
-      }
-      th {
-          background-color: #f4f4f4;
-      }
-  </style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+      
+      
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #c923a5;
+            color: white;
+        }
+
+        /* Hide numbers from radio button labels */
+        td label {
+            display: inline-block;
+            cursor: pointer;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: 0.3s;
+        }
+
+        td input {
+            display: none;
+        }
+
+        td input:checked + label {
+            background: #c923a5;
+            color: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            background: purple;
+
+        }
+
+        .btn-submit:hover {
+            background: #c923a5;
+        }
+
+        .alert-success {
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
+    <div class="heading"><h2>Intern Evaluation Form</h2></div>
+
     <div class="container">
         {% if messages %}
-        <div class="alert alert-success" role="alert">
-            {% for message in messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
                 {{ message }}
-            {% endfor %}
-        </div>
-        {% endif %}
-        <div class="heading">
-          <h2 class="mb-4">Evaluation Form</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        </div>
-        <form method="post" class="mb-4">
+
+        <form method="post">
             {% csrf_token %}
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Question</th>
+                        <th>N/A</th>
                         <th>1</th>
                         <th>2</th>
                         <th>3</th>
                         <th>4</th>
                         <th>5</th>
+
                     </tr>
                 </thead>
                 <tbody>
-                  {% for field in form %}
-                      <tr>
-                          <td>{{ field.label }}</td>
-                          {% for subwidget in field %}
-                              <td>{{ subwidget }}</td>
-                          {% endfor %}
-                      </tr>
-                  {% endfor %}
-              </tbody>
+                    {% for field in form %}
+                        <tr>
+                            <td>{{ field.label }}</td>
+                            {% for subwidget in field %}
+                                <td>
+                                    <input type="radio" id="{{ subwidget.id_for_label }}" name="{{ field.name }}" value="{{ subwidget.choice_label }}">
+                                    <label for="{{ subwidget.id_for_label }}"></label>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
-            <button type="submit" class="btn btn-primary">Submit Evaluation</button>
+            <button type="submit" class="btn-submit">Submit Evaluation</button>
         </form>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-  
-
 {% endblock nav_and_footer %}

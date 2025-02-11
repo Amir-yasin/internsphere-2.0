@@ -1,0 +1,47 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<div class="heading">    <h2 class="mb-3">Assign Supervisor</h2>
+</div>
+<div class="container mt-4">
+
+    <!-- Django Messages with Bootstrap Styling -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="assign-form" class="p-4 border rounded bg-light">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="section_batch" class="form-label">Select Section & Batch:</label>
+            <select id="section_batch" name="section_batch" class="form-select" required>
+                <option value="">-- Select Section & Batch --</option>
+                {% for section, batch in section_batches %}
+                <option value="{{ section }}|{{ batch }}">{{ section }} - {{ batch }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="supervisor" class="form-label">Select Supervisor:</label>
+            <select id="supervisor" name="supervisor_id" class="form-select" required>
+                <option value="">-- Select Supervisor --</option>
+                {% for supervisor in supervisors %}
+                <option value="{{ supervisor.id }}">{{ supervisor.supervisor_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <a href="{% url 'department_dashboard' %}" class="btn btn-purple">Back to Dashboard</a>
+        <button type="submit" class="btn" style="background-color: purple; color: white;">Assign Supervisor</button>
+
+    </form>
+</div>
+
+{% endblock nav_and_footer %}

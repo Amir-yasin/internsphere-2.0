@@ -1,0 +1,95 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<style>
+    .bg-purple {
+        background-color: #c923a5;
+        color: white;
+    }
+
+    .bg-purple:hover {
+        background-color: purple;
+        color: white;
+    }
+
+    .attendance-heading {
+        text-align: center;
+        margin: 20px 0;
+        color: #c923a5;
+        font-weight: bold;
+    }
+
+    .student-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .student-item {
+        background-color: #f9f4fb;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .student-item:hover {
+        background-color: #f0e4f8;
+    }
+
+    .student-name {
+        font-size: 16px;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .attendance-link {
+        text-decoration: none;
+        font-size: 14px;
+        padding: 10px 15px;
+        border-radius: 4px;
+        color: white;
+        background-color: #c923a5;
+    }
+
+    .attendance-link:hover {
+        background-color: purple;
+    }
+</style>
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
+<div class="heading"><h2>Attendance List</h2>
+</div>
+<div class="container">
+
+    <ul class="student-list">
+        
+        {% if students %}
+            
+            
+        {% for student in students %}
+        <li class="student-item">
+            <span class="student-name">
+                {{ student.user.get_full_name }} ({{ student.user.username }})
+            </span>
+            <a href="{% url 'attendance' student.id %}" class="attendance-link">
+                Mark Attendance
+            </a>
+        </li>
+        {% endfor %}
+        {% else %}
+        <h4>No Interns Found To Mark Attendance.</h4>
+        {% endif %}
+
+    </ul>
+</div>
+{% endblock nav_and_footer %}

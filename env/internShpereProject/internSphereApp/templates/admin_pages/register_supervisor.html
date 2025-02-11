@@ -2,25 +2,104 @@
 {% load static %}
 
 {% block nav_and_footer %}
-
 <div class="heading">
-    <h2>Register a Supervisor</h2>
+  <h2>Register Supervisor</h2>
 
 </div>
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert {{ message.tags }}">
-      {{ message }}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4 text-purple">Register New Supervisors</h2>
+
+        <!-- Display Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Supervisor Registration Form -->
+        <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" placeholder="Enter Username" required>
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" id="id_password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" placeholder="Enter Password" required>
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_supervisor_name" class="form-label">Supervisor Name</label>
+                <input type="text" name="supervisor_name" id="id_supervisor_name" class="form-control {% if form.supervisor_name.errors %}is-invalid{% endif %}" placeholder="Enter Supervisor Name" required>
+                <div class="invalid-feedback">
+                    {% for error in form.supervisor_name.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_department" class="form-label">Department</label>
+                <select name="department" id="id_department" class="form-select {% if form.department.errors %}is-invalid{% endif %}" required>
+                    <option value="" selected disabled>Choose Department</option>
+                    {% for department in form.department.field.queryset %}
+                        <option value="{{ department.id }}">{{ department.department_name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                    {% for error in form.department.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-purple">Register</button>
+            </div>
+        </form>
     </div>
-  {% endfor %}
-{% endif %}
-<link rel="stylesheet" href="{% static 'css/applications.css' %}">
-<div class="container">
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <a href="admin_dashboard" class="btn">Back to dashboard</a>
-  <a type="submit" class="btn">Register Supervisor</a>
-</form>
 </div>
+
+<style>
+    body {
+        background-color: white;
+    }
+
+    .btn-primary {
+        background-color: purple;
+        color: white;
+        font-weight: bold;
+    }
+
+    .btn-primary:hover {
+        background-color: #800080;
+    }
+
+    .card {
+        max-width: 500px;
+        margin: auto;
+        border-radius: 10px;
+    }
+
+    .text-purple {
+        color: purple;
+    }
+</style>
+
 {% endblock nav_and_footer %}

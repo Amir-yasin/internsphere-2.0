@@ -14,6 +14,11 @@ from django.shortcuts import get_list_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from django.utils.timezone import now
+from datetime import date, timedelta
+from django.db import transaction
+from django.db.models import Subquery, OuterRef, Value, IntegerField
+from django.db.models import Count
+
 
 
 # main pages views
@@ -23,16 +28,6 @@ def about(request):
     return render(request, 'main_pages/About.html', {'current_page': 'about'})
 def contact(request):
     return render(request, 'main_pages/contact.html', {'current_page': 'contact'})
-
-def register_user(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('login')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'main_pages/register.html', {'form': form, 'current_page': 'contact'})
 
 
 def login_user(request):
@@ -79,14 +74,13 @@ def Internships(request):
 
 @login_required
 def student_profile(request):
-    # Ensure the user has a student profile
+    
     if not hasattr(request.user, 'stud_profile'):
-        return redirect('error_page')  # Redirect if no profile exists
+        return redirect('error_page')  
 
     student = request.user.stud_profile
 
     if request.method == 'POST':
-        # Safeguard: Handle missing fields gracefully
         student.email = request.POST.get('email', student.email)
         student.phone_number = request.POST.get('phone_number', student.phone_number)
         student.gender = request.POST.get('gender', student.gender)
@@ -95,18 +89,18 @@ def student_profile(request):
         student.resume = request.FILES.get('resume', student.resume)
         student.linkedin_profile = request.POST.get('linkedin_profile', student.linkedin_profile)
         student.department = request.POST.get('department', student.department)
-        student.profile_completed = True  # Mark profile as completed
+        student.profile_completed = True  
         student.save()
         
         messages.success(request, 'Profile updated successfully!')
         return redirect('student_dashboard')
 
-    # Render the profile completion form
     return render(request, 'student_pages/student_profile.html', {
         'student': student,
         'department_choices': stud_profile.DEPARTMENT_CHOICES,
     })
     
+
 @login_required
 def bi_weekly_report(request):
     try:
@@ -123,6 +117,14 @@ def bi_weekly_report(request):
             messages.error(request, 'You have not selected a company to work with. Please select one.')
             return redirect('select_active_company')  
 
+        # Check if the student has submitted a report in the last two weeks
+        last_report = BiWeeklyReport.objects.filter(student=student_profile).order_by('-date_submitted').first()
+        if last_report:
+            time_since_last_report = timezone.now() - last_report.date_submitted
+            if time_since_last_report < timedelta(weeks=2):
+                messages.error(request, 'You can only submit a bi-weekly report every two weeks. Please wait for the next submission window.')
+                return redirect('student_dashboard')  
+
     except AttributeError:
         messages.error(request, 'Student profile is missing.')
         return redirect('student_profile')
@@ -131,9 +133,9 @@ def bi_weekly_report(request):
         form = BiWeeklyReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
-            report.student = student_profile  # Associate the student profile
-            report.company = active_application.company  # Use the active company
-            report.application_status = active_application  # Associate the application
+            report.student = student_profile  
+            report.company = active_application.company  
+            report.application_status = active_application  
             report.save()
             messages.success(request, 'Bi-weekly report submitted successfully!')
             return redirect('student_dashboard')
@@ -149,6 +151,7 @@ def bi_weekly_report(request):
     }
     return render(request, 'student_pages/bi_weekly_report.html', context)
 
+
 def view_biweekly_report(request, report_id):
     # Retrieve the report for viewing
     report = get_object_or_404(BiWeeklyReport, id=report_id)
@@ -159,13 +162,35 @@ def view_biweekly_report(request, report_id):
 def review_biweekly_reports(request):
     user = request.user
 
+    # Initialize variables
+    biweekly_reports = None
+    final_reports = None
+    evaluations = None
+
+    # Ensures the logged-in user is a company
     if user.user_type == "Company":
+        # Get the logged-in company
+        logged_in_company = user.company
+
+        # Fetch students who have selected this company as their active company
+        students_with_active_company = stud_profile.objects.filter(
+            applications__company=logged_in_company,
+            applications__is_active=True
+        ).distinct()
+
+        # Filter bi-weekly reports for these students
         biweekly_reports = BiWeeklyReport.objects.filter(
-            company=user.company, company_approval_status="Pending"
-        )
-        final_reports = FinalReport.objects.filter(
+            student__in=students_with_active_company,
+            company=logged_in_company,
             company_approval_status="Pending"
         )
+
+        # Filter final reports for these students
+        final_reports = FinalReport.objects.filter(
+            student__in=students_with_active_company,
+            company_approval_status="Pending"
+        )
+
     elif user.user_type == "InternshipCareerOffice":
         biweekly_reports = BiWeeklyReport.objects.filter(
             company_approval_status="Approved",
@@ -175,6 +200,8 @@ def review_biweekly_reports(request):
             company_approval_status="Approved",
             internship_office_approval_status="Pending"
         )
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
+
     elif user.user_type == "Department":
         biweekly_reports = BiWeeklyReport.objects.filter(
             internship_office_approval_status="Approved",
@@ -183,8 +210,16 @@ def review_biweekly_reports(request):
         )
         final_reports = FinalReport.objects.filter(
             internship_office_approval_status="Approved",
-            department_approval_status="Pending"
+            department_approval_status="Pending",
+            student__department=user.department_profile.department_name,
+
         )
+        evaluations = Evaluation.objects.filter(
+            internship_office_approval_status='Approved',
+            department_approval_status='Pending',
+            student__department=user.department_profile.department_name
+        )
+
     elif user.user_type == "Supervisor":
         biweekly_reports = BiWeeklyReport.objects.filter(
             department_approval_status="Approved",
@@ -193,20 +228,41 @@ def review_biweekly_reports(request):
         )
         final_reports = FinalReport.objects.filter(
             department_approval_status="Approved",
-            supervisor_approval_status="Pending"
+            supervisor_approval_status="Pending",
+                        student__department=user.supervisor_profile.department.department_name,
+
         )
-    else:
-        biweekly_reports = None
-        final_reports = None
+        evaluations = Evaluation.objects.filter(
+            department_approval_status='Approved',
+            student__department=user.supervisor_profile.department.department_name
+        )
 
-    # Group reports by student
+    # Group reports and evaluations by student
     reports_by_student = {}
-    for report in biweekly_reports:
-        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["biweekly"].append(report)
-    for report in final_reports:
-        reports_by_student.setdefault(report.student, {"biweekly": [], "final": []})["final"].append(report)
+    if biweekly_reports:
+        for report in biweekly_reports:
+            student = report.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["biweekly"].append(report)
 
+    if final_reports:
+        for report in final_reports:
+            student = report.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["final"].append(report)
+
+    if evaluations:
+        for evaluation in evaluations:
+            student = evaluation.student
+            if student not in reports_by_student:
+                reports_by_student[student] = {"biweekly": [], "final": [], "evaluations": []}
+            reports_by_student[student]["evaluations"].append(evaluation)
+
+    # Render the template with the grouped data
     return render(request, "company_pages/review_biweekly_reports.html", {"reports_by_student": reports_by_student})
+
 
 
 @login_required
@@ -262,7 +318,7 @@ def final_report(request):
 
         # Check for the active company
         active_application = Application.objects.filter(student=student_profile, is_active=True).first()
-
+        # print(active_application)
         if not active_application:
             messages.error(request, 'You have not selected a company to work with. Please select one.')
             return redirect('select_active_company')  
@@ -272,8 +328,8 @@ def final_report(request):
         return redirect('student_profile')
 
     try:
-        # Access the student's profile (assuming stud_profile is related to User)
-        stud_profile_instance = request.user.stud_profile  # Access the related stud_profile instance
+        # Access the student's profile 
+        stud_profile_instance = request.user.stud_profile  
 
         # Check if the student has already submitted a report
         report_instance = FinalReport.objects.get(student=stud_profile_instance)
@@ -281,17 +337,17 @@ def final_report(request):
     except FinalReport.DoesNotExist:
         form = FinalReportForm(request.POST or None, request.FILES or None)
     except stud_profile.DoesNotExist:
-        # Handle the case where stud_profile doesn't exist for the user
+        # Handles the case where stud_profile doesn't exist for the user
         messages.error(request, "No profile found for the current user.")
         return redirect('home')
 
     if request.method == 'POST':
         if form.is_valid():
             final_report = form.save(commit=False)
-            final_report.student = stud_profile_instance  # Set the related stud_profile instance
+            final_report.student = stud_profile_instance  
             final_report.save()
             messages.success(request, "Your final report has been submitted successfully!")
-            return redirect('student_dashboard')  # Replace with the URL name for viewing the report
+            return redirect('student_dashboard')  
         else:
             messages.error(request, "Please correct the errors below.")
 
@@ -382,6 +438,15 @@ def applications(request):
 def select_active_company(request):
     student_profile = request.user.stud_profile
     accepted_applications = Application.objects.filter(student=student_profile, status='Accepted')
+    active_application = Application.objects.filter(student=student_profile, is_active=True).first()
+
+    # If an active application is already selected, prevent further changes
+    if active_application:
+        # Display the selected active company
+        context = {
+            'active_company': active_application.company.company_name,
+        }
+        return render(request, 'student_pages/select_active_company.html', context)
 
     if request.method == 'POST':
         selected_application_id = request.POST.get('application_id')
@@ -400,23 +465,30 @@ def select_active_company(request):
     }
     return render(request, 'student_pages/select_active_company.html', context)
 
+
 @login_required
 def stud_notification(request):
     return render(request, 'student_pages/stud_notification.html', {'current_page': 'stud_notification'})
 
 @login_required
 def view_profile(request, user_id):
-    # Retrieve the student user and profile using the correct model names
     student_user = get_object_or_404(CustomUser, id=user_id, user_type='Student')
-    student_profile = get_object_or_404(stud_profile, user=student_user)  # Use stud_profile with lowercase 's'
+    student_profile = get_object_or_404(stud_profile, user=student_user)  
+    
+    # Filter reports to only include those submitted by the student
+    reports = BiWeeklyReport.objects.filter(student=student_profile)
+    final_reports = FinalReport.objects.filter(student=student_profile)
 
     context = {
         'student_user': student_user,
         'student_profile': student_profile,
+        'reports': reports,
+        'final_reports': final_reports,
         'current_page': 'view_profile'
     }
     
     return render(request, 'student_pages/view_profile.html', context)
+
 
 @login_required
 def intern_opportunities(request):
@@ -438,28 +510,6 @@ def intern_opportunities(request):
     except stud_profile.DoesNotExist:
         return redirect('student_profile')
 
-# # views.py
-# import json
-# from django.http import JsonResponse
-# from .models import Internship
-
-# def internships_by_department(request):
-#     # Assume student's department is passed as a query parameter
-#     department = request.GET.get('department', None)
-#     if department:
-#         internships = Internship.objects.filter(sector=department)
-#         internships_data = [
-#             {
-#                 'title': internship.title,
-#                 'description': internship.description,
-#                 'location': internship.location,
-#                 'start_date': internship.start_date,
-#                 'end_date': internship.end_date,
-#             }
-#             for internship in internships
-#         ]
-#         return JsonResponse({'internships': internships_data})
-#     return JsonResponse({'error': 'Department not specified'}, status=400)
 
 
 
@@ -471,7 +521,7 @@ def company_register(request):
             user = form.save(commit=False)
             user.user_type = 'Company'
             user.save()
-            # Save company profile with approved=False by default
+            
             Company.objects.create(
                 user=user,
                 company_name=form.cleaned_data['company_name'],
@@ -481,10 +531,17 @@ def company_register(request):
                 approved=False
             )
             return redirect('login')
+        else:
+            return render(request, 'company_pages/company_register.html', {
+                'form': form,
+                'current_page': 'company_register',
+                'errors': form.errors
+            })
     else:
         form = CompanyRegistrationForm()
 
     return render(request, 'company_pages/company_register.html', {'form': form, 'current_page': 'company_register'})
+
 
 @login_required
 def view_company_profile(request, user_id):
@@ -501,24 +558,29 @@ def view_company_profile(request, user_id):
 def company_dashboard(request):
     # Ensure the user is a company
     if not hasattr(request.user, 'company'):
-        return render(request, 'error.html', {'message': 'You are not authorized to view this page.'})
+        return render(request, 'home')
+    company = request.user.company  
+    interns = Internship.objects.filter(company=company)
+    internships = company.internships.all()
+    internship_list = [{'id': internship.id, 'title': internship.title} for internship in internships]
+    active_applications = Application.objects.filter(company=company, is_active=True)
+    students = stud_profile.objects.filter(applications__in=active_applications).distinct()
 
-    # Fetch all active applications for the company's internships
-    active_applications = Application.objects.filter(company=request.user.company, is_active=True)
-
-    # Fetch the students and their associated internships
     students_with_internships = [
         {
-            'student': application.student,  # Student linked to the application
-            'internship': application.internship,  # Internship for the application
+            'student': application.student,  
+            'internship': application.internship,  
         }
         for application in active_applications
     ]
 
-    # Pass the student-internship pairs to the template
     context = {
-        'students_with_internships': students_with_internships,
+        'internship_list': internship_list,  
+        'students': students,  
+        'students_with_internships': students_with_internships, 
+        'interns': interns,
     }
+
     return render(request, 'company_pages/company_dashboard.html', context)
 
 
@@ -554,23 +616,22 @@ def post_internship(request):
 @login_required
 def view_applicants(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id)
-    # applicants = internship.applications.all()  # Fetch all applications for this internship
-    applications = internship.applications.select_related('student__user')  # Optimized query
+    applicants = internship.applications.all()  # Fetch all applications for this internship
+    student = Internship.objects.select_related('stud_profile').all()
 
     # Filter pending applicants
-    pending_applicants = applications.filter(status="Pending")
+    pending_applicants = applicants.filter(status="Pending")
     
     return render(request, 'company_pages/view_applicants.html', {
         'internship': internship,
-        # 'applicants': applicants,
-        'applications': applications,
+        'applicants': applicants,
+        'student': student,
         'pending_applicants': pending_applicants,
     })
 @login_required
 def update_application_status(request, application_id, status):
     application = get_object_or_404(Application, id=application_id, internship__company=request.user.company)
 
-    # Update the status if it's valid
     if status in ['Accepted', 'Rejected']:
         application.status = status
         application.save()
@@ -580,128 +641,252 @@ def update_application_status(request, application_id, status):
 
     return redirect('view_applicants', internship_id=application.internship.id)
 
+def attendance(request, student_id):
+    student = get_object_or_404(stud_profile, id=student_id)
+    today = date.today()
+    start_date = today - timedelta(days=today.weekday())  # Start of the current week (Monday)
+    dates = [(start_date - timedelta(weeks=w)) for w in range(8)]  # Generate start dates of past 8 weeks
+    weeks = {w + 1: [(start_date - timedelta(weeks=w) + timedelta(d), None) for d in range(5)] for w in range(8)}
 
-@login_required
-def attendance(request):
-    return render(request, 'company_pages/attendance.html', {'current_page': 'attendance'})
+    for week, days in weeks.items():
+        for i, (day, _) in enumerate(days):
+            try:
+                attendance = Attendance.objects.get(student=student, date=day)
+                weeks[week][i] = (day, attendance.present)
+            except Attendance.DoesNotExist:
+                weeks[week][i] = (day, False)
+
+    if request.method == 'POST':
+        for week, days in weeks.items():
+            for day, _ in days:
+                date_str = day.strftime('%Y-%m-%d')
+                present = request.POST.get(date_str) == 'on'  
+                attendance, created = Attendance.objects.get_or_create(student=student, date=day, defaults={'present': present})
+                if not created:
+                    attendance.present = present
+                    attendance.save()
+        messages.success(request, "Attendance marked successfully!")
+        return redirect('attendance', student_id=student.id)
+
+    context = {
+        'student': student,
+        'weeks': weeks,
+    }
+    return render(request, 'company_pages/attendance.html', context)
+
+
+def attendance_list(request):
+    company = request.user.company  
+    internships = Internship.objects.all
+    active_applications = Application.objects.filter(company=company, is_active=True)
+    students = [app.student for app in active_applications]
+    return render(request, "company_pages/attendance_list.html", {"students": students , "internships": internships})
+
+
+
+from datetime import date, timedelta
+from django.db.models import Q
+
+
+def has_unmarked_absences(student, days=3):
+    today = date.today()
+
+    working_days = [today - timedelta(days=i) for i in range(14) if (today - timedelta(days=i)).weekday() < 5]
+    
+    attendance_records = Attendance.objects.filter(student=student, date__in=working_days).order_by('date')
+
+    attendance_dict = {record.date: record.present for record in attendance_records}
+
+    consecutive_absent_days = 0
+    absent_dates = []  
+    result = {"has_absence": False, "absent_dates": []}  
+
+    for day in working_days:
+        if day not in attendance_dict or not attendance_dict[day]:
+            consecutive_absent_days += 1
+            absent_dates.append(day) 
+            if consecutive_absent_days >= days:
+                result["has_absence"] = True
+                result["absent_dates"] = absent_dates[-days:]  
+                break  
+            consecutive_absent_days = 0  
+            absent_dates = []  
+    return result
+
+
+
+
+def absent_students(request):
+    internship_office = request.user.internshipcareeroffice   
+    active_applications = Application.objects.filter(is_active=True)
+    students = [app.student for app in active_applications]
+
+    # Find students who have 3 consecutive missing or absent attendance days
+    absent_students_with_dates = []
+    for student in students:
+        absence_info = has_unmarked_absences(student, 3)
+        if absence_info["has_absence"]:
+            absent_students_with_dates.append({
+                "student": student,
+                "absent_dates": absence_info["absent_dates"]
+            })
+
+  
+
+    # Ensure the absent_students_with_dates context is being passed
+    return render(
+        request,
+        "internship_office_pages/absentees.html",
+        {"absent_students_with_dates": absent_students_with_dates}
+    )
 
 @login_required
 def accepted_interns(request):
     return render(request, 'company_pages/accepted_interns.html', {'current_page': 'accepted_interns'})
 
+@login_required
 def submit_evaluation(request, student_id, internship_id):
-    # Check if the company user has permission
-    try:
-        company = request.user.company
-    except AttributeError:
-        messages.error(request, "You do not have permission to evaluate.")
-        return redirect('dashboard')
-
-    # Fetch student and internship objects
     student = get_object_or_404(stud_profile, id=student_id)
     internship = get_object_or_404(Internship, id=internship_id)
+    company = request.user.company 
 
-    # Check if an evaluation already exists for this student and company
+    # Check if an evaluation already exists
     if Evaluation.objects.filter(student=student, company=company, internship=internship).exists():
         messages.error(request, "You have already submitted an evaluation for this student.")
         return redirect('evaluation_list')
 
-    # Handle form submission
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EvaluationForm(request.POST)
         if form.is_valid():
-            # Create evaluation object
-            evaluation = Evaluation.objects.create(
-                student=student,
-                company=company,
-                internship=internship,
-                total_score=0  # Will calculate below
-            )
-            total_score = 0
+            total_raw_score = 0
+            answered_questions = 0  # Track only answered questions (1-5)
 
-            # Save answers and calculate total score
-            for question, answer in form.cleaned_data.items():
-                question_obj = EvaluationQuestion.objects.get(id=question.split("_")[1])  # Extract question ID
-                EvaluationAnswer.objects.create(
-                    evaluation=evaluation,
-                    question=question_obj,
-                    answer=int(answer)
+            with transaction.atomic():  # Ensure atomic save
+                evaluation = Evaluation.objects.create(
+                    student=student,
+                    internship=internship,
+                    company=company,
+                    total_score=0  # Temporary value, will update after calculation
                 )
-                total_score += int(answer)
 
-            # Update evaluation with total score
-            evaluation.total_score = total_score
-            evaluation.save()
+                for question in EvaluationQuestion.objects.all():
+                    field_name = f'question_{question.id}'
+                    answer_value = form.cleaned_data.get(field_name)
 
-            messages.success(request, "Evaluation submitted successfully!")
-            return redirect('evaluation_list')
-        else:
-            messages.error(request, "There was an error with your submission. Please try again.")
+                    if answer_value != 'N/A': 
+                        answered_questions += 1
+                        total_raw_score += int(answer_value)
+
+                        # Save individual answers
+                        EvaluationAnswer.objects.create(
+                            evaluation=evaluation,
+                            question=question,
+                            answer=int(answer_value)
+                        )
+
+                if answered_questions > 0:
+                    evaluation.total_score = round((total_raw_score / answered_questions) * 10, 2)
+                else:
+                    evaluation.total_score = 0  
+
+                evaluation.save()
+
+            messages.success(request, "Evaluation submitted successfully.")
+            return redirect('evaluation_list')  
+
     else:
         form = EvaluationForm()
 
-    return render(request, 'company_pages/submit_evaluation.html', {'form': form})
+    return render(request, 'company_pages/submit_evaluation.html', {
+        'form': form,
+        'student': student,
+        'internship': internship,
+    })
+
 
 
 
 @login_required
 def evaluation_list(request):
-    evaluations = Evaluation.objects.filter(company=request.user.company)
     user = request.user
+
     if hasattr(user, 'company'):
         evaluations = Evaluation.objects.filter(company=user.company)
     elif user.user_type == 'InternshipCareerOffice':
-        evaluations = Evaluation.objects.filter(company_approval_status='Approved')
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
     elif user.user_type == 'Department':
-        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved')
+        evaluations = Evaluation.objects.filter(internship_office_approval_status='Approved', department_approval_status='Pending')
+    elif user.user_type == 'Supervisor':
+        evaluations = Evaluation.objects.filter(department_approval_status='Approved')
     else:
         evaluations = None
 
     return render(request, 'company_pages/evaluation_list.html', {'evaluations': evaluations})
+
 
 @login_required
 def view_evaluation(request, evaluation_id):
     evaluation = get_object_or_404(Evaluation, id=evaluation_id)
     answers = EvaluationAnswer.objects.filter(evaluation=evaluation)
 
-    context = {
+    return render(request, 'company_pages/view_evaluation.html', {
         'evaluation': evaluation,
         'answers': answers,
-    }
-    return render(request, 'company_pages/view_evaluation.html', context)
+    })
 
-@login_required
+
+
 def approve_evaluation(request, evaluation_id, action):
     evaluation = get_object_or_404(Evaluation, id=evaluation_id)
     user = request.user
 
     if request.method == 'POST':
-        if action == 'approve':
-            if user.user_type == 'Company':
-                evaluation.company_approval_status = 'Approved'
-                evaluation.company_approval_date = now()
-            elif user.user_type == 'InternshipCareerOffice':
+        if action not in ('approve', 'reject'):
+            messages.error(request, "Invalid action.")
+            return redirect('evaluation_list')
+
+        if user.user_type == 'InternshipCareerOffice':
+            if action == 'approve':
                 evaluation.internship_office_approval_status = 'Approved'
                 evaluation.internship_office_approval_date = now()
-            elif user.user_type == 'Department':
-                evaluation.department_approval_status = 'Approved'
-                evaluation.department_approval_date = now()
-        elif action == 'reject':
-            if user.user_type == 'Company':
-                evaluation.company_approval_status = 'Rejected'
-                evaluation.company_approval_date = now()
-            elif user.user_type == 'InternshipCareerOffice':
+            else:
                 evaluation.internship_office_approval_status = 'Rejected'
                 evaluation.internship_office_approval_date = now()
-            elif user.user_type == 'Department':
+        elif user.user_type == 'Department':
+            if action == 'approve':
+                evaluation.department_approval_status = 'Approved'
+                evaluation.department_approval_date = now()
+            else:
                 evaluation.department_approval_status = 'Rejected'
                 evaluation.department_approval_date = now()
 
+        # Save the evaluation status and redirect
         evaluation.save()
         messages.success(request, f"Evaluation has been {action}d.")
         return redirect('evaluation_list')
 
-    return render(request, 'evaluations/approve_evaluation.html', {'evaluation': evaluation})
+    return render(request, 'company_pages/approve_evaluation.html', {'evaluation': evaluation})
+
+
+@login_required
+def bulk_approve_evaluations(request):
+    if request.user.user_type != 'InternshipCareerOffice':
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        evaluation_ids = request.POST.getlist('evaluation_ids')  
+        evaluations = Evaluation.objects.filter(id__in=evaluation_ids, internship_office_approval_status='Pending')
+        evaluations.update(
+            internship_office_approval_status='Approved',
+            internship_office_approval_date=now()
+        )
+        messages.success(request, f"{evaluations.count()} evaluations approved successfully.")
+        return redirect('evaluation_list')
+
+    evaluations = Evaluation.objects.filter(internship_office_approval_status='Pending')
+    return render(request, 'evaluations/bulk_approve.html', {'evaluations': evaluations})
+
 # Admin Views
 @login_required
 def admin_dashboard(request):
@@ -714,7 +899,6 @@ def admin_dashboard(request):
 
 
     # internship and carrer office views
-# Dashboard view for Internship Career Office
 @login_required
 def icu_dashboard(request):
     if request.user.user_type != 'InternshipCareerOffice':
@@ -725,14 +909,23 @@ def icu_dashboard(request):
     reports = BiWeeklyReport.objects.all()
     evaluations = Evaluation.objects.all()
     attendance_records = Attendance.objects.all()
+    
+    # Get students who have 3 consecutive unmarked weekdays
+    absent_students_list = [student for student in students if has_unmarked_absences(student, 3)]
+
+ 
+    for student in absent_students_list:
+        print(f"Student ID: {student.id}, User: {student.user}, First Name: {getattr(student.user, 'first_name', 'N/A')}")
 
     return render(request, 'internship_office_pages/icu_dashboard.html', {
         'students': students,
         'reports': reports,
         'evaluations': evaluations,
         'attendance_records': attendance_records,
+        'absent_students': absent_students_list,
     })
-    
+
+
 
 
 def register_students(request):
@@ -794,8 +987,7 @@ def view_company_info(request, company_id):
 
 @login_required
 def dis_approve_company(request, company_id):
-    # company = get_object_or_404(company, id=company_id)
-    # company.user.delete()  
+   
     if request.user.is_superuser: 
         company = get_object_or_404(Company, id=company_id)
         company.approved = False
@@ -817,7 +1009,7 @@ def register_internship_career_office(request):
         form = InternshipCareerOfficeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('icu_list')  # Redirect to a page listing all career offices or a success page
+            return redirect('icu_list')  
     else:
         form = InternshipCareerOfficeForm()
     return render(request, 'admin_pages/register_internship_career_office.html', {'form': form})
@@ -830,9 +1022,9 @@ def icu_list(request):
 
 @login_required
 def register_department(request):
-    if not request.user.is_superuser:  # Only allow superusers to register departments
+    if not request.user.is_superuser: 
         messages.error(request, "You do not have permission to register a department.")
-        return redirect('home')  # Replace 'home' with the appropriate URL name
+        return redirect('home') 
 
     if request.method == "POST":
         form = DepartmentRegistrationForm(request.POST)
@@ -840,7 +1032,7 @@ def register_department(request):
             try:
                 form.save()
                 messages.success(request, "Department registered successfully!")
-                return redirect('department_list')  # Replace with the URL name for department list
+                return redirect('department_list')  
             except Exception as e:
                 messages.error(request, f"An error occurred: {e}")
         else:
@@ -858,9 +1050,9 @@ def department_list(request):
 
 @login_required
 def register_supervisor(request):
-    if not request.user.is_superuser:  # Only allow superusers to register supervisors
+    if not request.user.is_superuser:  
         messages.error(request, "You do not have permission to register a supervisor.")
-        return redirect('home')  # Replace 'home' with the appropriate URL name
+        return redirect('home')  
 
     if request.method == "POST":
         form = SupervisorRegistrationForm(request.POST)
@@ -868,7 +1060,7 @@ def register_supervisor(request):
             try:
                 form.save()
                 messages.success(request, "Supervisor registered successfully!")
-                return redirect('supervisor_list')  # Replace with the URL name for supervisor list
+                return redirect('supervisor_list') 
             except Exception as e:
                 messages.error(request, f"An error occurred: {e}")
         else:
@@ -924,4 +1116,163 @@ def supervisor_dashboard(request):
         'final_reports': final_reports,
         'evaluations': evaluations,
         'attendance_records': attendance_records,
+    })
+    
+  
+    
+@login_required
+def view_applicants_list(request):
+    user = request.user
+
+    # Get all internships for the company
+    internships = Internship.objects.filter(company=user.company)
+
+    # Create a dictionary where each internship is mapped to its applications
+    internship_applications = {
+        internship: Application.objects.filter(internship=internship)
+        for internship in internships
+    }
+
+    context = {
+        'internship_applications': internship_applications,
+    }
+    return render(request, 'company_pages/view_applicants_list.html', context)
+
+
+@login_required
+def submit_evaluation_list(request):
+    user = request.user
+    students_with_internships = Application.objects.filter(company=user.company, is_active=True).select_related('student', 'internship')
+
+    context = {
+        'students_with_internships': students_with_internships, 
+    }
+    return render(request, 'company_pages/submit_evaluation_list.html', context)
+
+
+
+
+
+
+
+@login_required
+def assign_supervisor_view(request):
+    if request.method == "POST":
+        section_batch = request.POST.get("section_batch")
+        supervisor_id = request.POST.get("supervisor_id")
+
+        if not section_batch or not supervisor_id:
+            messages.error(request, "Please select a valid section and supervisor.")
+            return redirect("assign_supervisor")
+
+        section, batch = section_batch.split("|")  # Extract section and batch from combined value
+
+        students = stud_profile.objects.filter(section=section, batch=batch)
+        supervisor = get_object_or_404(Supervisor, id=supervisor_id)
+
+        if not students.exists():
+            messages.error(request, "No students found in the selected section and batch.")
+            return redirect("assign_supervisor")
+
+        # Check if the section and batch already have an assigned supervisor
+        existing_assignment = SupervisorAssignment.objects.filter(student__section=section, student__batch=batch).first()
+
+        if existing_assignment:
+            # Update the supervisor for all students in the section and batch
+            SupervisorAssignment.objects.filter(student__section=section, student__batch=batch).update(supervisor=supervisor)
+            messages.success(request, f"Supervisor updated for section {section}, batch {batch}.")
+        else:
+            # Assign the supervisor if not already assigned
+            for student in students:
+                SupervisorAssignment.objects.create(student=student, supervisor=supervisor)
+            messages.success(request, f"Supervisor assigned successfully for section {section}, batch {batch}.")
+
+        return redirect("assign_supervisor")
+
+    # Get supervisors based on department
+    department_name = request.user.department_profile.department_name
+    supervisors = Supervisor.objects.filter(department__department_name=department_name)
+
+    # Fetch unique section-batch combinations that have registered students
+    section_batches = (
+        stud_profile.objects.values_list('section', 'batch')
+        .distinct()
+        .order_by('section', 'batch')
+    )
+
+    return render(request, 'department_pages/assign_supervisor.html', {
+        'supervisors': supervisors,
+        'section_batches': section_batches,
+    })
+
+
+
+
+
+
+@login_required
+def evaluation_view(request):
+    supervisor = get_object_or_404(Supervisor, user=request.user)
+
+    # Get all students assigned to this supervisor
+    assigned_students = stud_profile.objects.filter(
+        supervisor_assignment__supervisor=supervisor
+    )
+
+    if request.method == "POST":
+        student_id = request.POST.get("student_id")
+        student = get_object_or_404(stud_profile, id=student_id)
+
+        bi_weekly_score = request.POST.get(f"bi_weekly_report_score_{student.id}")
+        final_report_score = request.POST.get(f"final_report_score_{student.id}")
+        presentation_score = request.POST.get(f"presentation_score_{student.id}")
+
+        if bi_weekly_score and final_report_score and presentation_score:
+            try:
+                bi_weekly_score = int(bi_weekly_score)
+                final_report_score = int(final_report_score)
+                presentation_score = int(presentation_score)
+
+                if 0 <= bi_weekly_score <= 100 and 0 <= final_report_score <= 100 and 0 <= presentation_score <= 100:
+                    evaluation, created = SupervisorEvaluation.objects.get_or_create(
+                        student=student,
+                        supervisor=supervisor
+                    )
+
+                    latest_company_evaluation = (
+                        Evaluation.objects.filter(student=student)
+                        .order_by('-submitted_at')
+                        .first()
+                    )
+
+                    company_score = latest_company_evaluation.total_score if latest_company_evaluation else 0
+
+                    evaluation.bi_weekly_report_score = bi_weekly_score
+                    evaluation.final_report_score = final_report_score
+                    evaluation.presentation_score = presentation_score
+
+                    evaluation.total_score = (
+                        bi_weekly_score + final_report_score + presentation_score + company_score
+                    )
+
+                    evaluation.save()
+
+            except ValueError:
+                print(f"Invalid score values for student {student.id}")
+
+        return redirect('evaluation_view')
+
+    student_evaluations = {
+        student.id: (
+            Evaluation.objects.filter(student=student)
+            .order_by('-submitted_at')
+            .values('total_score')
+            .first() or {'total_score': 0}
+        )['total_score']
+        for student in assigned_students
+    }
+
+    return render(request, "supervisor_pages/evaluation_page.html", {
+        "students": assigned_students,
+        "student_evaluations": student_evaluations,   
     })

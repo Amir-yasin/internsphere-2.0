@@ -18,7 +18,14 @@
 
 {% block nav_and_footer %}
     
-    
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
     <br>
         
             
@@ -91,7 +98,7 @@
                     </div>
                     <div class="col">
                         <!-- Image Section -->
-                        <img src="{% static 'img/interview.jpg' %}" class="home-img-fluid">
+                        <img src="{% static 'img/interview.png' %}" class="home-img-fluid mb-5">
                     </div>
                 </div>
             </div>

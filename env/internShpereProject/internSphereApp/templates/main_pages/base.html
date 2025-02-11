@@ -12,7 +12,18 @@
 </head>
 <body>
 
-
+<style>
+    body{
+        background-color:white;
+    }
+    .btn-purple {
+        background-color: purple;
+        color: #fff;
+    }
+    .btn-purple:hover {
+        background-color: #c923a9;
+    }
+</style>
 
 
     
@@ -36,118 +47,47 @@
                     
                     {% if user.is_authenticated %}
                         {% if user.user_type == 'Student' %}
-
-                            <li class="nav-item dropdown">
-                            <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
-                            <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'student_dashboard' %}">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'student_profile' %}">Profile</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'intern_opportunities' %}">Internships</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'bi_weekly_report' %}">Submit Reports</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'applications' %}">Applications</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'Graduate_students' %}">Graduate Students</a> 
-                                </li>
-                                
-                            </ul>
-                            </li>
-                        
+                        <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'student_dashboard' %}">Dashboard</a>
+                        </li>
+     
                         {% elif user.user_type == 'Company' %}
-                            <li class="nav-item dropdown">
-                            <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
-                            <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'view_company_profile' user_id=request.user.id %}">Profile</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'post_internship' %}">Post Internship</a>
-                                </li>
-                                <li class="nav-item">
-                                    {% if internship %}
-                                        <a class="dropdown-item" href="{% url 'view_applicants' internship_id=internship.id %}">Applicants</a>
-                                    {% else %}
-                                        <span class="dropdown-item disabled">Applicants</span>
-                                    {% endif %}
-                                </li>
-                                {% comment %} <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'view_applicants' internship_id=internship.id %}">Applicants</a>
-                                </li> {% endcomment %}
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'accepted_interns' %}">Accepted Interns</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="{% url 'attendance' %}">Attendance</a>
-                                </li>
-                                <li class="nav-item">
-                                    {% comment %} <a class="dropdown-item" href="{% url 'evaluate_intern' %}">Evaluation</a>  {% endcomment %}
-                                </li>
-                                </ul>
-                            </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'company_dashboard' %}">Dashboard</a>
+                        </li>
+
+
+                            
                         {% elif user.user_type == 'Department' %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Dep Services</a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'department_dashboard' %}">Dashboard</a>
-                                    </li></li></ul>
+                        <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'department_dashboard' %}">Dashboard</a>
+                        </li>
+                              
                          {% elif user.user_type == 'Supervisor' %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Sv Services</a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'supervisor_dashboard' %}">Dashboard</a>
-                                    </li></li></ul>
+                         <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'supervisor_dashboard' %}">Dashboard</a>
+                        </li>
+
+                           
                         {% elif user.user_type == 'Admin' or user.is_superuser %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"> Ad Services</a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'admin_dashboard' %}">Dashboard</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'register_students' %}">Register Students</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'student_list' %}">Student List</a>
-                                    </li>
-                                    {% comment %} <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a>
-                                    </li> {% endcomment %}
-                                </li>
-                            </ul>
+                        <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'admin_dashboard' %}">Dashboard</a>
+                        </li>
+                                    
+
+                                    
+                            
                         {% elif user.user_type == 'InternshipCareerOffice' %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link links dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">icu Services</a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'icu_dashboard' %}">Dashboard</a>
-                                    </li></li></ul>
+                        <li class="nav-item">
+                            <a class="nav-link links" href="{% url 'icu_dashboard' %}">Dashboard</a>
+                        </li>
+
+                            
                         {% endif %}
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link links" href="{% url 'student_dashboard' %}">Services</a>
+                        <a class="nav-link links" href="{% url 'student_dashboard' %}">Dashboard</a>
                     </li>
                     
                 {% endif %}

@@ -5,21 +5,104 @@
 <div class="heading">
     <h2>Register a Department</h2>
 </div>
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert {{ message.tags }}">
-      {{ message }}
+
+
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4 text-purple">Register a New Department</h2>
+
+        <!-- Display Messages -->
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Registration Form -->
+        <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" placeholder="Enter Username" required>
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" placeholder="Enter Password" required>
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="department_name" class="form-label">Department Name</label>
+                <select name="department_name" id="department_name" class="form-select {% if form.department_name.errors %}is-invalid{% endif %}" required>
+                    <option value="" disabled selected>Select Department</option>
+                    {% for value, label in form.department_name.field.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                    {% for error in form.department_name.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="department_head" class="form-label">Department Head</label>
+                <input type="text" name="department_head" id="department_head" class="form-control {% if form.department_head.errors %}is-invalid{% endif %}" placeholder="Enter Department Head Name" required>
+                <div class="invalid-feedback">
+                    {% for error in form.department_head.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+              <a href="admin_dashboard" class="btn btn-purple px-4 ms-4">Back to dashboard</a>
+              <button type="submit" class="btn btn-purple px-4 ms-3">Register Department</button>            </div>
+        </form>
     </div>
-  {% endfor %}
-{% endif %}
-<link rel="stylesheet" href="{% static 'css/applications.css' %}">
-<div class="container">
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <a href="admin_dashboard" class="btn">Back to dashboard</a>
-  <a type="submit" class="btn">Register Department</a>
-</form>
 </div>
+</div>
+
+<style>
+    body {
+      background-color: white;
+    }
+
+    .btn-purple {
+        background-color: purple;
+        color: white;
+    }
+
+    .btn-purple:hover {
+        background-color: #c923a9;
+    }
+
+    .card {
+        max-width: 500px;
+        margin: auto;
+        border-radius: 10px;
+    }
+
+    .text-purple {
+        color: purple;
+    }
+</style>
+
 
 {% endblock nav_and_footer %}

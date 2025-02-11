@@ -2,81 +2,394 @@
 {% load static %}
 
 {% block nav_and_footer %}
-    
 
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-    <link rel="stylesheet" href="{% static 'CSS/company_dashboard.css' %}">
-</head>
-<body>
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="css/hulu.css" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+      }
+
+      .section-title {
+        color: purple;
+        font-weight: bold;
+      }
+
+      .card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+      }
+
+      .btn-purple {
+        background-color: purple;
+        color: #fff;
+        border: none;
+      }
+
+      .btn-purple:hover {
+        background-color: #4e005e;
+        color:white;
+      }
+
+      .feature-image {
+        display: block;
+        margin: 0 auto;
+      }
+      /* Styles for the card container and its elements */
+
+      .card--container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+      }
+
+      .main--title {
+        color: rgba(113, 99, 186, 255);
+        padding-bottom: 10px;
+        font-size: 15px;
+      }
+
+      .card--wrapper {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .payment--card {
+        background-color: gray;
+        border-radius: 10px;
+        padding: 1.2rem;
+        width: calc(
+          20% - 1rem
+        ); /* Set each card to take up 20% of the container width minus gap */
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: all 0.5s ease-in-out;
+      }
+
+      .payment--card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card--header {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .title {
+        font-size: 12px;
+        font-weight: 200;
+      }
+
+      .ammount-value {
+        font-size: 24px;
+        font-family: "Courier New", Courier, monospace;
+        font-weight: 600;
+      }
+
+      .icon-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .icon {
+        color: white;
+        padding: 1rem;
+        height: 60px;
+        width: 60px;
+        text-align: center;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        background: red;
+      }
+
+      /* Custom color classes */
+      .light-purple {
+        background: rgb(254, 226, 233);
+      }
+
+      .dark-purple {
+        background: purple;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Main Content -->
     <div class="heading">
-        <h1>Admin Dashboard</h1>
+      <h2>
+        Welcome to the Administrative Dashboard
+      </h2>
+      <p class="lead text-center">
+        Streamlining internship management: Approve companies, register
+        users, and oversee operations seamlessly.
+      </p>
     </div>
-    <header>
-        <h1>Welcome, {{ user.username }}</h1>
-        <p class="text-center">You are logged in as an Admin</p>
-    </header>
-    
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h2>Register Students</h2>
-            <p>Register the students.</p>
-            <a href="{% url 'register_students' %}" class="btn1">Register</a>
-            <a href="{% url 'student_list' %}" class="btn1">list of students</a>
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Approve Companies</h2>
-            <p>Approve the Companies.</p>
-            <a href="{% url 'approve_companies' %}" class="btn1">Approve Now</a>
-            {% comment %} <a href="{% url 'student_list' %}" class="btn1">list of students</a> {% endcomment %}
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Register Department</h2>
-            <p>Register the Department.</p>
-            <a href="{% url 'register_department' %}" class="btn1">Register</a>
-            <a href="{% url 'department_list' %}" class="btn1">list of departments</a>
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Register ICU</h2>
-            <p>Register the Internship Office.</p>
-            <a href="{% url 'register_internship_career_office' %}" class="btn1">Register</a>
-            <a href="{% url 'icu_list' %}" class="btn1">list of icu</a>
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Register Supervisors</h2>
-            <p>Register the supervisors.</p>
-            <a href="{% url 'register_supervisor' %}" class="btn1">Register</a>
-            <a href="{% url 'supervisor_list' %}" class="btn1">list of Supervisors</a>
-        </div>
-    </div>
-    <br>
-    <br>
-    <br>
-
  
-    {% endblock nav_and_footer %}
+    <div>
+      <p class="text-center">You are logged in as an admin</p>
+  </div>
+    <div class="main-content">
+      <!-- Main Section -->
+        <div class="container">
+          <h1 class="section-title"></h1>
+
+        </div>
+      </section>
+      <div class="card--container">
+        <h3 class="main--title">Information</h3>
+        <div class="card--wrapper">
+          <!-- Card 1 -->
+          <div class="payment--card light-purple" id="card-1">
+            <div class="icon-container">
+              <i class="fas fa-user-graduate icon dark-purple"></i>
+            </div>
+
+            <div class="card--header">
+              <span class="title">Student</span>
+              <span class="ammount-value" id="student-card-value">0</span>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="payment--card light-purple" id="card-2">
+            <div class="icon-container">
+              <i class="fas fa-briefcase icon dark-purple"></i>
+            </div>
+
+            <div class="card--header">
+              <span class="title">Internship Unit</span>
+              <span class="ammount-value" id="internship-card-value">0</span>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="payment--card light-purple" id="card-3">
+            <div class="icon-container">
+              <i class="fas fa-building icon dark-purple"></i>
+            </div>
+
+            <div class="card--header">
+              <span class="title">Department</span>
+              <span class="ammount-value" id="department-card-value">0</span>
+            </div>
+          </div>
+          <!-- Card 4 -->
+          <div class="payment--card light-purple" id="card-4">
+            <div class="icon-container">
+              <i class="fas fa-chalkboard-teacher icon dark-purple"></i>
+            </div>
+
+            <div class="card--header">
+              <span class="title">Advisor</span>
+              <span class="ammount-value" id="advisor-card-value">0</span>
+            </div>
+          </div>
+          <!-- Card 5 -->
+          <div class="payment--card light-purple" id="card-1">
+            <div class="icon-container">
+              <i class="fas fa-building icon dark-purple"></i>
+            </div>
+
+            <div class="card--header">
+              <span class="title">Company</span>
+              <span class="ammount-value" id="company-card-value">0</span>
+            </div>
+          </div>
+        </div>
+          <!-- Features Section -->
+          <section id="features" class="py-5">
+            <div class="container">
+              <h2 class="section-title text-center">Features</h2>
+              <div class="row mt-4">
+                <!-- Card 1: Register -->
+                <div class="col-md-4 mb-4 ">
+                  <div class="card p-3 smooth-animation">
+                    <img src="{% static 'img/register.svg' %}" alt="Register" class="feature-image" width="350px">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Register Student</h5>
+                      <p class="card-text">Register Student</p>
+                      
+                      <a href="{% url 'register_students'  %}" class="btn btn-purple">Register</a>
+                      <a href="{% url 'student_list'  %}" class="btn btn-purple"> List of students</a>
+
+                     
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 2: Approve Company -->
+                <div class="col-md-4 mb-4 ">
+                  <div class="card p-3 smooth-animation">
+                    <img src="{% static 'img/approve.svg' %}" alt="approve" class="feature-image" width="365px">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Approve Company</h5>
+                      <p class="card-text">
+                        Approve internship partner companies.
+                      </p>
+                      <a href="{% url 'approve_companies'  %}" class="btn btn-purple">Approve</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 3: View List -->
+                <div class="col-md-4 mb-4 ">
+                  <div class="card p-3 smooth-animation">
+                   
+                    <img src="{% static 'img/view-list.svg' %}" alt="View List" class="feature-image" width="220px">
+
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Register Department</h5>
+                      <p class="card-text">Register the Department</p>
+                      <a href="{% url 'register_department'  %}" class="btn btn-purple">Register</a>
+                      <a href="{% url 'department_list'  %}" class="btn btn-purple">List of Departments</a>
+
+                    
+                    </div>
+                  </div>
+                </div>
+                <!-- card4 -->
+                <div class="col-md-6 mb-4">
+                  <div class="card p-3 smooth-animation">
+                   
+                    <img src="{% static 'img/admin_register_icu.png' %}" alt="View List" class="feature-image" width="330px">
+
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Register ICU</h5>
+                      <p class="card-text">Register the internship office</p>
+                      <a href="{% url 'register_internship_career_office'  %}" class="btn btn-purple">Register</a>
+                      <a href="{% url 'icu_list'  %}" class="btn btn-purple">List of Internship Offices</a>
+
+                     
+                    </div>
+                  </div>
+                </div>
+                <!-- card5 -->
+                <div class="col-md-6 mb-4">
+                  <div class="card p-3 smooth-animation">
+                    <img src="{% static 'img/image (2).png' %}" alt="View List" class="feature-image" width="375px">
+
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Register Supervisor</h5>
+                      <p class="card-text">Register the supervisor</p>
+                      <a href="{% url 'register_supervisor'  %}" class="btn btn-purple">Register</a>
+                      <a href="{% url 'supervisor_list'  %}" class="btn btn-purple">List of Supervisors</a>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <!-- Footer -->
+      <Special-Footer></Special-Footer>
+    </div>
+    <script>
+      // Initial counts for each category
+      let studentCount = 0;
+      let internshipCount = 0;
+      let departmentCount = 0;
+      let advisorCount = 0;
+      let companyCount = 0; // Added this variable for the company count
+
+      // Function to update card values
+      function updateCardValue(cardId, value) {
+        const element = document.getElementById(cardId);
+        if (element) {
+          element.textContent = value;
+        }
+      }
+
+      // Increment counts when actors are registered
+      function registerActor(type) {
+        switch (type) {
+          case "student":
+            studentCount++;
+            localStorage.setItem("studentCount", studentCount);
+            updateCardValue("student-card-value", studentCount);
+            break;
+          case "internship":
+            internshipCount++;
+            localStorage.setItem("internshipCount", internshipCount);
+            updateCardValue("internship-card-value", internshipCount);
+            break;
+          case "department":
+            departmentCount++;
+            localStorage.setItem("departmentCount", departmentCount);
+            updateCardValue("department-card-value", departmentCount);
+            break;
+          case "advisor":
+            advisorCount++;
+            localStorage.setItem("advisorCount", advisorCount);
+            updateCardValue("advisor-card-value", advisorCount);
+            break;
+          case "company":
+            companyCount++;
+            localStorage.setItem("companyCount", companyCount);
+            updateCardValue("company-card-value", companyCount);
+            break;
+          default:
+            console.log("Invalid actor type");
+        }
+      }
+
+      // Check local storage on page load and update card if actors were registered
+      window.onload = function () {
+        // Retrieve the counts from local storage if they exist
+        const storedStudentCount = localStorage.getItem("studentCount");
+        const storedInternshipCount = localStorage.getItem("internshipCount");
+        const storedDepartmentCount = localStorage.getItem("departmentCount");
+        const storedAdvisorCount = localStorage.getItem("advisorCount");
+        const storedCompanyCount = localStorage.getItem("companyCount");
+
+        // Update the card values if counts are found in local storage
+        if (storedStudentCount) {
+          studentCount = parseInt(storedStudentCount);
+          updateCardValue("student-card-value", studentCount);
+        }
+        if (storedInternshipCount) {
+          internshipCount = parseInt(storedInternshipCount);
+          updateCardValue("internship-card-value", internshipCount);
+        }
+        if (storedDepartmentCount) {
+          departmentCount = parseInt(storedDepartmentCount);
+          updateCardValue("department-card-value", departmentCount);
+        }
+        if (storedAdvisorCount) {
+          advisorCount = parseInt(storedAdvisorCount);
+          updateCardValue("advisor-card-value", advisorCount);
+        }
+        if (storedCompanyCount) {
+          companyCount = parseInt(storedCompanyCount);
+          updateCardValue("company-card-value", companyCount);
+        }
+      };
+    </script>
+  </body>
+</html>
+
+  {% endblock nav_and_footer %}
+

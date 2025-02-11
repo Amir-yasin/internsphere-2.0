@@ -1,23 +1,82 @@
-
 {% extends "main_pages/base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block nav_and_footer %}
-<div class="heading">
-<h2>Submit Final Report</h2>
-</div>
-{% if messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Final Report Submission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/final-report-submition.css' %}" />
+    <style>
+     
+    </style>
+</head>
+<body>
+  {% if messages %}
   {% for message in messages %}
-    <div class="alert {{ message.tags }}">
-      {{ message }}
-    </div>
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
   {% endfor %}
 {% endif %}
+  <div class="heading">
+    <h2 class="text-center mb-4">Final Report Submission</h2>
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Submit Report</button>
-</form>
+  </div>
+    <div class="submission-container">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
+            <div class="mb-3">
+                <label for="studentName" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="studentName" value="{{ request.user.get_full_name }}" readonly />
+            </div>
+            
+            <div class="mb-3">
+                <label for="studentId" class="form-label">Student ID</label>
+                <input type="text" class="form-control" id="studentId" value="{{ user.username }}" readonly />
+            </div>
+            
+            <div class="mb-3">
+                <label for="section" class="form-label">Section</label>
+                <input type="text" class="form-control" id="section" value="{{ user.stud_profile.section }}" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload Final Report</label>
+                <div class="file-input-container" id="fileUpload">
+                    <div>
+                        <i class="bi bi-upload fs-4 text-secondary"></i>
+                        <span class="ms-2">Drag and drop your file here or click to browse</span>
+                    </div>
+                    <input type="file" class="form-control" id="reportFile" name="report_file" required style="display: none" />
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'student_dashboard' %}" class="btn btn-purple ">Back</a>
+                <button type="submit" class="btn btn-purple">Submit Report <i class="bi bi-check-circle ms-2"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector("#fileUpload").addEventListener("click", () => {
+            document.querySelector("#reportFile").click();
+        });
+
+        document.querySelector("#reportFile").addEventListener("change", function () {
+            let fileName = this.files[0] ? this.files[0].name : "No file chosen";
+            document.querySelector("#fileUpload span").innerText = fileName;
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 {% endblock nav_and_footer %}

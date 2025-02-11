@@ -1,0 +1,125 @@
+{% extends "main_pages/base.html" %}
+{% load static %}
+
+{% block nav_and_footer %}
+<style>
+    /* General Styles */
+    .btn-purple {
+        background-color: #c923a5;
+        color: white;
+        transition: background-color 0.3s ease;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-weight: bold;
+    }
+    .btn-purple:hover {
+        background-color: purple;
+        color: white;
+    }
+    
+    {% comment %} .heading {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(to right, #c923a5, purple);
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    } {% endcomment %}
+
+    .card {
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.02);
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .student-info img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #c923a5;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+    .no-students {
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: black;
+        padding: 20px;
+    }
+
+    .back-btn {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+</style>
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
+<div class="heading">
+    <h1>Students for Evaluation</h1>
+</div>
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in students_with_internships %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="student-info">
+                            <img src="{{ item.student.profile_picture.url }}" alt="Student Image" onerror="this.src='{% static 'images/default_profile.png' %}'">
+                            <div>
+                                <h5 class="mb-0">{{ item.student.user.get_full_name }}</h5>
+                                <small class="text-muted">Internship: {{ item.internship.title }}</small>
+                            </div>
+                        </div>
+                        <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn btn-purple btn-md">
+                            Evaluate
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item no-students">
+                        No students found for evaluation.
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="back-btn">
+        <a href="{% url 'company_dashboard' %}" class="btn btn-purple btn-md">Back to Dashboard</a>
+    </div>
+</div>
+
+{% endblock nav_and_footer %}

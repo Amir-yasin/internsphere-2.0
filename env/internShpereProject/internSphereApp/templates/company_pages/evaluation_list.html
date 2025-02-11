@@ -27,49 +27,92 @@
 
     }
 </style>
-<div class="container">
+
+
+
     {% if messages %}
-    <div class="alert alert-success" role="alert">
-        {% for message in messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
             {{ message }}
-        {% endfor %}
-    </div>
-    {% endif %}
-</div>
-<div class="heading">
-    <h1>Evaluation List</h1>
-
-</div>
-{% if evaluations %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Student</th>
-                <th>Company</th>
-                <th>Internship</th>
-                <th>Total Score</th>
-                <th>Submitted At</th>
-                <th>Actions</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            {% for evaluation in evaluations %}
-                <tr>
-                    <td>{{ evaluation.student.user.first_name }} {{ evaluation.student.user.last_name }}</td>
-                    <td>{{ evaluation.company.company_name }}</td>
-                    <td>{{ evaluation.internship.title }}</td>
-                    <td>{{ evaluation.total_score }}</td>
-                    <td>{{ evaluation.submitted_at }}</td>
-                    <td>
-                        <a href="{% url 'view_evaluation' evaluation.id %}" class="btn">View Evaluation</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No evaluations submitted yet.</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 {% endif %}
+    <div class="heading">
+        <h1>Evaluation List</h1>
+    
+    </div>
+    <!-- Bulk Approval Form -->
+   
+    
+        
+        
+    {% if evaluations.exists %}
+    <form method="POST" id="bulk-approval-form">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    {% if user.user_type == 'InternshipCareerOffice' or user.user_type == 'Department'  %}
+                    <th>Select</th>
+                    {% endif %}
+                    
+                    <th>Student</th>
+                    <th>Internship</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evaluation in evaluations %}
+                    <tr>
+                        {% if user.user_type == 'InternshipCareerOffice' or user.user_type == 'Department'  %}
+                        <td>
+                            <input type="checkbox" name="evaluation_ids" value="{{ evaluation.id }}">
+                        </td>
+                        {% endif %}
+                        <td>{{ evaluation.student.user.get_full_name }}</td>
+                        <td>{{ evaluation.internship }}</td>
+                        {% if user.user_type == 'Company' %}
+                        <td>{{ evaluation.internship_office_approval_status }}</td>
+                        {% elif user.user_type == 'InternshipCareerOffice' %}
+                        <td>{{ evaluation.internship_office_approval_status }}</td>
+                        {% elif user.user_type == 'Department' %}
+                        <td>{{ evaluation.department_approval_status }}</td>
+                        {% elif user.user_type == 'Supervisor' %}
+                        <td>{{ evaluation.department_approval_status }} by the department</td>
+
+                        {% endif %}
+                            
+                        <td>
+                            {% comment %} <button type="button" class="btn btn-primary view-evaluation" 
+                                    data-id="{{ evaluation.id }}">View Details</button> {% endcomment %}
+                                    <a href="{% url 'view_evaluation' evaluation.id %}" class="btn btn-purple px-4 py-2 text-white shadow-sm" style="background: purple; color: white">View Evaluation Details</a>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if user.user_type == 'InternshipCareerOffice' or user.user_type == 'Department'  %}
+        <button type="submit" class="btn btn-success">Approve Selected</button>
+        {% endif %}
+            
+    </form>
+    {% else %}
+<h5>   <li>
+    There Are No pending Evaluations Yet
+</li> 
+</h5>
+    {% endif %}
+        
+
+   
+
+   
+</body>
+</html>
+
 
 {% endblock nav_and_footer %}

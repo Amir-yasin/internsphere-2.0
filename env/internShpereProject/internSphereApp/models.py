@@ -35,7 +35,8 @@ class stud_profile(models.Model):
         ('THM', 'THM'),
     ]
         
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='stud_profile' , limit_choices_to={'user_type': 'Student'})
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, 
+                                related_name='stud_profile' , limit_choices_to={'user_type': 'Student'})
     batch = models.CharField(max_length=10)
     section = models.CharField(max_length=10)
     temporary_password = models.CharField(max_length=100)
@@ -45,10 +46,21 @@ class stud_profile(models.Model):
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
     year_of_study = models.CharField(max_length=2)
     skills = models.CharField(max_length=1000)
-    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  # Ensures matching with sector choices
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)  
     resume = models.FileField(upload_to='resumes/')
     linkedin_profile = models.URLField(blank=True, null=True)
     list_of_students = models.FileField(upload_to='list_of_students/', blank=True, null=True)
+
+
+    def get_active_company(self):
+        try:
+            active_application = self.applications.filter(is_active=True).first()
+            if active_application:
+                return active_application.company
+            return None  # Return None if no active company is found
+        except Application.DoesNotExist:
+            return None
+
 
     def __str__(self):
         return self.user.username
@@ -113,7 +125,7 @@ class Internship(models.Model):
         ('THM', 'THM'),
     ]
     
-    company = models.ForeignKey('Company', on_delete=models.CASCADE)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='internships')
     title = models.CharField(max_length=255)
     description = models.TextField()
     requirement = models.TextField()
@@ -237,39 +249,53 @@ class FinalReport(models.Model):
         return f"Final Report by {self.student.user.username}"
 
 
-
-# Attendance model
+# Take attendance
 class Attendance(models.Model):
-    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE)
-    internship = models.ForeignKey(Internship, on_delete=models.CASCADE)
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name='attendances')
     date = models.DateField()
-    status = models.CharField(max_length=10, choices=[('present', 'Present'), ('absent', 'Absent')])
+    present = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('student', 'date')  
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.date} - {self.status}"
+        return f"{self.student.user.username} - {self.date} - {'Present' if self.present else 'Absent'}"
 
-# User = get_user_model()
-
+#Evaluation
 class Evaluation(models.Model):
-    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='evaluations')
-    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='evaluations')
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='evaluations')
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='company_evaluations')
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE, related_name='company_evaluations')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_evaluations')
     submitted_at = models.DateTimeField(default=now)
-    total_score = models.IntegerField(default=0)
-    submitted = models.BooleanField(default=False)
-
-    # Approval fields
-    company_approval_status = models.CharField(max_length=20, default='Pending')
-    company_approval_date = models.DateTimeField(null=True, blank=True)
-
-    internship_office_approval_status = models.CharField(max_length=20, default='Pending')
+    total_score = models.FloatField(default=0)  
+    internship_office_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
     internship_office_approval_date = models.DateTimeField(null=True, blank=True)
-
-    department_approval_status = models.CharField(max_length=20, default='Pending')
+    department_approval_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='Pending'
+    )
     department_approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Evaluation for {self.student.user.get_full_name()} by {self.company.name}"
+        return f"Evaluation for {self.student.user.get_full_name()} by {self.company.company_name}"
+
+    def calculate_total_score(self):
+        total_raw_score = sum(answer.answer for answer in self.answers.all())
+        num_questions = 23  # Fixed number of questions
+
+        if num_questions > 0:  # Avoid division by zero
+            calculated_score = (total_raw_score / num_questions) * 10
+        else:
+            calculated_score = 0
+
+        self.total_score = round(calculated_score, 2)  # Round for clarity
+        self.save()
 
 
 class EvaluationQuestion(models.Model):
@@ -286,3 +312,45 @@ class EvaluationAnswer(models.Model):
 
     def __str__(self):
         return f"{self.question.text}: {self.answer}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.evaluation.calculate_total_score()
+    
+    
+class SupervisorAssignment(models.Model):
+    student = models.ForeignKey('stud_profile', on_delete=models.CASCADE, related_name='supervisor_assignment')
+    supervisor = models.ForeignKey('Supervisor', on_delete=models.CASCADE, related_name='supervised_students')
+    assigned_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} assigned to {self.supervisor.supervisor_name}"
+
+
+
+class SupervisorEvaluation(models.Model):
+    student = models.ForeignKey(stud_profile, on_delete=models.CASCADE, related_name="evaluations")
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, related_name="evaluations")
+
+    bi_weekly_report_score = models.IntegerField(default=0)
+    final_report_score = models.IntegerField(default=0)
+    presentation_score = models.IntegerField(default=0)
+    total_score = models.IntegerField(default=0, editable=False)  # Auto-calculated
+
+    def save(self, *args, **kwargs):
+        # Ensure we fetch the latest company evaluation score
+        company_evaluation = Evaluation.objects.filter(student=self.student).order_by('-submitted_at').first()
+        company_score = company_evaluation.total_score if company_evaluation else 0
+
+        # Reset total_score before calculating new values
+        self.total_score = (
+            self.bi_weekly_report_score +
+            self.final_report_score +
+            self.presentation_score +
+            company_score
+        )
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Evaluation for {self.student.user.username} by {self.supervisor.supervisor_name}"

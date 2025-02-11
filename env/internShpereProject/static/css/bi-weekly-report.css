@@ -1,0 +1,49 @@
+/* Make sure the body and html elements take up the full height of the page */
+html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  /* Make the container take up all the available space */
+  .container {
+    height: calc(100% - 80px); /* Adjust 80px based on the height of the header and footer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Adjust the form container to fill the available space */
+  .bi-weekly-report-form {
+    width: 100%;
+    max-width: 900px; /* Maximum width for the form */
+    min-height: 80%; /* Form will take 80% of the available height */
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Allow scrolling if content overflows */
+  }
+  
+  /* Ensure the form content fits within the available space and scrolls if needed */
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+  
+  /* Adjust button styles for uniformity */
+  button {
+    padding: 12px 24px;
+    font-weight: bold;
+    background-color: blueviolet;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    align-self: flex-start; /* Align button at the start of the form */
+  }
+  
+  button:hover {
+    background-color: darkviolet !important;
+  }
+  

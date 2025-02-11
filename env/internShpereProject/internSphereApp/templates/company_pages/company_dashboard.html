@@ -9,81 +9,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/company_dashboard.css' %}">
+    <style>
+ 
+
+      
+      body{
+        background-color:white;
+    }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card img {
+            height: 300px;
+            width: 350px;
+            border-radius: 8px;
+            margin: flex;
+        }
+
+        .btn-purple {
+            background-color: purple;
+            color: #fff;
+        }
+        .btn-purple:hover {
+            background-color: #c923a9;
+        }
+    </style>
 </head>
 <body>
-    {% if messages %}
-    <div id="message-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <div class="heading">
-        <h1>Company Dashboard</h1>
-    </div>
-    <header>
-        <h1>Welcome, {{ user.username }}</h1>
+  {% if messages %}
+  {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+  {% endfor %}
+{% endif %}
+<div class="heading">
+  <h1>Welcome, {{ user.username }}</h1>
+</div>
+    <div>
         <p class="text-center">You are logged in as a {{ user.user_type }}</p>
-    </header>
+    </div>
 
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h2>My Profile</h2>
-            <p>View your Company's profile.</p>
-            <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn1">View Profile</a>
-        </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/view_profile.png' %}" alt="My Profile">
+                    <div class="card-body">
+                        <h5 class="card-title">My Profile</h5>
+                        <p class="card-text">View and edit your company profile details.</p>
+                        <a href="{% url 'view_company_profile' user_id=request.user.id %}" class="btn btn-purple">My Profile</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/post internship.png' %}" alt="Post Internship">
+                    <div class="card-body">
+                        <h5 class="card-title">Post Internship</h5>
+                        <p class="card-text">Create and publish new internship opportunities.</p>
+                        <a href="{% url 'post_internship' %}" class="btn btn-purple">Post Internship</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/View Applicant .png' %}" alt="View Applicants">
+                    <div class="card-body">
+                        <h5 class="card-title">View Applicants</h5>
+                        <p class="card-text">View, accept, or reject student applications.</p>
+                        <a href="{% url 'view_applicants_list' %}" class="btn btn-purple">View Applicants</a>
+                    </div>
+                </div>
+            </div>
 
-        <div class="dashboard-item">
-            <h2>Posted Internships</h2>
-            <p>Post Your Internships</p>
-            <a href="{% url 'post_internship' %}" class="btn1">Post New Internship</a>
-        </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/company_approve_report.png' %}" alt="Approve Reports">
+                    <div class="card-body">
+                        <h5 class="card-title">Approve Reports</h5>
+                        <p class="card-text">Review and approve submitted internship reports.</p>
+                        <a href="{% url 'review_biweekly_reports' %}" class="btn btn-purple">Approve Reports</a>
+                    </div>
+                </div>
+            </div>
 
-        <div class="dashboard-item">
-            <h2>Applicants</h2>
-            {% if internship_list %} 
-                {% for internship in internship_list %}
-                    <ul>
-                        <p>Total: {{ internship.applications.count }}</p>
-                        <a class="btn1" href="{% url 'view_applicants' internship_id=internship.id %}">{{ internship.title }} Applicants</a>
-                    </ul>
-                {% endfor %}
-            {% else %}
-                <p><strong>No Applicants Yet.</strong></p>
-            {% endif %}
-        </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/Attendance .png' %}" alt="Attendance">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage Attendance</h5>
+                        <p class="card-text">Record and manage student attendance efficiently.</p>
+                        <a href="{% url 'attendance_list' %}" class="btn btn-purple">Manage Attendance</a>
+                    </div>
+                </div>
+            </div>
 
-        <div class="dashboard-item">
-            <h2>Review Bi-weekly Reports</h2>
-            <p>Review and Approve</p>
-            <a href="{% url 'review_biweekly_reports' %}" class="btn1">View Bi-weekly Reports</a>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{% static 'img/Evaluation.png' %}" alt="Evaluate Students">
+                    <div class="card-body">
+                        <h5 class="card-title">Evaluate Students</h5>
+                        <p class="card-text">Evaluate student performance and provide feedback.</p>
+                        <a href="{% url 'submit_evaluation_list' %}" class="btn btn-purple">Evaluate Students</a>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="dashboard-item">
-            <h2>Manage Interns</h2>
-            <p>Total: 8</p>
-            <a href="{% url 'attendance' %}" class="btn1">Manage Attendance</a>
-        </div>
-
-        <div class="dashboard-item">
-            <h2>Submit Evaluations</h2>
-            {% if students_with_internships %}
-                <ul>
-                    {% for item in students_with_internships %}
-                        
-                            {{ item.student.user.get_full_name }} <!-- Adjust field as per your model -->
-                            {% comment %} - Internship: {{ item.internship.title }} {% endcomment %}
-                            <a href="{% url 'submit_evaluation' item.student.id item.internship.id %}" class="btn1" style="background: purple; color: white">Evaluate</a>
-                        
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p><strong>No Interns Available for Evaluation.</strong></p>
-            {% endif %}
-        </div>
-        
     </div>
 </body>
 </html>

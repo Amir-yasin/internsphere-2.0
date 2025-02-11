@@ -1,0 +1,316 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  font-family: "Poopins", sans-serif;
+}
+body {
+  display: flex;
+  background-color: white;
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 110px;
+  height: 100vh;
+  padding: 0 1.7rem;
+  color: aliceblue;
+  overflow: hidden;
+  transition: all 0.5s linear;
+  background: purple;
+}
+.sidebar:hover {
+  width: 240px;
+  transition: 0.5s;
+}
+.logo {
+  height: 80px;
+  padding: 16px;
+}
+.menu {
+  height: 88%;
+  position: relative;
+  list-style: none;
+  padding: 0;
+}
+.menu li {
+  padding: 1rem;
+  margin: 8px 0;
+  border-radius: 8px;
+  transition: all 0.5s ease-in-out;
+}
+.menu li:hover,
+.active {
+  background: rgb(196, 195, 195);
+}
+.menu a {
+  color: aliceblue;
+  font-size: 14px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+}
+.menu a span {
+  overflow: hidden;
+}
+.menu a li {
+  font-size: 1.2rem;
+}
+.logout {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.main--content {
+  position: relative;
+  background: rgb(240, 238, 238);
+  width: 100%;
+  padding: 1rem;
+}
+.header--wrapper img {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.header--wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 2rem;
+  margin-bottom: 1rem;
+}
+.header--title {
+  color: rgba(113, 99, 186, 255);
+}
+.user--info {
+  display: flex;
+  align-items: center;
+  gap: 1;
+}
+
+.card--container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Space between the two columns */
+  padding: 20px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column; /* Stack cards vertically in each column */
+  gap: 20px; /* Space between cards in the column */
+  flex: 2; /* Make both columns equal in width */
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.card img {
+  max-width: 50%;
+  height: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+.card h3 {
+  margin: 15px 0;
+}
+
+.card p {
+  color: #666;
+}
+
+.main--title {
+  color: rgba(113, 99, 186, 255);
+  padding-bottom: 10px;
+  font-size: 15px;
+}
+
+.card--header {
+  display: flex;
+  flex-direction: column;
+}
+.title {
+  font-size: 12px;
+  font-weight: 200;
+}
+.amount--value {
+  font-size: 24px;
+  font-family: "courier new", courier, monospace;
+  font-weight: 600;
+}
+.icon {
+  color: white;
+  padding: 1rem;
+  height: 60px;
+  width: 60px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  background: red;
+}
+.card.detail {
+  font-size: 18px;
+  color: gray;
+  letter-spacing: 2px;
+  font-family: "courier new", courier, monospace;
+}
+button {
+  padding: 12px 18px;
+  background-color: purple;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+h2 {
+  text-align: center;
+}
+button:hover {
+  background-color: purple;
+}
+
+.tabular--wrapper {
+  background: #fff;
+  margin-top: 1rem;
+  border-radius: 10px;
+  padding: 2rem;
+}
+.table--container {
+  width: 100%;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead {
+  background: rgba(113, 99, 186, 255);
+  color: #fff;
+}
+th {
+  padding: 15px;
+  text-align: left;
+}
+tbody {
+  background: #f2f2f2;
+}
+td {
+  padding: 15px;
+  font-size: 14px;
+  color: #333;
+}
+tr:nth-child(even) {
+  background: #fff;
+}
+tfoot {
+  background: rgba(113, 99, 186, 255);
+  font-weight: bold;
+  color: #fff;
+}
+tfoot td {
+  padding: 15px;
+  color: #fff;
+}
+.table--container button {
+  color: green;
+  background: none;
+  cursor: pointer;
+}
+.b {
+  color: red;
+}
+
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+.section-title {
+  color: purple;
+  font-weight: bold;
+}
+.card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+.card:hover {
+  transform: translateY(-10px);
+}
+.btn-purple {
+  background-color: purple;
+  color: #fff;
+}
+.btn-purple:hover {
+  background-color: purple;
+}
+.smooth-animation {
+  transition: all 0.3s ease-in-out;
+}
+
+.feature-image {
+  margin: 0 auto;
+}
+
+.sidebar {
+  background-color: purple;
+  height: 100vh;
+  color: white;
+  padding-top: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+}
+.sidebar a {
+  color: #d1c4e9;
+  text-decoration: none;
+  padding: 10px 15px;
+  display: block;
+}
+.sidebar a:hover {
+  background-color: #4a148c;
+  color: white;
+}
