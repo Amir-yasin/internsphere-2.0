@@ -31,6 +31,7 @@
             <th>user name</th>
             <th>ICU director</th>
             <th>Email Address</th>
+            <th>Actions</th>
 
         </tr>
         {% for icu_lists in icu_list %}
@@ -38,9 +39,9 @@
             <td>{{ icu_lists.user.username }}</td>
             <td>{{ icu_lists.ICU_director }}</td>
             <td>{{ icu_lists.user.email }}</td>
-
-
-                {% comment %} <a href="{% url 'delete_student' student.id %}">Delete</a> {% endcomment %}
+            <td>
+                <a class="btn btn-purple" href="{% url 'delete_icu' icu_lists.id %}">Delete</a>
+            </td>        
         </tr>
         {% endfor %}
     </table>

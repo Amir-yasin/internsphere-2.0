@@ -170,8 +170,9 @@
 
             <div class="card--header">
               <span class="title">Student</span>
-              <span class="ammount-value" id="student-card-value">0</span>
-            </div>
+              <span class="ammount-value" id="student-card-value">
+                {{ user_counts.students }}
+            </span>            </div>
           </div>
           <!-- Card 2 -->
           <div class="payment--card light-purple" id="card-2">
@@ -181,7 +182,7 @@
 
             <div class="card--header">
               <span class="title">Internship Unit</span>
-              <span class="ammount-value" id="internship-card-value">0</span>
+              <span class="ammount-value" id="internship-card-value">{{ user_counts.internship_offices }}</span>
             </div>
           </div>
           <!-- Card 3 -->
@@ -192,8 +193,9 @@
 
             <div class="card--header">
               <span class="title">Department</span>
-              <span class="ammount-value" id="department-card-value">0</span>
-            </div>
+              <span class="ammount-value" id="department-card-value">
+                {{ user_counts.departments }}
+            </span>            </div>
           </div>
           <!-- Card 4 -->
           <div class="payment--card light-purple" id="card-4">
@@ -202,9 +204,10 @@
             </div>
 
             <div class="card--header">
-              <span class="title">Advisor</span>
-              <span class="ammount-value" id="advisor-card-value">0</span>
-            </div>
+              <span class="title">Supervisor</span>
+              <span class="ammount-value" id="advisor-card-value">
+                {{ user_counts.supervisors }}
+            </span>            </div>
           </div>
           <!-- Card 5 -->
           <div class="payment--card light-purple" id="card-1">
@@ -214,8 +217,9 @@
 
             <div class="card--header">
               <span class="title">Company</span>
-              <span class="ammount-value" id="company-card-value">0</span>
-            </div>
+              <span class="ammount-value" id="company-card-value">
+                {{ user_counts.companies }}
+            </span>            </div>
           </div>
         </div>
           <!-- Features Section -->

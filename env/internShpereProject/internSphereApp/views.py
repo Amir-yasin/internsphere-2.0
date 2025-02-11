@@ -890,10 +890,22 @@ def bulk_approve_evaluations(request):
 # Admin Views
 @login_required
 def admin_dashboard(request):
-    if request.user.is_superuser == False:
+    if not request.user.is_superuser:
         return redirect('home')
-    elif request.user.is_superuser or request.user.user_type == 'Admin':
-        return render(request, 'admin_pages/admin_dashboard.html', {'current_page': 'admin_dashboard'})
+
+    user_counts = {
+        'students': CustomUser.objects.filter(user_type='Student').count(),
+        'companies': CustomUser.objects.filter(user_type='Company').count(),
+        'departments': CustomUser.objects.filter(user_type='Department').count(),
+        'internship_offices': CustomUser.objects.filter(user_type='InternshipCareerOffice').count(),
+        'supervisors': CustomUser.objects.filter(user_type='Supervisor').count(),
+        'admins': CustomUser.objects.filter(user_type='Admin' or is_superuser).count(),
+    }
+
+    return render(request, 'admin_pages/admin_dashboard.html', {
+        'user_counts': user_counts,
+        'current_page': 'admin_dashboard'
+    })
     
 
 
@@ -963,7 +975,29 @@ def student_list(request):
 def delete_student(request, student_id):
     student = get_object_or_404(stud_profile, id=student_id)
     student.user.delete()  
+    messages.success(request, f"{student.user.first_name} {student.user.last_name} has been deleted.")
     return redirect('student_list')
+
+
+def delete_icu(request, InternshipCareerOffice_id):
+    icu = get_object_or_404(InternshipCareerOffice, id=InternshipCareerOffice_id)
+    icu.delete()  
+    messages.success(request, f"{icu.ICU_director} has been deleted.")
+    return redirect('icu_list')
+
+
+def delete_department(request, department_id):
+    department = get_object_or_404(Department, id=department_id)  
+    department.delete()  
+    messages.success(request, f"{department.department_head} has been deleted.")
+    return redirect('department_list')
+
+
+def delete_supervisor(request, supervisor_id):
+    supervisor = get_object_or_404(Supervisor, id=supervisor_id)
+    supervisor.delete()  
+    messages.success(request, f"{supervisor.supervisor_name} has been deleted.")
+    return redirect('supervisor_list')
 
 @login_required
 def approve_companies(request):

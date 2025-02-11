@@ -31,6 +31,7 @@
             <th>user name</th>
             <th>supervisor name</th>
             <th>department name</th>
+            <th>Actions</th>
 
         </tr>
         {% for supervisor in supervisors %}
@@ -38,7 +39,9 @@
             <td>{{ supervisor.user.username }}</td>
             <td>{{ supervisor.supervisor_name }}</td>
             <td>{{ supervisor.department.department_name }}</td>
-
+            <td>
+                <a class="btn btn-purple" href="{% url 'delete_supervisor' supervisor.id %}">Delete</a>
+            </td>
 
                 {% comment %} <a href="{% url 'delete_student' student.id %}">Delete</a> {% endcomment %}
         </tr>

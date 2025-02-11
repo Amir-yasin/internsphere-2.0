@@ -31,6 +31,7 @@
             <th>user name</th>
             <th>department head</th>
             <th>department name</th>
+            <th>Actions</th>
 
         </tr>
         {% for department in departments %}
@@ -38,6 +39,9 @@
             <td>{{ department.user.username }}</td>
             <td>{{ department.department_head }}</td>
             <td>{{ department.department_name }}</td>
+            <td>
+                <a class="btn btn-purple" href="{% url 'delete_department' department.id %}">Delete</a>
+            </td>
 
 
         </tr>
