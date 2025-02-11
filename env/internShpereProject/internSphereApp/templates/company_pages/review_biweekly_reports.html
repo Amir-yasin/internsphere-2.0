@@ -119,7 +119,7 @@
                                                 </form>
                                                 <form method="post" action="{% url 'approve_evaluation' evaluation.id 'reject' %}" style="display:inline;">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                    {% comment %} <button type="submit" class="btn btn-danger btn-sm">Reject</button> {% endcomment %}
                                                 </form>
                                             {% endfor %}
                                         {% else %}
